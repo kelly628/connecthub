@@ -593,6 +593,7 @@ export default function App() {
             onSelectProject={id => { setSelectedId(id); setNavView('projects'); }}
             onSelectPerson={name => { setNavView('people'); setSelectedId(null); setSelectedPerson(name); }}
             onOpenStickyNote={() => setShowStickyModal(true)}
+            onNavigate={view => { maybeDiscardDraft(); setNavView(view); setSelectedId(null); setShowForm(false); setEditingProject(null); setSelectedPerson(null); }}
           />
         ) : (
           <ProjectsView

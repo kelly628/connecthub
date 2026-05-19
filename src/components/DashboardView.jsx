@@ -25,15 +25,21 @@ function daysUntil(dateStr) {
 
 const PINK = '#c2336b';
 
-function StatCard({ label, value, sub, accent, highlight = false }) {
+function StatCard({ label, value, sub, accent, highlight = false, onClick }) {
   return (
-    <div style={{
-      background: highlight ? 'rgba(194,51,107,0.06)' : 'var(--surface)',
-      border: `1.5px solid ${highlight ? 'rgba(194,51,107,0.35)' : 'var(--border)'}`,
-      borderRadius: 14, padding: '20px 24px', flex: 1, minWidth: 140,
-      position: 'relative', overflow: 'hidden',
-      transition: 'border-color 0.2s, background 0.2s',
-    }}>
+    <div
+      onClick={onClick}
+      style={{
+        background: highlight ? 'rgba(194,51,107,0.06)' : 'var(--surface)',
+        border: `1.5px solid ${highlight ? 'rgba(194,51,107,0.35)' : 'var(--border)'}`,
+        borderRadius: 14, padding: '20px 24px', flex: 1, minWidth: 140,
+        position: 'relative', overflow: 'hidden',
+        transition: 'border-color 0.2s, background 0.2s, box-shadow 0.15s',
+        cursor: onClick ? 'pointer' : 'default',
+      }}
+      onMouseOver={e => { if (onClick) e.currentTarget.style.boxShadow = '0 4px 16px rgba(13,23,48,0.1)'; }}
+      onMouseOut={e => { e.currentTarget.style.boxShadow = 'none'; }}
+    >
       <div style={{ fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: highlight ? PINK : 'var(--muted)', marginBottom: 8 }}>{label}</div>
       <div style={{ fontFamily: 'Commune, serif', fontSize: 36, fontWeight: 700, color: highlight ? PINK : (accent || 'var(--blue)'), lineHeight: 1 }}>{value}</div>
       {sub && <div style={{ fontSize: 11, color: highlight ? 'rgba(194,51,107,0.7)' : 'var(--muted)', marginTop: 6, fontFamily: 'Barlow Condensed, sans-serif' }}>{sub}</div>}
@@ -128,7 +134,7 @@ function EventRow({ project, onSelect, onSelectPerson }) {
   );
 }
 
-export default function DashboardView({ projects, team, onSelectProject, onSelectPerson, onOpenStickyNote, isAdmin = false }) {
+export default function DashboardView({ projects, team, onSelectProject, onSelectPerson, onOpenStickyNote, isAdmin = false, onNavigate }) {
   const now = new Date();
 
   // Sort projects by date
@@ -233,21 +239,23 @@ export default function DashboardView({ projects, team, onSelectProject, onSelec
 
       {/* Stat cards */}
       <div style={{ display: 'flex', gap: 14, marginBottom: 32, flexWrap: 'wrap' }}>
-        <StatCard label="Upcoming Projects" value={upcoming.length} sub={`${past.length} past`} />
+        <StatCard label="Upcoming Projects" value={upcoming.length} sub={`${past.length} past`} onClick={() => onNavigate?.('projects')} />
         <StatCard
           label="Pending Approvals"
           value={pendingApprovals}
           sub={pendingApprovals === 0 ? 'All clear!' : `${projects.filter(p => p.blessed).length} approved`}
           accent={pendingApprovals > 0 ? 'var(--blue)' : 'var(--green)'}
           highlight={isAdmin && pendingApprovals > 0}
+          onClick={() => onNavigate?.('approvals')}
         />
         <StatCard
           label="Tasks Complete"
           value={`${taskPct}%`}
           sub={`${doneTasks} of ${totalTasks} done`}
           accent={taskPct === 100 ? 'var(--green)' : 'var(--blue)'}
+          onClick={() => onNavigate?.('tasks')}
         />
-        <StatCard label="Team Members" value={team.length} sub={`${memberStats.length} with tasks`} />
+        <StatCard label="Team Members" value={team.length} sub={`${memberStats.length} with tasks`} onClick={() => onNavigate?.('people')} />
       </div>
 
       <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 28, alignItems: 'start' }}>
