@@ -677,8 +677,8 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
         </div>
 
         <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-          {/* Connect the Dots — admin submits for review */}
-          {isAdmin && !project.submitted && !project.blessed && (
+          {/* Connect the Dots — staff submits for review */}
+          {!project.submitted && !project.blessed && (
             <button
               onClick={handleConnectTheDots}
               disabled={isConnecting}
