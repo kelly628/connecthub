@@ -1181,7 +1181,7 @@ a { color: inherit; text-decoration: none; }
   0%, 100% { transform: translateX(0); }
   50% { transform: translateX(5px); }
 }
-.bounce-arrow { animation: bounce-arrow 1.2s ease-in-out infinite; }
+.bounce-arrow { animation: bounce-arrow 2.2s ease-in-out infinite; }
 
 /* ── Mobile ─────────────────────────────────── */
 @media (max-width: 768px) {
