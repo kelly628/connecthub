@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Network, Plus, Users, ListChecks, BadgeCheck, X, LayoutDashboard, Lock, Unlock } from 'lucide-react';
+import { Network, Plus, Users, ListChecks, BadgeCheck, X, LayoutDashboard, Lock, Unlock, UserCircle } from 'lucide-react';
 import { load, save, loadTeam, saveTeam } from './data/store';
 import ProjectsView from './components/ProjectsView';
 import ProjectDetail from './components/ProjectDetail';
@@ -11,6 +11,48 @@ import ApprovalsView from './components/ApprovalsView';
 import DashboardView from './components/DashboardView';
 
 const ADMIN_PIN = '1234';
+
+function UserPickerModal({ team, onSelect }) {
+  const [selected, setSelected] = useState('');
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'rgba(13,23,48,0.55)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(6px)' }}>
+      <div style={{ background: '#fff', borderRadius: 14, width: 320, overflow: 'hidden', boxShadow: '0 24px 64px rgba(13,23,48,0.22)' }}>
+        <div style={{ height: 3, background: 'var(--yellow)' }} />
+        <div style={{ padding: '24px' }}>
+          <div style={{ fontFamily: 'Commune, serif', fontSize: 22, fontWeight: 700, color: 'var(--blue)', marginBottom: 4 }}>Who are you?</div>
+          <div style={{ fontSize: 12, color: 'var(--muted)', fontFamily: 'Barlow Condensed, sans-serif', marginBottom: 18, lineHeight: 1.5 }}>
+            Select your name to get started. You'll only be able to check off your own tasks.
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 260, overflowY: 'auto', marginBottom: 16 }}>
+            {team.map(m => (
+              <button
+                key={m.id}
+                onClick={() => setSelected(m.name)}
+                style={{
+                  textAlign: 'left', padding: '10px 14px', borderRadius: 8, cursor: 'pointer',
+                  fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: 14,
+                  background: selected === m.name ? 'var(--blue)' : 'var(--cream)',
+                  color: selected === m.name ? '#fff' : 'var(--text)',
+                  border: `1.5px solid ${selected === m.name ? 'var(--blue)' : 'transparent'}`,
+                  transition: 'all 0.12s',
+                }}
+              >
+                {m.name}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => selected && onSelect(selected)}
+            disabled={!selected}
+            style={{ width: '100%', padding: '11px', background: selected ? 'var(--yellow)' : 'var(--cream-dk)', border: 'none', borderRadius: 8, cursor: selected ? 'pointer' : 'not-allowed', fontSize: 12, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: selected ? 'var(--blue)' : 'var(--muted)' }}
+          >
+            Continue
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function PinModal({ onUnlock, onClose }) {
   const [pin, setPin] = useState('');
@@ -181,6 +223,7 @@ export default function App() {
   const [toast, setToast] = useState(null);
   const [isAdmin, setIsAdmin] = useState(() => localStorage.getItem('ctd_is_admin') === 'true');
   const [showPinModal, setShowPinModal] = useState(false);
+  const [currentUser, setCurrentUser] = useState(() => localStorage.getItem('ctd_current_user') || '');
 
   function handleUnlock() {
     setIsAdmin(true);
@@ -190,6 +233,14 @@ export default function App() {
   function handleLock() {
     setIsAdmin(false);
     localStorage.removeItem('ctd_is_admin');
+  }
+  function handleSelectUser(name) {
+    setCurrentUser(name);
+    localStorage.setItem('ctd_current_user', name);
+  }
+  function handleSwitchUser() {
+    setCurrentUser('');
+    localStorage.removeItem('ctd_current_user');
   }
 
   function showToast(msg) {
@@ -386,9 +437,9 @@ export default function App() {
           onClick={goToApprovals}
           style={{ position: 'relative' }}
         >
-          <BadgeCheck size={16} />
+          <BadgeCheck size={16} style={{ color: isAdmin ? 'var(--yellow)' : 'currentColor' }} />
           Approvals
-          {pendingCount > 0 && (
+          {isAdmin && pendingCount > 0 && (
             <span style={{
               marginLeft: 'auto',
               background: '#F5C800', color: '#5a3e00',
@@ -425,6 +476,16 @@ export default function App() {
         </button>
 
         <CountdownWidget events={upcomingEvents} />
+
+        {!isAdmin && currentUser && (
+          <div className="sidebar-user-display" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', color: 'rgba(255,255,255,0.5)', fontFamily: 'Barlow Condensed, sans-serif', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <UserCircle size={13} strokeWidth={2} />
+            <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{currentUser}</span>
+            <button onClick={handleSwitchUser} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: 0, flexShrink: 0 }}>
+              Switch
+            </button>
+          </div>
+        )}
 
         <div style={{ marginTop: 'auto', paddingTop: 12 }}>
           {isAdmin ? (
@@ -463,6 +524,7 @@ export default function App() {
             projects={projects}
             team={team}
             isAdmin={isAdmin}
+            currentUser={currentUser}
             onUpdateDots={dots => setDraftProject(p => ({ ...p, dots }))}
             onUpdateProject={handleUpdateDraft}
             onEdit={() => {}}
@@ -477,6 +539,7 @@ export default function App() {
             projects={projects}
             team={team}
             isAdmin={isAdmin}
+            currentUser={currentUser}
             onUpdateDots={dots => handleUpdateDots(selected.id, dots)}
             onUpdateProject={handleUpdateProject}
             onEdit={() => { setEditingProject(selected); setShowForm(true); }}
@@ -490,6 +553,8 @@ export default function App() {
             name={selectedPerson}
             projects={projects}
             team={team}
+            isAdmin={isAdmin}
+            currentUser={currentUser}
             onBack={() => setSelectedPerson(null)}
             onOpenStickyNote={() => setShowStickyModal(true)}
             onToggleTask={handleToggleTask}
@@ -499,6 +564,8 @@ export default function App() {
             team={team}
             projects={projects}
             onSaveTeam={persistTeam}
+            isAdmin={isAdmin}
+            currentUser={currentUser}
             onToggleTask={handleToggleTask}
             onSelectPerson={name => setSelectedPerson(name)}
             onOpenStickyNote={() => setShowStickyModal(true)}
@@ -573,6 +640,10 @@ export default function App() {
           onUnlock={handleUnlock}
           onClose={() => setShowPinModal(false)}
         />
+      )}
+
+      {!isAdmin && !currentUser && team.length > 0 && (
+        <UserPickerModal team={team} onSelect={handleSelectUser} />
       )}
     </div>
   );

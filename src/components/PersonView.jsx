@@ -17,7 +17,7 @@ function daysUntil(dateStr) {
   return Math.ceil((new Date(dateStr) - new Date()) / 86400000);
 }
 
-export default function PersonView({ name, projects, team = [], onBack, onToggleTask }) {
+export default function PersonView({ name, projects, team = [], onBack, onToggleTask, isAdmin = false, currentUser = '' }) {
   // All assignments for this person, sorted by date
   const assignments = [];
   projects.forEach(project => {
@@ -89,20 +89,23 @@ export default function PersonView({ name, projects, team = [], onBack, onToggle
             if (tasks.length === 0) return <em style={{ fontSize: 12, color: 'var(--muted)' }}>No tasks listed yet.</em>;
             return (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                {tasks.map((task, i) => (
-                  <label key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, cursor: a.blessed ? 'pointer' : 'default', opacity: a.blessed ? 1 : 0.5 }}>
+                {(() => {
+                    const canToggle = a.blessed && (isAdmin || currentUser.trim().toLowerCase() === name.trim().toLowerCase());
+                    return tasks.map((task, i) => (
+                  <label key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, cursor: canToggle ? 'pointer' : 'default', opacity: a.blessed ? 1 : 0.5 }}>
                     <input
                       type="checkbox"
                       checked={task.done}
-                      disabled={!a.blessed}
-                      onChange={() => a.blessed && onToggleTask?.(a.projectId, a.dotIdx, i)}
-                      style={{ marginTop: 2, accentColor: 'var(--green)', flexShrink: 0, cursor: a.blessed ? 'pointer' : 'default' }}
+                      disabled={!canToggle}
+                      onChange={() => canToggle && onToggleTask?.(a.projectId, a.dotIdx, i)}
+                      style={{ marginTop: 2, accentColor: 'var(--green)', flexShrink: 0, cursor: canToggle ? 'pointer' : 'default' }}
                     />
                     <span style={{ fontSize: 13, color: task.done ? 'var(--muted)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none', lineHeight: 1.5, transition: 'all 0.15s' }}>
                       {task.text}
                     </span>
                   </label>
-                ))}
+                ));
+                  })()}
               </div>
             );
           })()}

@@ -143,10 +143,11 @@ const DOT_PRIORITY = [
   [2, 2], // bot-center
 ];
 
-function DotCell({ dot, onEdit, onToggleDone, blessed = false, animClass = '', animDelay = '0ms', accentColor = null }) {
+function DotCell({ dot, onEdit, onToggleDone, blessed = false, isAdmin = false, currentUser = '', animClass = '', animDelay = '0ms', accentColor = null }) {
   const tasks = normalizeTasks(dot.responsibilities);
   const isEmpty = !dot.member?.trim();
   const noTasks = !isEmpty && tasks.length === 0;
+  const canToggle = blessed && (isAdmin || dot.member?.trim().toLowerCase() === currentUser.trim().toLowerCase());
 
   return (
     <div
@@ -172,13 +173,13 @@ function DotCell({ dot, onEdit, onToggleDone, blessed = false, animClass = '', a
             {tasks.length === 0 ? (
               <span style={{ fontSize: 11, color: 'var(--muted)', fontStyle: 'italic' }}>No tasks yet</span>
             ) : tasks.map((task, i) => (
-              <label key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, cursor: blessed ? 'pointer' : 'default', opacity: blessed ? 1 : 0.5 }} onClick={e => e.stopPropagation()}>
+              <label key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, cursor: canToggle ? 'pointer' : 'default', opacity: blessed ? 1 : 0.5 }} onClick={e => e.stopPropagation()}>
                 <input
                   type="checkbox"
                   checked={task.done}
-                  disabled={!blessed}
-                  onChange={() => blessed && onToggleDone(i)}
-                  style={{ marginTop: 2, accentColor: 'var(--green)', flexShrink: 0, cursor: blessed ? 'pointer' : 'default' }}
+                  disabled={!canToggle}
+                  onChange={() => canToggle && onToggleDone(i)}
+                  style={{ marginTop: 2, accentColor: 'var(--green)', flexShrink: 0, cursor: canToggle ? 'pointer' : 'default' }}
                 />
                 <span style={{ fontSize: 11, color: task.done ? 'var(--muted)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none', lineHeight: 1.4 }}>
                   {task.text}
@@ -439,7 +440,7 @@ function DoneNotesStack({ notes }) {
   );
 }
 
-export default function ProjectDetail({ project, projects = [], team = [], onUpdateDots, onUpdateProject, onEdit, onDelete, onDuplicate, onBack, onSelectPerson, isNew = false, isAdmin = false }) {
+export default function ProjectDetail({ project, projects = [], team = [], onUpdateDots, onUpdateProject, onEdit, onDelete, onDuplicate, onBack, onSelectPerson, isNew = false, isAdmin = false, currentUser = '' }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [editingDotIndex, setEditingDotIndex] = useState(null);
   const [hubHover, setHubHover] = useState(false);
@@ -917,6 +918,8 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
                 onEdit={() => setEditingDotIndex(cell.index)}
                 onToggleDone={taskIdx => handleToggleDone(cell.index, taskIdx)}
                 blessed={!!project.blessed}
+                isAdmin={isAdmin}
+                currentUser={currentUser}
                 animClass={isConnecting ? 'ctd-dot-animate' : ''}
                 animDelay={isConnecting ? `${150 + Math.floor(cell.index / 4) * 150}ms` : '0ms'}
                 accentColor={accentColor}

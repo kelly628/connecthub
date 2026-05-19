@@ -41,7 +41,7 @@ function memberStats(member, projects) {
 }
 
 
-function BinderInterior({ member, projects, color, onClose, onToggleTask }) {
+function BinderInterior({ member, projects, color, onClose, onToggleTask, isAdmin = false, currentUser = '' }) {
   const lname = member.name.trim().toLowerCase();
   const memberProjects = projects
     .filter(p => (p.dots || []).some(d =>
@@ -237,11 +237,13 @@ function BinderInterior({ member, projects, color, onClose, onToggleTask }) {
                     {activeTasks.length === 0 ? (
                       <div style={{ paddingTop: 20, color: '#ccc', fontFamily: 'Barlow Condensed, sans-serif', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.08em' }}>No tasks for this project</div>
                     ) : (
-                      activeTasks.map(({ task, dotIdx, taskIdx }, i) => (
+                      activeTasks.map(({ task, dotIdx, taskIdx }, i) => {
+                        const canToggle = activeProject.blessed && (isAdmin || currentUser.trim().toLowerCase() === member.name.trim().toLowerCase());
+                        return (
                         <div
                           key={i}
-                          onClick={() => activeProject.blessed && onToggleTask?.(activeProject.id, dotIdx, taskIdx)}
-                          style={{ display: 'flex', alignItems: 'center', gap: 12, height: 28, cursor: activeProject.blessed ? 'pointer' : 'default', opacity: activeProject.blessed ? 1 : 0.5 }}
+                          onClick={() => canToggle && onToggleTask?.(activeProject.id, dotIdx, taskIdx)}
+                          style={{ display: 'flex', alignItems: 'center', gap: 12, height: 28, cursor: canToggle ? 'pointer' : 'default', opacity: activeProject.blessed ? 1 : 0.5 }}
                         >
                           <div style={{ width: 15, height: 15, borderRadius: 4, flexShrink: 0, background: task.done ? tabColor : 'transparent', border: `2px solid ${task.done ? tabColor : '#ddd'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
                             {task.done && <svg width="9" height="9" viewBox="0 0 9 9"><polyline points="1.5,4.5 3.5,6.5 7.5,2" stroke="#fff" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>}
@@ -250,7 +252,8 @@ function BinderInterior({ member, projects, color, onClose, onToggleTask }) {
                             {task.text}
                           </span>
                         </div>
-                      ))
+                        );
+                      })
                     )}
                   </div>
                 )}
@@ -492,7 +495,7 @@ function MemberForm({ initial, onSave, onCancel }) {
   );
 }
 
-export default function PeopleView({ team, projects, onSaveTeam, onSelectPerson, onOpenStickyNote, onToggleTask }) {
+export default function PeopleView({ team, projects, onSaveTeam, onSelectPerson, onOpenStickyNote, onToggleTask, isAdmin = false, currentUser = '' }) {
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [viewMode, setViewMode] = useState('list');
@@ -558,6 +561,8 @@ export default function PeopleView({ team, projects, onSaveTeam, onSelectPerson,
               color={BINDER_COLORS[sortedTeam.findIndex(m => m.id === binderOpen.id) % BINDER_COLORS.length]}
               onClose={() => setBinderOpen(null)}
               onToggleTask={onToggleTask}
+              isAdmin={isAdmin}
+              currentUser={currentUser}
             />
           )}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 28, padding: '8px 4px 32px' }}>

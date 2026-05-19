@@ -1257,6 +1257,9 @@ a { color: inherit; text-decoration: none; }
   /* Hide New Project button from bottom nav */
   .sidebar-new-btn { display: none !important; }
 
+  /* Hide user display in bottom nav (too cramped) */
+  .sidebar-user-display { display: none !important; }
+
   /* Dashboard / Approvals: collapse two-column grids */
   .dashboard-grid { grid-template-columns: 1fr !important; }
   .approvals-grid { grid-template-columns: 1fr !important; }
