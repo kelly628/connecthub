@@ -1177,6 +1177,12 @@ a { color: inherit; text-decoration: none; }
 /* FAB hidden on desktop */
 .mobile-fab { display: none; }
 
+@keyframes bounce-arrow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(5px); }
+}
+.bounce-arrow { animation: bounce-arrow 1.2s ease-in-out infinite; }
+
 /* ── Mobile ─────────────────────────────────── */
 @media (max-width: 768px) {
   html, body, #root { height: auto; }

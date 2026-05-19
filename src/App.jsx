@@ -589,6 +589,7 @@ export default function App() {
           <DashboardView
             projects={projects}
             team={team}
+            isAdmin={isAdmin}
             onSelectProject={id => { setSelectedId(id); setNavView('projects'); }}
             onSelectPerson={name => { setNavView('people'); setSelectedId(null); setSelectedPerson(name); }}
             onOpenStickyNote={() => setShowStickyModal(true)}

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { CheckCircle2, Clock, ArrowRight, TrendingUp, GraduationCap, BookOpen, Apple, Pencil, Heart, HandHeart, Users, Globe, Music, Palette, Baby, Camera, Trophy, Award, Ribbon, Star, Sparkles, PartyPopper, Gift, Martini, Leaf, Sun, Handshake, Crown, Calendar } from 'lucide-react';
+import { CheckCircle2, Clock, ArrowRight, TrendingUp, GraduationCap, BookOpen, Apple, Pencil, Heart, HandHeart, Users, Globe, Music, Palette, Baby, Camera, Trophy, Award, Ribbon, Star, Sparkles, PartyPopper, Gift, Martini, Leaf, Sun, Handshake, Crown, Calendar, ChevronDown } from 'lucide-react';
 import LogoMark from './LogoMark';
 
 const ICON_MAP = { GraduationCap, BookOpen, Apple, Pencil, Heart, HandHeart, Users, Globe, Music, Palette, Baby, Camera, Trophy, Award, Ribbon, Star, Sparkles, PartyPopper, Gift, Martini, Leaf, Sun, Handshake, Crown };
@@ -23,15 +23,25 @@ function daysUntil(dateStr) {
   return Math.ceil((new Date(dateStr) - new Date()) / 86400000);
 }
 
-function StatCard({ label, value, sub, accent }) {
+const PINK = '#c2336b';
+
+function StatCard({ label, value, sub, accent, highlight = false }) {
   return (
     <div style={{
-      background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14,
-      padding: '20px 24px', flex: 1, minWidth: 140,
+      background: highlight ? 'rgba(194,51,107,0.06)' : 'var(--surface)',
+      border: `1.5px solid ${highlight ? 'rgba(194,51,107,0.35)' : 'var(--border)'}`,
+      borderRadius: 14, padding: '20px 24px', flex: 1, minWidth: 140,
+      position: 'relative', overflow: 'hidden',
+      transition: 'border-color 0.2s, background 0.2s',
     }}>
-      <div style={{ fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)', marginBottom: 8 }}>{label}</div>
-      <div style={{ fontFamily: 'Commune, serif', fontSize: 36, fontWeight: 700, color: accent || 'var(--blue)', lineHeight: 1 }}>{value}</div>
-      {sub && <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 6, fontFamily: 'Barlow Condensed, sans-serif' }}>{sub}</div>}
+      <div style={{ fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: highlight ? PINK : 'var(--muted)', marginBottom: 8 }}>{label}</div>
+      <div style={{ fontFamily: 'Commune, serif', fontSize: 36, fontWeight: 700, color: highlight ? PINK : (accent || 'var(--blue)'), lineHeight: 1 }}>{value}</div>
+      {sub && <div style={{ fontSize: 11, color: highlight ? 'rgba(194,51,107,0.7)' : 'var(--muted)', marginTop: 6, fontFamily: 'Barlow Condensed, sans-serif' }}>{sub}</div>}
+      {highlight && (
+        <div style={{ position: 'absolute', bottom: 10, right: 14, color: PINK, opacity: 0.7 }} className="bounce-arrow">
+          <ChevronDown size={18} strokeWidth={2.5} />
+        </div>
+      )}
     </div>
   );
 }
@@ -118,7 +128,7 @@ function EventRow({ project, onSelect, onSelectPerson }) {
   );
 }
 
-export default function DashboardView({ projects, team, onSelectProject, onSelectPerson, onOpenStickyNote }) {
+export default function DashboardView({ projects, team, onSelectProject, onSelectPerson, onOpenStickyNote, isAdmin = false }) {
   const now = new Date();
 
   // Sort projects by date
@@ -229,6 +239,7 @@ export default function DashboardView({ projects, team, onSelectProject, onSelec
           value={pendingApprovals}
           sub={pendingApprovals === 0 ? 'All clear!' : `${projects.filter(p => p.blessed).length} approved`}
           accent={pendingApprovals > 0 ? 'var(--blue)' : 'var(--green)'}
+          highlight={isAdmin && pendingApprovals > 0}
         />
         <StatCard
           label="Tasks Complete"
