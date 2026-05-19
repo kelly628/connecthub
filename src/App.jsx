@@ -475,7 +475,6 @@ export default function App() {
           <Plus size={20} />
         </button>
 
-        <CountdownWidget events={upcomingEvents} />
 
         {!isAdmin && currentUser && (
           <div className="sidebar-user-display" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', color: 'rgba(255,255,255,0.5)', fontFamily: 'Barlow Condensed, sans-serif', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
