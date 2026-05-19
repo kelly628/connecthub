@@ -143,7 +143,7 @@ const DOT_PRIORITY = [
   [2, 2], // bot-center
 ];
 
-function DotCell({ dot, onEdit, onToggleDone, animClass = '', animDelay = '0ms', accentColor = null }) {
+function DotCell({ dot, onEdit, onToggleDone, blessed = false, animClass = '', animDelay = '0ms', accentColor = null }) {
   const tasks = normalizeTasks(dot.responsibilities);
   const isEmpty = !dot.member?.trim();
   const noTasks = !isEmpty && tasks.length === 0;
@@ -172,12 +172,13 @@ function DotCell({ dot, onEdit, onToggleDone, animClass = '', animDelay = '0ms',
             {tasks.length === 0 ? (
               <span style={{ fontSize: 11, color: 'var(--muted)', fontStyle: 'italic' }}>No tasks yet</span>
             ) : tasks.map((task, i) => (
-              <label key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, cursor: 'pointer' }} onClick={e => e.stopPropagation()}>
+              <label key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, cursor: blessed ? 'pointer' : 'default', opacity: blessed ? 1 : 0.5 }} onClick={e => e.stopPropagation()}>
                 <input
                   type="checkbox"
                   checked={task.done}
-                  onChange={() => onToggleDone(i)}
-                  style={{ marginTop: 2, accentColor: 'var(--green)', flexShrink: 0, cursor: 'pointer' }}
+                  disabled={!blessed}
+                  onChange={() => blessed && onToggleDone(i)}
+                  style={{ marginTop: 2, accentColor: 'var(--green)', flexShrink: 0, cursor: blessed ? 'pointer' : 'default' }}
                 />
                 <span style={{ fontSize: 11, color: task.done ? 'var(--muted)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none', lineHeight: 1.4 }}>
                   {task.text}
@@ -915,6 +916,7 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
                 dot={project.dots[cell.index] || { member: '', responsibilities: [] }}
                 onEdit={() => setEditingDotIndex(cell.index)}
                 onToggleDone={taskIdx => handleToggleDone(cell.index, taskIdx)}
+                blessed={!!project.blessed}
                 animClass={isConnecting ? 'ctd-dot-animate' : ''}
                 animDelay={isConnecting ? `${150 + Math.floor(cell.index / 4) * 150}ms` : '0ms'}
                 accentColor={accentColor}

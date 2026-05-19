@@ -240,8 +240,8 @@ function BinderInterior({ member, projects, color, onClose, onToggleTask }) {
                       activeTasks.map(({ task, dotIdx, taskIdx }, i) => (
                         <div
                           key={i}
-                          onClick={() => onToggleTask?.(activeProject.id, dotIdx, taskIdx)}
-                          style={{ display: 'flex', alignItems: 'center', gap: 12, height: 28, cursor: 'pointer' }}
+                          onClick={() => activeProject.blessed && onToggleTask?.(activeProject.id, dotIdx, taskIdx)}
+                          style={{ display: 'flex', alignItems: 'center', gap: 12, height: 28, cursor: activeProject.blessed ? 'pointer' : 'default', opacity: activeProject.blessed ? 1 : 0.5 }}
                         >
                           <div style={{ width: 15, height: 15, borderRadius: 4, flexShrink: 0, background: task.done ? tabColor : 'transparent', border: `2px solid ${task.done ? tabColor : '#ddd'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
                             {task.done && <svg width="9" height="9" viewBox="0 0 9 9"><polyline points="1.5,4.5 3.5,6.5 7.5,2" stroke="#fff" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>}

@@ -90,12 +90,13 @@ export default function PersonView({ name, projects, team = [], onBack, onToggle
             return (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                 {tasks.map((task, i) => (
-                  <label key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, cursor: 'pointer' }}>
+                  <label key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, cursor: a.blessed ? 'pointer' : 'default', opacity: a.blessed ? 1 : 0.5 }}>
                     <input
                       type="checkbox"
                       checked={task.done}
-                      onChange={() => onToggleTask?.(a.projectId, a.dotIdx, i)}
-                      style={{ marginTop: 2, accentColor: 'var(--green)', flexShrink: 0, cursor: 'pointer' }}
+                      disabled={!a.blessed}
+                      onChange={() => a.blessed && onToggleTask?.(a.projectId, a.dotIdx, i)}
+                      style={{ marginTop: 2, accentColor: 'var(--green)', flexShrink: 0, cursor: a.blessed ? 'pointer' : 'default' }}
                     />
                     <span style={{ fontSize: 13, color: task.done ? 'var(--muted)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none', lineHeight: 1.5, transition: 'all 0.15s' }}>
                       {task.text}
