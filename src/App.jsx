@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Network, Plus, Users, ListChecks, BadgeCheck, X, LayoutDashboard } from 'lucide-react';
+import { Network, Plus, Users, ListChecks, BadgeCheck, X, LayoutDashboard, Lock, Unlock } from 'lucide-react';
 import { load, save, loadTeam, saveTeam } from './data/store';
 import ProjectsView from './components/ProjectsView';
 import ProjectDetail from './components/ProjectDetail';
@@ -9,6 +9,64 @@ import PersonView from './components/PersonView';
 import TasksView from './components/TasksView';
 import ApprovalsView from './components/ApprovalsView';
 import DashboardView from './components/DashboardView';
+
+const ADMIN_PIN = '1234';
+
+function PinModal({ onUnlock, onClose }) {
+  const [pin, setPin] = useState('');
+  const [error, setError] = useState(false);
+
+  function handleSubmit() {
+    if (pin === ADMIN_PIN) {
+      onUnlock();
+    } else {
+      setError(true);
+      setPin('');
+    }
+  }
+
+  return (
+    <>
+      <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(13,23,48,0.28)', zIndex: 400, backdropFilter: 'blur(4px)' }} />
+      <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: '#fff', borderRadius: 14, zIndex: 401, width: 300, boxShadow: '0 24px 64px rgba(13,23,48,0.18), 0 2px 8px rgba(13,23,48,0.07)', overflow: 'hidden' }}>
+        <div style={{ height: 3, background: 'var(--blue)' }} />
+        <div style={{ padding: '24px 24px 20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
+            <Lock size={16} color="var(--blue)" strokeWidth={1.8} />
+            <div style={{ fontFamily: 'Commune, serif', fontSize: 20, fontWeight: 700, color: 'var(--blue)' }}>Admin Access</div>
+          </div>
+          <div style={{ fontSize: 12, color: 'var(--muted)', fontFamily: 'Barlow Condensed, sans-serif', marginBottom: 20, lineHeight: 1.5 }}>
+            Enter your PIN to unlock admin controls.
+          </div>
+          <input
+            type="password"
+            inputMode="numeric"
+            maxLength={4}
+            value={pin}
+            onChange={e => { setPin(e.target.value.replace(/\D/g, '')); setError(false); }}
+            onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+            autoFocus
+            placeholder="••••"
+            style={{ width: '100%', boxSizing: 'border-box', padding: '12px 14px', border: `1.5px solid ${error ? '#F5C800' : 'var(--border)'}`, borderRadius: 8, fontSize: 22, textAlign: 'center', fontFamily: 'monospace', letterSpacing: '0.3em', outline: 'none', marginBottom: error ? 8 : 16 }}
+          />
+          {error && (
+            <div style={{ fontSize: 11, color: '#b45309', fontFamily: 'Barlow Condensed, sans-serif', marginBottom: 16, textAlign: 'center' }}>
+              Incorrect PIN — try again.
+            </div>
+          )}
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={onClose} style={{ flex: 1, padding: '9px', background: 'none', border: '1px solid var(--border)', borderRadius: 8, cursor: 'pointer', fontSize: 11, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--muted)' }}>
+              Cancel
+            </button>
+            <button onClick={handleSubmit} style={{ flex: 2, padding: '9px 20px', background: 'var(--blue)', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 11, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#fff' }}>
+              Unlock
+            </button>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
 
 function StickyNoteModal({ projects, onSave, onClose }) {
   const [selectedProjectId, setSelectedProjectId] = useState(projects[0]?.id || '');
@@ -121,6 +179,18 @@ export default function App() {
   const [showStickyModal, setShowStickyModal] = useState(false);
   const [draftProject, setDraftProject] = useState(null);
   const [toast, setToast] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(() => localStorage.getItem('ctd_is_admin') === 'true');
+  const [showPinModal, setShowPinModal] = useState(false);
+
+  function handleUnlock() {
+    setIsAdmin(true);
+    localStorage.setItem('ctd_is_admin', 'true');
+    setShowPinModal(false);
+  }
+  function handleLock() {
+    setIsAdmin(false);
+    localStorage.removeItem('ctd_is_admin');
+  }
 
   function showToast(msg) {
     setToast(msg);
@@ -355,6 +425,27 @@ export default function App() {
         </button>
 
         <CountdownWidget events={upcomingEvents} />
+
+        <div style={{ marginTop: 'auto', paddingTop: 12 }}>
+          {isAdmin ? (
+            <button
+              onClick={handleLock}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: 'rgba(28,107,58,0.2)', border: '1px solid rgba(28,107,58,0.4)', borderRadius: 8, cursor: 'pointer', color: '#6ee0a0', fontFamily: 'Barlow Condensed, sans-serif', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}
+            >
+              <Unlock size={13} strokeWidth={2} />
+              Admin Mode
+              <span style={{ marginLeft: 'auto', opacity: 0.6, fontSize: 10 }}>Lock</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => setShowPinModal(true)}
+              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, cursor: 'pointer', color: 'rgba(255,255,255,0.35)', fontFamily: 'Barlow Condensed, sans-serif', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}
+            >
+              <Lock size={13} strokeWidth={2} />
+              Admin Login
+            </button>
+          )}
+        </div>
       </aside>
 
       <main className="main">
@@ -371,6 +462,7 @@ export default function App() {
             isNew={true}
             projects={projects}
             team={team}
+            isAdmin={isAdmin}
             onUpdateDots={dots => setDraftProject(p => ({ ...p, dots }))}
             onUpdateProject={handleUpdateDraft}
             onEdit={() => {}}
@@ -384,6 +476,7 @@ export default function App() {
             project={selected}
             projects={projects}
             team={team}
+            isAdmin={isAdmin}
             onUpdateDots={dots => handleUpdateDots(selected.id, dots)}
             onUpdateProject={handleUpdateProject}
             onEdit={() => { setEditingProject(selected); setShowForm(true); }}
@@ -420,6 +513,7 @@ export default function App() {
         ) : showApprovals ? (
           <ApprovalsView
             projects={projects}
+            isAdmin={isAdmin}
             onToggleBlessed={handleToggleBlessed}
             onSelect={id => { setSelectedId(id); setNavView('projects'); }}
             onOpenStickyNote={() => setShowStickyModal(true)}
@@ -471,6 +565,13 @@ export default function App() {
           projects={projects}
           onSave={handleAddNote}
           onClose={() => setShowStickyModal(false)}
+        />
+      )}
+
+      {showPinModal && (
+        <PinModal
+          onUnlock={handleUnlock}
+          onClose={() => setShowPinModal(false)}
         />
       )}
     </div>

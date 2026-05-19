@@ -12,7 +12,7 @@ function daysUntil(dateStr) {
   return Math.ceil((new Date(dateStr) - new Date()) / 86400000);
 }
 
-function ApprovalCard({ project, onToggle, onSelect, approved }) {
+function ApprovalCard({ project, onToggle, onSelect, approved, isAdmin = false }) {
   const days = daysUntil(project.date);
   let totalTasks = 0, doneTasks = 0;
   (project.dots || []).forEach(d => {
@@ -54,34 +54,39 @@ function ApprovalCard({ project, onToggle, onSelect, approved }) {
             {project.leads?.length > 0 && <span style={{ fontSize: 12, color: 'var(--muted)' }}>Lead: <strong style={{ color: 'var(--text)' }}>{Array.isArray(project.leads) ? project.leads.join(', ') : project.leads}</strong></span>}
           </div>
         </div>
-        <button
-          onClick={() => {
-            if (!approved) {
-              confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 }, colors: ['#1C6B3A', '#F5C800', '#0D1730'] });
-            }
-            onToggle();
-          }}
-          style={{
-            flexShrink: 0,
-            padding: '7px 14px',
-            borderRadius: 8,
-            border: `1.5px solid ${approved ? 'var(--border)' : 'var(--green)'}`,
-            background: approved ? 'transparent' : 'var(--green)',
-            color: approved ? 'var(--muted)' : '#fff',
-            fontSize: 11,
-            fontFamily: 'Barlow Condensed, sans-serif',
-            fontWeight: 700,
-            textTransform: 'uppercase',
-            letterSpacing: '0.06em',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 5,
-            transition: 'all 0.15s',
-          }}
-        >
-          {approved ? 'Revoke' : <><CheckCircle2 size={12} /> Approve</>}
-        </button>
+        {isAdmin ? (
+          <button
+            onClick={() => {
+              if (!approved) {
+                confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 }, colors: ['#1C6B3A', '#F5C800', '#0D1730'] });
+              }
+              onToggle();
+            }}
+            style={{
+              flexShrink: 0, padding: '7px 14px', borderRadius: 8,
+              border: `1.5px solid ${approved ? 'var(--border)' : 'var(--green)'}`,
+              background: approved ? 'transparent' : 'var(--green)',
+              color: approved ? 'var(--muted)' : '#fff',
+              fontSize: 11, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700,
+              textTransform: 'uppercase', letterSpacing: '0.06em', cursor: 'pointer',
+              display: 'flex', alignItems: 'center', gap: 5, transition: 'all 0.15s',
+            }}
+          >
+            {approved ? 'Revoke' : <><CheckCircle2 size={12} /> Approve</>}
+          </button>
+        ) : (
+          <span style={{
+            flexShrink: 0, padding: '6px 12px', borderRadius: 8,
+            border: `1.5px solid ${approved ? 'rgba(28,107,58,0.3)' : 'var(--border)'}`,
+            background: approved ? 'rgba(28,107,58,0.07)' : 'transparent',
+            color: approved ? 'var(--green)' : 'var(--muted)',
+            fontSize: 11, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700,
+            textTransform: 'uppercase', letterSpacing: '0.06em',
+            display: 'flex', alignItems: 'center', gap: 5,
+          }}>
+            {approved ? <><CheckCircle2 size={12} /> Approved</> : <><Clock size={12} /> Pending</>}
+          </span>
+        )}
       </div>
 
       {/* Progress bar */}
@@ -104,7 +109,7 @@ function ApprovalCard({ project, onToggle, onSelect, approved }) {
   );
 }
 
-export default function ApprovalsView({ projects, onToggleBlessed, onSelect, onOpenStickyNote }) {
+export default function ApprovalsView({ projects, isAdmin = false, onToggleBlessed, onSelect, onOpenStickyNote }) {
   const pending = projects.filter(p => p.submitted && !p.blessed);
   const approved = projects.filter(p => p.blessed);
 
@@ -143,6 +148,7 @@ export default function ApprovalsView({ projects, onToggleBlessed, onSelect, onO
                   key={p.id}
                   project={p}
                   approved={false}
+                  isAdmin={isAdmin}
                   onToggle={() => onToggleBlessed(p.id)}
                   onSelect={() => onSelect(p.id)}
                 />
@@ -175,6 +181,7 @@ export default function ApprovalsView({ projects, onToggleBlessed, onSelect, onO
                   key={p.id}
                   project={p}
                   approved={true}
+                  isAdmin={isAdmin}
                   onToggle={() => onToggleBlessed(p.id)}
                   onSelect={() => onSelect(p.id)}
                 />

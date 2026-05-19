@@ -439,7 +439,7 @@ function DoneNotesStack({ notes }) {
   );
 }
 
-export default function ProjectDetail({ project, projects = [], team = [], onUpdateDots, onUpdateProject, onEdit, onDelete, onDuplicate, onBack, onSelectPerson, isNew = false }) {
+export default function ProjectDetail({ project, projects = [], team = [], onUpdateDots, onUpdateProject, onEdit, onDelete, onDuplicate, onBack, onSelectPerson, isNew = false, isAdmin = false }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [editingDotIndex, setEditingDotIndex] = useState(null);
   const [hubHover, setHubHover] = useState(false);
@@ -676,8 +676,8 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
         </div>
 
         <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
-          {/* Connect the Dots — staff submits for review */}
-          {!project.submitted && !project.blessed && (
+          {/* Connect the Dots — admin submits for review */}
+          {isAdmin && !project.submitted && !project.blessed && (
             <button
               onClick={handleConnectTheDots}
               disabled={isConnecting}
@@ -695,7 +695,7 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
             </button>
           )}
           {/* Back to Draft — withdraw from approval queue */}
-          {project.submitted && !project.blessed && (
+          {isAdmin && project.submitted && !project.blessed && (
             <button
               onClick={() => onUpdateProject({ ...project, submitted: false })}
               style={{
