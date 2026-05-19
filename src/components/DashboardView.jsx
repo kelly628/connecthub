@@ -44,8 +44,8 @@ function StatCard({ label, value, sub, accent, highlight = false, onClick }) {
       <div style={{ fontFamily: 'Commune, serif', fontSize: 36, fontWeight: 700, color: highlight ? PINK : (accent || 'var(--blue)'), lineHeight: 1 }}>{value}</div>
       {sub && <div style={{ fontSize: 11, color: highlight ? 'rgba(194,51,107,0.7)' : 'var(--muted)', marginTop: 6, fontFamily: 'Barlow Condensed, sans-serif' }}>{sub}</div>}
       {highlight && (
-        <div style={{ position: 'absolute', bottom: 10, right: 14, color: PINK, opacity: 0.7 }} className="bounce-arrow">
-          <ChevronDown size={18} strokeWidth={2.5} />
+        <div style={{ position: 'absolute', top: 16, right: 14, color: PINK, opacity: 0.7 }} className="bounce-arrow">
+          <ChevronDown size={18} strokeWidth={2.5} style={{ transform: 'rotate(-90deg)' }} />
         </div>
       )}
     </div>
