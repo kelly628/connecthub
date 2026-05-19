@@ -1,14 +1,21 @@
 import { useState, useRef, useEffect } from 'react';
 import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
-import { ArrowLeft, Pencil, Trash2, CheckCircle2, Clock, Plus, X, Copy, Download, GraduationCap, BookOpen, Apple, Heart, Users, Globe, HandHeart, Music, Palette, Baby, Camera, Trophy, Award, Star, Sparkles, Martini, Sun, PartyPopper, Gift, Leaf, Ribbon, Handshake, Crown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Pencil, Trash2, CheckCircle2, Clock, Plus, X, Copy, Download, GraduationCap, BookOpen, Heart, Users, Globe, HandHeart, Music, Palette, Baby, Camera, Trophy, Award, Star, Sparkles, Martini, Sun, PartyPopper, Gift, Leaf, Ribbon, Handshake, Crown, ChevronLeft, ChevronRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import LogoMark from './LogoMark';
+
+const LatinCross = ({ size = 22, strokeWidth = 2, color = 'currentColor', ...props }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <line x1="12" y1="2" x2="12" y2="22" />
+    <line x1="5" y1="8" x2="19" y2="8" />
+  </svg>
+);
 
 const ICON_OPTIONS = [
   { name: 'GraduationCap', label: 'Graduation', Component: GraduationCap },
   { name: 'BookOpen',      label: 'Learning',   Component: BookOpen },
-  { name: 'Apple',         label: 'School',     Component: Apple },
+  { name: 'Cross',         label: 'Faith',      Component: LatinCross },
   { name: 'Pencil',        label: 'Pencil',     Component: Pencil },
   { name: 'Heart',         label: 'Heart',      Component: Heart },
   { name: 'HandHeart',     label: 'Care',       Component: HandHeart },
