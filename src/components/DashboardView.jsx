@@ -136,7 +136,7 @@ function EventRow({ project, onSelect, onSelectPerson }) {
   );
 }
 
-export default function DashboardView({ projects, team, onSelectProject, onSelectPerson, onOpenStickyNote, isAdmin = false, onNavigate }) {
+export default function DashboardView({ projects, team, onSelectProject, onSelectPerson, onOpenStickyNote, isAdmin = false, onNavigate, currentUser = '' }) {
   const now = new Date();
 
   // Sort projects by date
@@ -207,7 +207,7 @@ export default function DashboardView({ projects, team, onSelectProject, onSelec
     <div className="page">
       <div className="page-header">
         <div>
-          <h1 className="page-title">Dashboard</h1>
+          <h1 className="page-title">What Up, {currentUser ? currentUser.split(' ')[0] : 'Kelly'}!</h1>
         </div>
         {isFlying && (
           <style>{`
