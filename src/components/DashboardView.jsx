@@ -31,10 +31,10 @@ function StatCard({ label, value, sub, accent, highlight = false, onClick }) {
       onClick={onClick}
       style={{
         background: highlight ? 'rgba(194,51,107,0.06)' : 'var(--surface)',
-        border: `1.5px solid ${highlight ? 'rgba(194,51,107,0.35)' : 'var(--border)'}`,
+        border: highlight ? `1.5px solid rgba(194,51,107,0.35)` : '1px solid rgba(210,195,170,0.3)',
         borderRadius: 14, padding: '20px 24px', flex: 1, minWidth: 140,
         position: 'relative', overflow: 'hidden',
-        transition: 'border-color 0.2s, background 0.2s, box-shadow 0.15s',
+        transition: 'background 0.2s, box-shadow 0.15s',
         cursor: onClick ? 'pointer' : 'default',
       }}
       onMouseOver={e => { if (onClick) e.currentTarget.style.boxShadow = '0 4px 16px rgba(13,23,48,0.1)'; }}
