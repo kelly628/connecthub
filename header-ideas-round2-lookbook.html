@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ConnectHub — Six New Header Ideas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+:root{
+  --cream:#F6F1E9; --paper:#FFFFFF; --paper-warm:#FBF8F2;
+  --forest:#1E3D31; --forest-soft:#EAF1EA; --muted:#5E6F64;
+  --terra:#B85C3C; --terra-tint:#FBEBE2; --terra-tint2:#F2E2D8;
+  --cream-on-dark:#F4EEE4;
+  --line:rgba(30,61,49,0.12); --line-soft:rgba(30,61,49,0.07);
+  --shadow:0 1px 2px rgba(30,61,49,0.04), 0 12px 30px -18px rgba(30,61,49,0.22);
+  --shadow-lift:0 2px 4px rgba(30,61,49,0.05), 0 22px 48px -22px rgba(30,61,49,0.30);
+  --r-lg:18px; --r-md:14px;
+}
+*{box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{margin:0;background:var(--cream);color:var(--forest);
+  font-family:"DM Sans",system-ui,sans-serif;line-height:1.62;font-size:16px;
+  background-image:radial-gradient(rgba(30,61,49,0.022) 1px, transparent 1px);background-size:4px 4px;}
+.wrap{max-width:1000px;margin:0 auto;padding:60px 26px 72px;}
+
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--terra);font-weight:600;}
+header h1{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:clamp(29px,4.3vw,45px);
+  line-height:1.1;letter-spacing:-0.01em;margin:14px 0 0;color:var(--forest);}
+.lede{font-size:17.5px;color:#34503f;max-width:64ch;margin:20px 0 0;line-height:1.6;}
+.lede b{font-weight:600;color:var(--forest);}
+
+.owned{margin-top:24px;padding:16px 18px;background:var(--paper);border:1px solid var(--line);
+  border-radius:var(--r-md);box-shadow:var(--shadow);display:flex;gap:12px;align-items:flex-start;}
+.owned i{font-size:19px;color:var(--terra);flex:none;margin-top:2px;}
+.owned p{margin:0;font-size:14px;color:#3c5648;line-height:1.55;}
+.owned b{color:var(--forest);font-weight:600;}
+
+section{margin-top:54px;}
+.label{font-family:"Fraunces",Georgia,serif;font-size:13.5px;font-weight:600;letter-spacing:.02em;
+  color:var(--terra);text-transform:uppercase;margin-bottom:5px;display:flex;align-items:center;gap:11px;flex-wrap:wrap;}
+.label-sub{font-size:14px;color:var(--muted);margin:0 0 18px;max-width:64ch;}
+.cap{display:flex;gap:11px;align-items:flex-start;margin-top:16px;padding:14px 16px;background:var(--paper-warm);
+  border:1px solid var(--line-soft);border-radius:var(--r-md);}
+.cap i{font-size:18px;color:var(--terra);margin-top:1px;flex:none;}
+.cap span{font-size:13.5px;color:#3c5648;line-height:1.55;}
+.cap b{color:var(--forest);font-weight:600;}
+
+.takeaway{margin-top:46px;background:var(--forest);color:var(--cream-on-dark);border-radius:var(--r-lg);
+  padding:26px 28px;display:flex;gap:15px;align-items:flex-start;box-shadow:var(--shadow-lift);}
+.takeaway i{font-size:24px;color:#E8A079;flex:none;margin-top:2px;}
+.takeaway p{margin:0;font-size:15.5px;line-height:1.6;color:#EDE6D8;}
+.takeaway b{color:#fff;font-weight:600;}
+.takeaway .lead{color:#E8A079;font-weight:600;}
+footer{margin-top:28px;text-align:center;font-size:12.5px;color:var(--muted);}
+footer .dot{color:var(--terra);margin:0 6px;}
+
+/* ══ mockups render in the REAL ConnectHub brand ══ */
+.mock{
+  --pea:#175933; --lush:#457D58; --blush:#E46E88; --panache:#E0F1E6;
+  --ch-bg:#F4FAF6; --ch-text:#0D2B1A; --ch-muted:#5E7A68; --ch-line:rgba(23,89,51,0.12);
+  background:var(--ch-bg);border:1px solid var(--line);border-radius:var(--r-lg);
+  box-shadow:var(--shadow);overflow:hidden;padding:22px 24px 0;
+  font-family:"Montserrat",sans-serif;color:var(--ch-text);
+}
+.mock *{line-height:1.35}
+.mk-back{font-size:10.5px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--ch-muted);
+  display:inline-flex;align-items:center;gap:5px;margin-bottom:14px;}
+.mk-title{font-family:"Fraunces",Georgia,serif;font-weight:400;color:var(--pea);letter-spacing:-0.02em;}
+.num{font-family:"Montserrat",sans-serif;font-weight:700;font-variant-numeric:tabular-nums;}
+.mk-below{display:flex;gap:9px;margin-top:20px;}
+.mk-below div{flex:1;height:40px;border:1.5px solid var(--lush);border-radius:9px 9px 0 0;
+  border-bottom:none;background:#f4faf7;opacity:.45;}
+.mk-ghost{width:29px;height:29px;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;
+  color:var(--ch-muted);font-size:14px;flex:none;}
+.av{border-radius:50%;display:inline-flex;align-items:center;justify-content:center;color:#fff;
+  font-weight:700;flex:none;border:2px solid #fff;overflow:hidden;}
+.badge{border-radius:13px;background:#f4faf7;border:1.5px solid var(--ch-line);
+  display:inline-flex;align-items:center;justify-content:center;flex:none;}
+.approved{color:var(--lush);display:inline-flex;align-items:center;gap:5px;font-weight:700;
+  font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;}
+
+/* 01 countdown */
+.cd{display:flex;align-items:center;gap:22px;flex-wrap:wrap;}
+.cd-num{font-family:"Montserrat";font-weight:800;font-size:clamp(52px,9vw,86px);line-height:.82;
+  letter-spacing:-0.04em;font-variant-numeric:tabular-nums;}
+.cd-unit{font-size:10px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--ch-muted);margin-top:7px;}
+.cd-rule{width:1px;align-self:stretch;background:var(--ch-line);min-height:74px;}
+.cd-state{margin-top:14px;padding-top:12px;border-top:1px dashed var(--ch-line);display:flex;gap:9px;
+  align-items:center;flex-wrap:wrap;font-size:11px;color:var(--ch-muted);}
+.cd-mini{display:inline-flex;align-items:baseline;gap:6px;background:#fff;border:1px solid var(--ch-line);
+  border-radius:99px;padding:5px 13px;}
+.cd-mini .n{font-weight:800;font-size:14px;color:var(--pea);font-variant-numeric:tabular-nums;}
+
+/* 02 ticket */
+.tk{display:flex;background:#fff;border-radius:14px;overflow:hidden;position:relative;
+  box-shadow:0 2px 4px rgba(13,43,26,.04),0 18px 40px -22px rgba(13,43,26,.3);flex-wrap:wrap;}
+.tk-main{flex:1;min-width:230px;padding:20px 24px;}
+.tk-perf{width:0;border-left:2px dashed var(--ch-line);position:relative;}
+.tk-stub{width:132px;background:var(--panache);padding:18px 16px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;text-align:center;gap:3px;}
+.tk-mon{font-size:10px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--lush);}
+.tk-day{font-family:"Montserrat";font-weight:800;font-size:38px;line-height:1;color:var(--pea);
+  font-variant-numeric:tabular-nums;}
+.tk-yr{font-size:10.5px;font-weight:600;letter-spacing:.1em;color:var(--ch-muted);}
+.tk-lbl{font-size:9px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--ch-muted);}
+
+/* 03 playbill */
+.pb{text-align:center;padding:26px 20px 24px;background:#fff;border:1px solid var(--ch-line);
+  border-radius:14px;position:relative;}
+.pb-eyebrow{font-size:10px;font-weight:700;letter-spacing:.24em;text-transform:uppercase;color:var(--lush);}
+.pb-rule{width:46px;height:2px;background:var(--blush);margin:14px auto;border-radius:2px;}
+.pb-credit{font-size:12px;color:var(--ch-muted);letter-spacing:.03em;}
+.pb-credit b{color:var(--ch-text);font-weight:600;}
+.pb-corner{position:absolute;top:14px;font-size:9.5px;font-weight:700;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ch-muted);}
+
+/* 04 readiness */
+.rd{display:flex;align-items:center;gap:18px;flex-wrap:wrap;}
+.rd-rail{display:flex;gap:3px;margin-top:11px;}
+.rd-seg{height:6px;flex:1;border-radius:2px;background:var(--panache);min-width:5px;}
+.rd-seg.on{background:var(--lush);}
+.rd-legend{display:flex;justify-content:space-between;gap:12px;margin-top:8px;font-size:11px;color:var(--ch-muted);flex-wrap:wrap;}
+
+/* 05 timeline */
+.tl{position:relative;padding:26px 0 8px;}
+.tl-line{position:absolute;left:0;right:0;top:38px;height:2px;background:var(--ch-line);}
+.tl-row{position:relative;display:flex;justify-content:space-between;align-items:flex-start;}
+.tl-pt{display:flex;flex-direction:column;align-items:center;gap:7px;position:relative;z-index:1;flex:1;min-width:0;}
+.tl-tick{width:9px;height:9px;border-radius:50%;background:#cfe0d5;border:2px solid var(--ch-bg);}
+.tl-pt.now .tl-tick{width:15px;height:15px;background:var(--lush);box-shadow:0 0 0 4px rgba(69,125,88,.16);}
+.tl-nm{font-size:10px;color:var(--ch-muted);text-align:center;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis;max-width:100%;}
+.tl-pt.now .tl-nm{color:var(--pea);font-weight:700;}
+
+/* 06 roll call */
+.rc-faces{display:flex;margin-top:12px;}
+.rc-faces .av{margin-left:-9px;}
+.rc-faces .av:first-child{margin-left:0;}
+.rc-crown{position:absolute;top:-6px;left:50%;transform:translateX(-50%);font-size:10px;color:var(--blush);}
+
+@media(max-width:680px){
+  .mock{padding:16px 15px 0;}
+  .cd-rule{display:none;}
+  .tk-stub{width:100%;flex-direction:row;gap:10px;padding:12px;}
+  .tk-perf{width:100%;height:0;border-left:none;border-top:2px dashed var(--ch-line);}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">ConnectHub &middot; Header, round two</div>
+    <h1>Six new ideas —<br>this time with an actual point of view.</h1>
+    <p class="lede">The first six were all the same row rearranged, which is why none of them landed. These six each <b>lead with a different piece of information</b> — time, readiness, the people, the occasion — because the header's real job is answering the one question you ask when you open an event.</p>
+    <div class="owned">
+      <i class="ti ti-alert-circle"></i>
+      <p><b>My mistake to fix:</b> you asked to see six new ideas and I built one instead. The one I built (the dotted "Thread") is <b>currently live in the app</b> — say the word and I'll roll it back to the old header, or swap in whichever of these six you want.</p>
+    </div>
+  </header>
+
+  <!-- 01 COUNTDOWN -->
+  <section>
+    <div class="label">07 &middot; The Countdown</div>
+    <p class="label-sub">Time leads. The number of days is the biggest thing on the screen, because that's the question every event person actually opens with.</p>
+    <div class="mock">
+      <div class="mk-back"><i class="ti ti-arrow-left"></i> All Projects</div>
+      <div class="cd">
+        <div>
+          <div class="cd-num" style="color:var(--ch-muted);">57</div>
+          <div class="cd-unit">Days ago &middot; wrapped</div>
+        </div>
+        <div class="cd-rule"></div>
+        <div style="flex:1;min-width:190px;">
+          <div class="mk-title" style="font-size:clamp(28px,4.6vw,40px);">Spring Gala</div>
+          <div style="font-size:12.5px;color:var(--ch-muted);margin-top:7px;font-weight:500;">
+            May 30, 2026 &nbsp;·&nbsp; Ms. Kelly &amp; Kelly Claverie &nbsp;·&nbsp; <span class="approved" style="display:inline-flex;"><i class="ti ti-circle-check" style="font-size:12px;"></i>Approved</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:2px;align-self:flex-start;">
+          <span class="mk-ghost"><i class="ti ti-copy"></i></span>
+          <span class="mk-ghost"><i class="ti ti-download"></i></span>
+          <span class="mk-ghost"><i class="ti ti-trash"></i></span>
+        </div>
+      </div>
+      <div class="cd-state">
+        <span style="font-weight:600;letter-spacing:.04em;">Upcoming events read:</span>
+        <span class="cd-mini"><span class="n">42</span> days to go</span>
+        <span class="cd-mini" style="border-color:rgba(228,110,136,.4);"><span class="n" style="color:var(--blush);">3</span> days to go</span>
+        <span class="cd-mini"><span class="n" style="color:var(--lush);">Today</span></span>
+      </div>
+      <div class="mk-below"><div></div><div></div><div></div><div></div></div>
+    </div>
+    <div class="cap"><i class="ti ti-clock"></i><span><b>Why it's different:</b> no other idea makes the header <em>useful at a glance</em> — you learn urgency before you read a word. Spring Gala is past, so it honestly reads "57 days ago"; upcoming events count down, and go Deep Blush inside the last week. <b>The risk:</b> a past event's header is a big gray number, which is a lot of real estate for old news.</span></div>
+  </section>
+
+  <!-- 02 TICKET -->
+  <section>
+    <div class="label">08 &middot; The Ticket Stub <span style="font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:#7a3a22;background:var(--terra-tint);border:1px solid var(--terra-tint2);border-radius:99px;padding:4px 11px;"><i class="ti ti-star"></i> My pick</span></div>
+    <p class="label-sub">The header is an actual event ticket — torn stub, perforated edge, the date printed on the tear-off.</p>
+    <div class="mock">
+      <div class="mk-back"><i class="ti ti-arrow-left"></i> All Projects</div>
+      <div class="tk">
+        <div class="tk-main">
+          <div class="tk-lbl" style="margin-bottom:7px;">Archbishop Rummel &middot; Spring 2026</div>
+          <div class="mk-title" style="font-size:clamp(27px,4.4vw,38px);">Spring Gala</div>
+          <div style="display:flex;align-items:center;gap:9px;margin-top:12px;flex-wrap:wrap;">
+            <span style="display:inline-flex;">
+              <span class="av" style="width:24px;height:24px;font-size:8.5px;background:var(--pea);">MK</span>
+              <span class="av" style="width:24px;height:24px;font-size:8.5px;background:var(--lush);margin-left:-8px;">KC</span>
+            </span>
+            <span style="font-size:12.5px;font-weight:600;">Ms. Kelly &amp; Kelly Claverie</span>
+            <span style="color:var(--ch-line);">|</span>
+            <span style="font-size:12.5px;color:var(--ch-muted);"><span class="num" style="color:var(--pea);font-size:14px;">8</span> on the team</span>
+          </div>
+        </div>
+        <div class="tk-perf"></div>
+        <div class="tk-stub">
+          <div class="tk-mon">May</div>
+          <div class="tk-day">30</div>
+          <div class="tk-yr">2026</div>
+          <div class="approved" style="margin-top:6px;font-size:9px;"><i class="ti ti-circle-check" style="font-size:11px;"></i>Approved</div>
+        </div>
+      </div>
+      <div class="mk-below"><div></div><div></div><div></div><div></div></div>
+    </div>
+    <div class="cap"><i class="ti ti-ticket"></i><span><b>Why it's my pick:</b> it's the only idea that looks like the <em>thing it's about</em>. School events run on tickets, programs and stubs — so the header stops being an admin toolbar and becomes an object. The date block is genuinely easier to read than any date field, and the stub tints by status: Panache green when approved, warm when awaiting.</span></div>
+  </section>
+
+  <!-- 03 PLAYBILL -->
+  <section>
+    <div class="label">09 &middot; The Playbill</div>
+    <p class="label-sub">Centered like a printed program cover. Formal, symmetrical, and unmistakably about an occasion.</p>
+    <div class="mock">
+      <div class="mk-back"><i class="ti ti-arrow-left"></i> All Projects</div>
+      <div class="pb">
+        <span class="pb-corner" style="left:16px;">May 30, 2026</span>
+        <span class="pb-corner" style="right:16px;"><span class="approved" style="font-size:9.5px;"><i class="ti ti-circle-check" style="font-size:11px;"></i>Approved</span></span>
+        <div class="pb-eyebrow" style="margin-top:14px;">Archbishop Rummel presents</div>
+        <div class="mk-title" style="font-size:clamp(32px,6vw,52px);margin-top:10px;">Spring Gala</div>
+        <div class="pb-rule"></div>
+        <div class="pb-credit">Led by <b>Ms. Kelly</b> and <b>Kelly Claverie</b></div>
+        <div class="pb-credit" style="margin-top:4px;">with a company of <b class="num">8</b></div>
+      </div>
+      <div class="mk-below"><div></div><div></div><div></div><div></div></div>
+    </div>
+    <div class="cap"><i class="ti ti-masks-theater"></i><span><b>Why it's different:</b> it's the only <em>symmetrical</em> option, and symmetry reads as ceremony. Perfect for galas, concerts and banquets. <b>The risk:</b> a centered header is beautiful but less scannable, and it pushes the team grid further down the page.</span></div>
+  </section>
+
+  <!-- 04 READINESS -->
+  <section>
+    <div class="label">10 &middot; The Readiness Meter</div>
+    <p class="label-sub">The header answers "are we ready?" — a completion ring on the badge and a task rail under the title.</p>
+    <div class="mock">
+      <div class="mk-back"><i class="ti ti-arrow-left"></i> All Projects</div>
+      <div class="rd">
+        <div style="position:relative;flex:none;">
+          <svg width="62" height="62" viewBox="0 0 62 62">
+            <circle cx="31" cy="31" r="27" fill="none" stroke="#E0F1E6" stroke-width="5"/>
+            <circle cx="31" cy="31" r="27" fill="none" stroke="#457D58" stroke-width="5" stroke-linecap="round"
+              stroke-dasharray="169.6" stroke-dashoffset="125.5" transform="rotate(-90 31 31)"/>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;">
+            <svg width="19" height="24" viewBox="0 0 36 48"><polygon points="18,0 0,40 18,30" fill="#175933"/><polygon points="18,0 36,40 18,30" fill="#457D58"/><polygon points="0,40 18,30 9,48" fill="#E46E88"/><polygon points="36,40 18,30 27,48" fill="#E46E88"/></svg>
+          </div>
+        </div>
+        <div style="flex:1;min-width:200px;">
+          <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;">
+            <div class="mk-title" style="font-size:clamp(27px,4.4vw,40px);">Spring Gala</div>
+            <span class="num" style="font-size:17px;color:var(--lush);">26%</span>
+            <span style="font-size:11px;color:var(--ch-muted);font-weight:600;letter-spacing:.06em;text-transform:uppercase;">ready</span>
+          </div>
+          <div class="rd-rail">
+            <div class="rd-seg on"></div><div class="rd-seg on"></div><div class="rd-seg on"></div>
+            <div class="rd-seg on"></div><div class="rd-seg on"></div>
+            <div class="rd-seg"></div><div class="rd-seg"></div><div class="rd-seg"></div><div class="rd-seg"></div>
+            <div class="rd-seg"></div><div class="rd-seg"></div><div class="rd-seg"></div><div class="rd-seg"></div>
+            <div class="rd-seg"></div><div class="rd-seg"></div><div class="rd-seg"></div><div class="rd-seg"></div>
+            <div class="rd-seg"></div><div class="rd-seg"></div>
+          </div>
+          <div class="rd-legend">
+            <span><span class="num" style="color:var(--pea);">5</span> of <span class="num">19</span> tasks done &middot; <span class="num" style="color:var(--pea);">8</span> on the team</span>
+            <span>May 30, 2026 &middot; <span class="approved" style="display:inline-flex;"><i class="ti ti-circle-check" style="font-size:11px;"></i>Approved</span></span>
+          </div>
+        </div>
+      </div>
+      <div class="mk-below"><div></div><div></div><div></div><div></div></div>
+    </div>
+    <div class="cap"><i class="ti ti-progress-check"></i><span><b>Why it's different:</b> it's the only header that shows <em>progress</em> — one rail segment per task, so you see at a glance that 5 of 19 are done without scrolling the grid. <b>The risk:</b> 19 tiny segments is a lot of detail up top, and an event with 60 tasks would need the rail to switch to a plain bar.</span></div>
+  </section>
+
+  <!-- 05 TIMELINE -->
+  <section>
+    <div class="label">11 &middot; The Timeline Rail</div>
+    <p class="label-sub">This event pinned on the school year, so you always see what surrounds it.</p>
+    <div class="mock">
+      <div class="mk-back"><i class="ti ti-arrow-left"></i> All Projects</div>
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+        <div class="badge" style="width:44px;height:44px;">
+          <svg width="20" height="26" viewBox="0 0 36 48"><polygon points="18,0 0,40 18,30" fill="#175933"/><polygon points="18,0 36,40 18,30" fill="#457D58"/><polygon points="0,40 18,30 9,48" fill="#E46E88"/><polygon points="36,40 18,30 27,48" fill="#E46E88"/></svg>
+        </div>
+        <div class="mk-title" style="font-size:clamp(27px,4.4vw,40px);flex:1;min-width:170px;">Spring Gala</div>
+        <span class="approved"><i class="ti ti-circle-check" style="font-size:13px;"></i>Approved</span>
+      </div>
+      <div class="tl">
+        <div class="tl-line"></div>
+        <div class="tl-row">
+          <div class="tl-pt"><span style="font-size:9.5px;color:var(--ch-muted);font-weight:600;">Mar 14</span><span class="tl-tick"></span><span class="tl-nm">Open House</span></div>
+          <div class="tl-pt"><span style="font-size:9.5px;color:var(--ch-muted);font-weight:600;">Apr 22</span><span class="tl-tick"></span><span class="tl-nm">Honors Night</span></div>
+          <div class="tl-pt now"><span class="num" style="font-size:11.5px;color:var(--pea);">May 30</span><span class="tl-tick"></span><span class="tl-nm">Spring Gala</span></div>
+          <div class="tl-pt"><span style="font-size:9.5px;color:var(--ch-muted);font-weight:600;">Jun 05</span><span class="tl-tick"></span><span class="tl-nm">Graduation</span></div>
+          <div class="tl-pt"><span style="font-size:9.5px;color:var(--ch-muted);font-weight:600;">Aug 19</span><span class="tl-tick"></span><span class="tl-nm">Welcome Back</span></div>
+        </div>
+      </div>
+      <div class="mk-below"><div></div><div></div><div></div><div></div></div>
+    </div>
+    <div class="cap"><i class="ti ti-timeline"></i><span><b>Why it's different:</b> it's the only idea that gives the event <em>context</em> — you see Graduation is six days later, which is exactly the kind of collision that bites a school calendar. Neighboring events are clickable, so it doubles as navigation. <b>The risk:</b> it's the tallest of the six and needs at least three events to look right.</span></div>
+  </section>
+
+  <!-- 06 ROLL CALL -->
+  <section>
+    <div class="label">12 &middot; The Roll Call</div>
+    <p class="label-sub">The people are the header. Eight faces, leads marked, everything else kept small.</p>
+    <div class="mock">
+      <div class="mk-back"><i class="ti ti-arrow-left"></i> All Projects</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;">
+        <div style="min-width:210px;">
+          <div class="mk-title" style="font-size:clamp(27px,4.4vw,40px);">Spring Gala</div>
+          <div style="font-size:12px;color:var(--ch-muted);margin-top:6px;font-weight:500;">
+            May 30, 2026 &nbsp;·&nbsp; <span class="approved" style="display:inline-flex;"><i class="ti ti-circle-check" style="font-size:11px;"></i>Approved</span>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:9.5px;font-weight:700;letter-spacing:.13em;text-transform:uppercase;color:var(--ch-muted);text-align:right;">
+            The team &middot; <span class="num" style="color:var(--pea);font-size:12px;">8</span>
+          </div>
+          <div class="rc-faces">
+            <span class="av" style="width:38px;height:38px;font-size:12px;background:var(--pea);position:relative;">MK<span class="rc-crown"><i class="ti ti-star-filled"></i></span></span>
+            <span class="av" style="width:38px;height:38px;font-size:12px;background:var(--lush);position:relative;">KC<span class="rc-crown"><i class="ti ti-star-filled"></i></span></span>
+            <span class="av" style="width:38px;height:38px;font-size:12px;background:#5E7A68;">JR</span>
+            <span class="av" style="width:38px;height:38px;font-size:12px;background:#6d8f7a;">MG</span>
+            <span class="av" style="width:38px;height:38px;font-size:12px;background:#5E7A68;">ML</span>
+            <span class="av" style="width:38px;height:38px;font-size:12px;background:#6d8f7a;">SM</span>
+            <span class="av" style="width:38px;height:38px;font-size:12px;background:#5E7A68;">CD</span>
+            <span class="av" style="width:38px;height:38px;font-size:12px;background:#6d8f7a;">FT</span>
+          </div>
+        </div>
+      </div>
+      <div class="mk-below"><div></div><div></div><div></div><div></div></div>
+    </div>
+    <div class="cap"><i class="ti ti-users-group"></i><span><b>Why it's different:</b> it puts the <em>people</em> first, which matches what this app is really for — who's doing what. Stars mark the leads, hovering a face highlights that person's card below. <b>The risk:</b> without real photos it's a row of initials, and it gets crowded past ten people.</span></div>
+  </section>
+
+  <div class="takeaway">
+    <i class="ti ti-arrow-right-circle"></i>
+    <p><span class="lead">The move:</span> I'd build <b>The Ticket Stub (08)</b> — it's the only one that turns the header into an object instead of a toolbar, the date block genuinely reads faster than a date field, and it belongs to the world of school events. If you want the header to be <em>useful</em> rather than beautiful, <b>The Readiness Meter (10)</b> is the one. Point at any of the six and I'll build it properly — and tell me what to do with the Thread that's currently live.</p>
+  </div>
+
+  <footer>ConnectHub <span class="dot">&middot;</span> header ideas, round two <span class="dot">&middot;</span> prepared July 26, 2026 <span class="dot">&middot;</span> nothing is committed yet</footer>
+
+</div>
+</body>
+</html>
