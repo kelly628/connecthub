@@ -50,10 +50,10 @@ function IconPicker({ currentIcon, hasLogo, onSelectIcon, onUpload, onClear, onC
         width: 380, boxShadow: '0 8px 40px rgba(0,0,0,0.18)',
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-          <div style={{ fontFamily: 'Commune, serif', fontSize: 20, fontWeight: 700, color: 'var(--blue)' }}>Event Icon</div>
+          <div style={{ fontFamily: 'var(--font-heading)', fontSize: 20, fontWeight: 700, color: 'var(--blue)' }}>Event Icon</div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', display: 'flex', alignItems: 'center' }}><X size={18} /></button>
         </div>
-        <p style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 16, fontFamily: 'Barlow Condensed, sans-serif', letterSpacing: '0.03em' }}>
+        <p style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 16, fontFamily: 'Montserrat, sans-serif', letterSpacing: '0.03em' }}>
           Choose a built-in icon or upload your own logo.
         </p>
 
@@ -85,14 +85,14 @@ function IconPicker({ currentIcon, hasLogo, onSelectIcon, onUpload, onClear, onC
         <div style={{ display: 'flex', gap: 8, paddingTop: 14, borderTop: '1px solid var(--border)' }}>
           <button
             onClick={() => { onUpload(); onClose(); }}
-            style={{ flex: 1, background: 'var(--yellow)', border: 'none', borderRadius: 8, padding: '9px 0', fontSize: 12, cursor: 'pointer', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#112275', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+            style={{ flex: 1, background: 'var(--yellow)', border: 'none', borderRadius: 8, padding: '9px 0', fontSize: 12, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#175933', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
           >
             <Camera size={13} /> Upload Logo
           </button>
           {(currentIcon || hasLogo) && (
             <button
               onClick={() => { onClear(); onClose(); }}
-              style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '9px 14px', fontSize: 12, cursor: 'pointer', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--muted)' }}
+              style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '9px 14px', fontSize: 12, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--muted)' }}
             >
               Clear
             </button>
@@ -104,7 +104,7 @@ function IconPicker({ currentIcon, hasLogo, onSelectIcon, onUpload, onClear, onC
 }
 
 function fireConfetti() {
-  const colors = ['#1C6B3A', '#7EC4E8', '#F5C800', '#E03A2A', '#E05A85'];
+  const colors = ['#457D58', '#6EC8F5', '#E46E88', '#C0392B', '#E46E88'];
   confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 }, colors });
   setTimeout(() => confetti({ particleCount: 60, spread: 120, origin: { y: 0.55 }, colors }), 250);
 }
@@ -119,6 +119,16 @@ function fmt(dateStr) {
   return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 }
 
+// "Spring 2026" — the playbill eyebrow, read off the event's own date.
+function seasonOf(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr + 'T00:00:00');
+  if (isNaN(d)) return '';
+  const m = d.getMonth();
+  const season = m === 11 || m <= 1 ? 'Winter' : m <= 4 ? 'Spring' : m <= 7 ? 'Summer' : 'Fall';
+  return `${season} ${d.getFullYear()}`;
+}
+
 // Normalize old string format to task array
 function normalizeTasks(responsibilities) {
   if (Array.isArray(responsibilities)) return responsibilities;
@@ -126,8 +136,8 @@ function normalizeTasks(responsibilities) {
   return String(responsibilities).split(/,\s*|\n/).filter(t => t.trim()).map(text => ({ text: text.trim(), done: false }));
 }
 
-// Priority fill order for 5x3 grid (hub at center [1,2])
-// Fill cells adjacent to hub first, expand outward
+// Priority fill order for 5x3 team grid — flex centering packs each row,
+// so rows fill evenly as members are added
 const DOT_PRIORITY = [
   [0, 4], // top-far-right  ← first (alphabetically first member goes here)
   [0, 0], // top-far-left
@@ -155,7 +165,7 @@ function DotCell({ dot, onEdit, onToggleDone, blessed = false, isAdmin = false, 
       style={{
         ...(animClass ? { animationDelay: animDelay } : {}),
         ...(noTasks ? { opacity: 0.45 } : {}),
-        ...(accentColor ? { borderColor: accentColor, background: accentColor === 'var(--yellow)' ? 'rgba(245,200,0,0.04)' : undefined } : {}),
+        ...(accentColor ? { borderColor: accentColor, background: accentColor === 'var(--yellow)' ? 'rgba(228,110,136,0.04)' : undefined } : {}),
       }}
       onClick={isEmpty ? onEdit : undefined}
     >
@@ -247,15 +257,15 @@ function DotEditPanel({ dot, team, projects = [], usedMembers = new Set(), onSav
                 <div style={{ width: 44, height: 44, borderRadius: '50%', background: 'var(--green)', flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   {member.photoUrl
                     ? <img src={member.photoUrl} alt={member.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    : <span style={{ fontSize: 16, fontWeight: 700, color: '#fff', fontFamily: 'Barlow Condensed, sans-serif' }}>{initials}</span>}
+                    : <span style={{ fontSize: 16, fontWeight: 700, color: '#fff', fontFamily: 'Montserrat, sans-serif' }}>{initials}</span>}
                 </div>
               );
             })()}
             <div>
-              <div style={{ fontFamily: 'Commune, serif', fontSize: 20, fontWeight: 700, color: 'var(--text)', lineHeight: 1.1 }}>
+              <div style={{ fontFamily: 'var(--font-heading)', fontSize: 20, fontWeight: 700, color: 'var(--text)', lineHeight: 1.1 }}>
                 {dot.member || 'Add Team Member'}
               </div>
-              {dot.member && <div style={{ fontSize: 11, color: 'var(--muted)', fontFamily: 'Barlow Condensed, sans-serif', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 2 }}>Edit Assignment</div>}
+              {dot.member && <div style={{ fontSize: 11, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 2 }}>Edit Assignment</div>}
             </div>
           </div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', display: 'flex', alignItems: 'center', padding: 4 }}>
@@ -267,7 +277,7 @@ function DotEditPanel({ dot, team, projects = [], usedMembers = new Set(), onSav
         <div style={{ flex: 1, overflowY: 'auto', padding: '24px', display: 'flex', flexDirection: 'column', gap: 24 }}>
           {/* Team member */}
           <div>
-            <div style={{ fontSize: 11, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)', marginBottom: 8 }}>
+            <div style={{ fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)', marginBottom: 8 }}>
               Team Member
             </div>
             {team.length > 0 ? (
@@ -287,7 +297,7 @@ function DotEditPanel({ dot, team, projects = [], usedMembers = new Set(), onSav
 
           {/* Tasks */}
           <div>
-            <div style={{ fontSize: 11, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)', marginBottom: 10 }}>
+            <div style={{ fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)', marginBottom: 10 }}>
               Responsibilities
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -309,14 +319,14 @@ function DotEditPanel({ dot, team, projects = [], usedMembers = new Set(), onSav
             </div>
             <button
               onClick={addTask}
-              style={{ marginTop: 10, background: 'none', border: '1px dashed var(--border)', borderRadius: 8, padding: '10px 0', fontSize: 12, cursor: 'pointer', color: 'var(--muted)', fontFamily: 'Barlow Condensed, sans-serif', textTransform: 'uppercase', letterSpacing: '0.06em', display: 'flex', alignItems: 'center', gap: 5, width: '100%', justifyContent: 'center' }}
+              style={{ marginTop: 10, background: 'none', border: '1px dashed var(--border)', borderRadius: 8, padding: '10px 0', fontSize: 12, cursor: 'pointer', color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', textTransform: 'uppercase', letterSpacing: '0.06em', display: 'flex', alignItems: 'center', gap: 5, width: '100%', justifyContent: 'center' }}
             >
               <Plus size={12} /> Add Task
             </button>
 
             {suggestions.length > 0 && (
               <div style={{ marginTop: 16 }}>
-                <div style={{ fontSize: 9, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--green)', marginBottom: 8 }}>
+                <div style={{ fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--green)', marginBottom: 8 }}>
                   Suggested from past events
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
@@ -324,7 +334,7 @@ function DotEditPanel({ dot, team, projects = [], usedMembers = new Set(), onSav
                     <button
                       key={i}
                       onClick={() => addSuggestion(s)}
-                      style={{ background: '#f4faf7', border: '1px solid rgba(28,107,58,0.25)', borderRadius: 20, padding: '5px 12px', fontSize: 12, cursor: 'pointer', color: 'var(--green)', fontFamily: 'Barlow, sans-serif', display: 'flex', alignItems: 'center', gap: 4, transition: 'background 0.12s' }}
+                      style={{ background: '#f4faf7', border: '1px solid rgba(69,125,88,0.25)', borderRadius: 20, padding: '5px 12px', fontSize: 12, cursor: 'pointer', color: 'var(--green)', fontFamily: 'Montserrat, sans-serif', display: 'flex', alignItems: 'center', gap: 4, transition: 'background 0.12s' }}
                       onMouseOver={e => e.currentTarget.style.background = '#e6f4ec'}
                       onMouseOut={e => e.currentTarget.style.background = '#f4faf7'}
                     >
@@ -343,7 +353,7 @@ function DotEditPanel({ dot, team, projects = [], usedMembers = new Set(), onSav
             <button className="btn-primary" onClick={commit} style={{ flex: 1, fontSize: 14 }}>
               Save Task
             </button>
-            <button onClick={onClose} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 18px', fontSize: 12, cursor: 'pointer', color: 'var(--muted)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            <button onClick={onClose} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 18px', fontSize: 12, cursor: 'pointer', color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Cancel
             </button>
           </div>
@@ -351,7 +361,7 @@ function DotEditPanel({ dot, team, projects = [], usedMembers = new Set(), onSav
           {dot.member && !confirmingDelete && (
             <button
               onClick={() => setConfirmingDelete(true)}
-              style={{ background: 'none', border: '1px solid var(--red)', borderRadius: 8, padding: '8px 0', fontSize: 12, cursor: 'pointer', color: 'var(--red)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}
+              style={{ background: 'none', border: '1px solid var(--red)', borderRadius: 8, padding: '8px 0', fontSize: 12, cursor: 'pointer', color: 'var(--red)', fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}
             >
               <Trash2 size={13} /> Remove from this event
             </button>
@@ -368,13 +378,13 @@ function DotEditPanel({ dot, team, projects = [], usedMembers = new Set(), onSav
               <div style={{ display: 'flex', gap: 8 }}>
                 <button
                   onClick={() => { onSave({ member: '', responsibilities: [] }); onClose(); }}
-                  style={{ flex: 1, background: 'var(--red)', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 0', fontSize: 12, cursor: 'pointer', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}
+                  style={{ flex: 1, background: 'var(--red)', color: '#fff', border: 'none', borderRadius: 8, padding: '8px 0', fontSize: 12, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}
                 >
                   Yes, Remove
                 </button>
                 <button
                   onClick={() => setConfirmingDelete(false)}
-                  style={{ flex: 1, background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 0', fontSize: 12, cursor: 'pointer', color: 'var(--muted)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}
+                  style={{ flex: 1, background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 0', fontSize: 12, cursor: 'pointer', color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}
                 >
                   Keep
                 </button>
@@ -422,7 +432,7 @@ function DoneNotesStack({ notes }) {
           </button>
         )}
         <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 9, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#a89000', marginBottom: 3 }}>
+          <div style={{ fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#a89000', marginBottom: 3 }}>
             {safeIdx + 1} / {notes.length} · Done
           </div>
           <div style={{ fontSize: 12, color: 'var(--muted)', fontStyle: 'italic', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
@@ -443,7 +453,6 @@ function DoneNotesStack({ notes }) {
 export default function ProjectDetail({ project, projects = [], team = [], onUpdateDots, onUpdateProject, onEdit, onDelete, onDuplicate, onBack, onSelectPerson, isNew = false, isAdmin = false, currentUser = '' }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [editingDotIndex, setEditingDotIndex] = useState(null);
-  const [hubHover, setHubHover] = useState(false);
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [countWarning, setCountWarning] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -455,10 +464,14 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
   const [newNoteText, setNewNoteText] = useState('');
   const [nameDraft, setNameDraft] = useState(project.name || '');
   const [showLeadsPicker, setShowLeadsPicker] = useState(false);
+  const [editingDate, setEditingDate] = useState(false);
 
   useEffect(() => {
     setNameDraft(project.name || '');
   }, [project.id]);
+
+  // Playbill eyebrow — the season is read off the event's own date.
+  const season = seasonOf(project.date);
 
   const leadsArr = Array.isArray(project.leads) ? project.leads : project.leads ? [project.leads] : [];
 
@@ -566,115 +579,23 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
   const rows = [[], [], []];
   for (let r = 0; r < 3; r++) {
     for (let c = 0; c < 5; c++) {
-      if (r === 1 && c === 2) {
-        rows[r].push({ type: 'hub', key: 'hub' });
-      } else {
-        const priorityIdx = DOT_PRIORITY.findIndex(([dr, dc]) => dr === r && dc === c);
-        if (priorityIdx !== -1 && priorityIdx < dotCount) {
-          rows[r].push({ type: 'dot', index: priorityIdx, key: `${r}-${c}` });
-        }
+      const priorityIdx = DOT_PRIORITY.findIndex(([dr, dc]) => dr === r && dc === c);
+      if (priorityIdx !== -1 && priorityIdx < dotCount) {
+        rows[r].push({ type: 'dot', index: priorityIdx, key: `${r}-${c}` });
       }
     }
   }
 
   return (
     <div className="page" style={{ maxWidth: 'none' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 24 }}>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <button
-            onClick={onBack}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: 12, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: 4, padding: 0, marginBottom: 10 }}
-          >
-            <ArrowLeft size={13} /> All Projects
-          </button>
-          <input
-            value={nameDraft}
-            onChange={e => setNameDraft(e.target.value)}
-            onBlur={saveNameOnBlur}
-            onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur(); }}
-            placeholder="Event name..."
-            autoFocus={!project.name}
-            style={{
-              fontFamily: 'Commune, serif', fontSize: 'clamp(28px, 4vw, 52px)', fontWeight: 400,
-              color: nameDraft ? 'var(--blue)' : 'var(--muted)', letterSpacing: '-0.02em', lineHeight: 1.1,
-              background: 'none', border: 'none', borderBottom: '2px solid transparent', outline: 'none',
-              padding: '0 0 4px', width: '100%', marginBottom: 10, display: 'block',
-              transition: 'border-color 0.15s',
-            }}
-            onFocus={e => e.currentTarget.style.borderBottomColor = 'var(--border)'}
-            onBlurCapture={e => e.currentTarget.style.borderBottomColor = 'transparent'}
-          />
-          <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
-            {/* Date picker */}
-            <input
-              type="date"
-              value={project.date || ''}
-              onChange={e => onUpdateProject({ ...project, date: e.target.value })}
-              style={{
-                fontSize: 13, color: project.date ? 'var(--muted)' : 'var(--muted)',
-                border: '1px solid var(--border)', borderRadius: 6, padding: '4px 8px',
-                fontFamily: 'Barlow Condensed, sans-serif', background: 'var(--surface)', outline: 'none', cursor: 'pointer',
-              }}
-            />
-            {/* Leads picker */}
-            <div style={{ position: 'relative' }}>
-              <button
-                onClick={() => setShowLeadsPicker(v => !v)}
-                style={{ fontSize: 12, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, background: 'none', border: '1px solid var(--border)', borderRadius: 6, padding: '4px 10px', cursor: 'pointer', color: leadsArr.length ? 'var(--text)' : 'var(--muted)', display: 'flex', alignItems: 'center', gap: 6 }}
-              >
-                <Users size={11} />
-                {leadsArr.length > 0 ? (
-                  <>
-                    {leadsArr.map(leadName => {
-                      const m = team.find(t => t.name.trim().toLowerCase() === leadName.trim().toLowerCase());
-                      const initials = leadName.trim().split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
-                      return (
-                        <div key={leadName} style={{ width: 18, height: 18, borderRadius: '50%', background: 'var(--blue)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1.5px solid #fff', marginLeft: -4 }}>
-                          {m?.photoUrl
-                            ? <img src={m.photoUrl} alt={leadName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            : <span style={{ fontSize: 7, fontWeight: 700, color: '#fff', fontFamily: 'Barlow Condensed, sans-serif' }}>{initials}</span>}
-                        </div>
-                      );
-                    })}
-                    <span style={{ marginLeft: 2 }}>Lead: {leadsArr.join(', ')}</span>
-                  </>
-                ) : 'Add Leads'}
-              </button>
-              {showLeadsPicker && (
-                <>
-                  <div onClick={() => setShowLeadsPicker(false)} style={{ position: 'fixed', inset: 0, zIndex: 50 }} />
-                  <div style={{ position: 'absolute', top: 'calc(100% + 6px)', left: 0, background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, boxShadow: '0 4px 20px rgba(0,0,0,0.12)', zIndex: 51, minWidth: 180, padding: '6px 0', overflow: 'hidden' }}>
-                    {team.length === 0 && <div style={{ padding: '10px 14px', fontSize: 12, color: 'var(--muted)', fontStyle: 'italic' }}>No team members yet.</div>}
-                    {team.map(m => (
-                      <label key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '8px 14px', cursor: 'pointer', transition: 'background 0.1s' }}
-                        onMouseOver={e => e.currentTarget.style.background = 'var(--cream)'}
-                        onMouseOut={e => e.currentTarget.style.background = 'transparent'}
-                      >
-                        <input type="checkbox" checked={leadsArr.includes(m.name)} onChange={() => toggleLead(m.name)} style={{ accentColor: 'var(--green)', flexShrink: 0 }} />
-                        <span style={{ fontSize: 13, color: 'var(--text)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 600 }}>{m.name}</span>
-                      </label>
-                    ))}
-                  </div>
-                </>
-              )}
-            </div>
-            <span style={{
-              fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700,
-              textTransform: 'uppercase', letterSpacing: '0.1em',
-              color: project.completed ? '#C9A800' : project.blessed ? 'var(--green)' : project.submitted ? '#b45309' : 'var(--muted)',
-              display: 'flex', alignItems: 'center', gap: 4,
-            }}>
-              {project.completed
-                ? <><Trophy size={11} /> Complete</>
-                : project.blessed
-                ? <><CheckCircle2 size={11} /> Approved</>
-                : project.submitted
-                  ? <><Clock size={11} /> Awaiting Approval</>
-                  : <><Clock size={11} /> Draft</>}
-            </span>
-          </div>
-        </div>
+      {/* Header — back link and actions sit above the playbill */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12, marginBottom: 14, flexWrap: 'wrap' }}>
+        <button
+          onClick={onBack}
+          style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: 12, fontFamily: 'var(--font-body)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: 4, padding: '4px 0' }}
+        >
+          <ArrowLeft size={13} /> All Projects
+        </button>
 
         <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
           {/* Connect the Dots — staff submits for review */}
@@ -684,9 +605,9 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
               disabled={isConnecting}
               style={{
                 display: 'flex', alignItems: 'center', gap: 6,
-                background: 'var(--yellow)', color: '#112275',
+                background: 'var(--yellow)', color: '#175933',
                 border: 'none', borderRadius: 8, padding: '7px 16px', fontSize: 12, cursor: 'pointer',
-                fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800,
+                fontFamily: 'Montserrat, sans-serif', fontWeight: 800,
                 textTransform: 'uppercase', letterSpacing: '0.08em', transition: 'filter 0.15s',
               }}
               onMouseOver={e => e.currentTarget.style.filter = 'brightness(0.92)'}
@@ -702,7 +623,7 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
               style={{
                 background: 'none', border: '1px solid var(--border)', borderRadius: 8,
                 padding: '7px 14px', fontSize: 12, cursor: 'pointer', color: 'var(--muted)',
-                fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700,
+                fontFamily: 'Montserrat, sans-serif', fontWeight: 700,
                 textTransform: 'uppercase', letterSpacing: '0.06em',
               }}
             >
@@ -740,7 +661,7 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
                       style={{
                         display: 'block', width: '100%', textAlign: 'left',
                         padding: '9px 14px', border: 'none', background: 'none',
-                        fontSize: 12, fontFamily: 'Barlow Condensed, sans-serif',
+                        fontSize: 12, fontFamily: 'Montserrat, sans-serif',
                         fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em',
                         color: 'var(--text)', cursor: 'pointer',
                       }}
@@ -756,7 +677,7 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
           </div>
           {confirmDelete ? (
             <div style={{ display: 'flex', gap: 6 }}>
-              <button onClick={onDelete} style={{ background: 'var(--blue)', color: '#fff', border: 'none', borderRadius: 8, padding: '7px 14px', fontSize: 12, cursor: 'pointer', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Delete</button>
+              <button onClick={onDelete} style={{ background: 'var(--blue)', color: '#fff', border: 'none', borderRadius: 8, padding: '7px 14px', fontSize: 12, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Delete</button>
               <button onClick={() => setConfirmDelete(false)} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '7px 10px', fontSize: 12, cursor: 'pointer', color: 'var(--muted)' }}>Cancel</button>
             </div>
           ) : (
@@ -770,15 +691,157 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
         </div>
       </div>
 
+      {/* ── The Playbill ──────────────────────────────────
+          The event announced like a printed program cover:
+          crest, season, title, rule, credits — symmetrical,
+          with every line still the live control. */}
+      <div className="playbill" style={{ marginBottom: 24 }}>
+        <div className="pb-topbar">
+          {/* Date — reads as printed type, becomes a picker on click */}
+          {editingDate ? (
+            <input
+              type="date"
+              className="pb-date-input"
+              value={project.date || ''}
+              autoFocus
+              onChange={e => onUpdateProject({ ...project, date: e.target.value })}
+              onBlur={() => setEditingDate(false)}
+              onKeyDown={e => { if (e.key === 'Enter' || e.key === 'Escape') e.currentTarget.blur(); }}
+              aria-label="Event date"
+            />
+          ) : (
+            <button
+              className={`pb-date${project.date ? '' : ' empty'}`}
+              onClick={() => setEditingDate(true)}
+            >
+              {project.date ? fmt(project.date) : 'Add a date'}
+            </button>
+          )}
+
+          {(() => {
+            const textC = project.completed ? '#8F7700' : project.blessed ? 'var(--green)' : project.submitted ? '#b45309' : 'var(--muted)';
+            return (
+              <span className="pb-status" style={{ color: textC }}>
+                {project.completed
+                  ? <><Trophy size={11} /> Complete</>
+                  : project.blessed
+                  ? <><CheckCircle2 size={11} /> Approved</>
+                  : project.submitted
+                    ? <><Clock size={11} /> Awaiting Approval</>
+                    : <><Clock size={11} /> Draft</>}
+              </span>
+            );
+          })()}
+        </div>
+
+        {/* Crest */}
+        <input
+          ref={logoInputRef}
+          type="file"
+          accept="image/*"
+          style={{ display: 'none' }}
+          onChange={handleLogoUpload}
+        />
+        <button
+          className="pb-crest"
+          onClick={() => setShowIconPicker(true)}
+          title={project.logoUrl || project.iconName ? 'Change icon or logo' : 'Add an icon or logo'}
+        >
+          {project.logoUrl ? (
+            <img src={project.logoUrl} alt="Event logo" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 6, boxSizing: 'border-box' }} />
+          ) : project.iconName && ICON_MAP[project.iconName] ? (
+            (() => { const Icon = ICON_MAP[project.iconName]; return <Icon size={25} color="var(--blue)" strokeWidth={1.5} />; })()
+          ) : (
+            <LogoMark size={21} />
+          )}
+        </button>
+
+        {season && <div className="pb-eyebrow">{season}</div>}
+
+        <input
+          className="pb-title"
+          value={nameDraft}
+          onChange={e => setNameDraft(e.target.value)}
+          onBlur={saveNameOnBlur}
+          onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur(); }}
+          placeholder="Event name..."
+          autoFocus={!project.name}
+          aria-label="Event name"
+        />
+
+        <div className="pb-rule" />
+
+        {/* Credits */}
+        <div className="pb-credit" style={{ position: 'relative' }}>
+          <button
+            className={`pb-leads${leadsArr.length ? '' : ' empty'}`}
+            onClick={() => setShowLeadsPicker(v => !v)}
+            aria-expanded={showLeadsPicker}
+          >
+            {leadsArr.length > 0 ? (
+              <>
+                <span style={{ display: 'inline-flex', flexShrink: 0 }}>
+                  {leadsArr.map((leadName, i) => {
+                    const m = team.find(t => t.name.trim().toLowerCase() === leadName.trim().toLowerCase());
+                    const initials = leadName.trim().split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+                    return (
+                      <span key={leadName} style={{ width: 22, height: 22, borderRadius: '50%', background: 'var(--blue)', overflow: 'hidden', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, border: '1.5px solid #fff', marginLeft: i ? -8 : 0 }}>
+                        {m?.photoUrl
+                          ? <img src={m.photoUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                          : <span style={{ fontSize: 8, fontWeight: 700, color: '#fff', fontFamily: 'var(--font-body)' }}>{initials}</span>}
+                      </span>
+                    );
+                  })}
+                </span>
+                <span style={{ minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }} title={leadsArr.join(', ')}>
+                  Led by <b>{leadsArr.length > 1 ? `${leadsArr.slice(0, -1).join(', ')} and ${leadsArr[leadsArr.length - 1]}` : leadsArr[0]}</b>
+                </span>
+              </>
+            ) : 'Add leads'}
+          </button>
+          {showLeadsPicker && (
+            <>
+              <div onClick={() => setShowLeadsPicker(false)} style={{ position: 'fixed', inset: 0, zIndex: 50 }} />
+              <div style={{ position: 'absolute', top: 'calc(100% + 6px)', left: '50%', transform: 'translateX(-50%)', background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 10, boxShadow: '0 4px 20px rgba(0,0,0,0.12)', zIndex: 51, minWidth: 200, padding: '6px 0', overflow: 'hidden', textAlign: 'left' }}>
+                {team.length === 0 && <div style={{ padding: '10px 14px', fontSize: 12, color: 'var(--muted)', fontStyle: 'italic' }}>No team members yet.</div>}
+                {team.map(m => (
+                  <label key={m.id} style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '9px 14px', cursor: 'pointer', transition: 'background 0.1s' }}
+                    onMouseOver={e => e.currentTarget.style.background = 'var(--cream)'}
+                    onMouseOut={e => e.currentTarget.style.background = 'transparent'}
+                  >
+                    <input type="checkbox" checked={leadsArr.includes(m.name)} onChange={() => toggleLead(m.name)} style={{ accentColor: 'var(--green)', flexShrink: 0 }} />
+                    <span style={{ fontSize: 13, color: 'var(--text)', fontFamily: 'var(--font-body)', fontWeight: 600 }}>{m.name}</span>
+                  </label>
+                ))}
+              </div>
+            </>
+          )}
+        </div>
+
+        <div className="pb-credit">
+          <span>with a company of <span className="num">{dotCount}</span></span>
+          <span style={{ display: 'inline-flex', gap: 4 }}>
+            <button className="pb-step" onClick={() => changeDotCount(dotCount - 1)} disabled={dotCount <= 1} aria-label="Fewer team members">−</button>
+            <button className="pb-step" onClick={() => changeDotCount(dotCount + 1)} disabled={dotCount >= 12} aria-label="More team members">+</button>
+          </span>
+        </div>
+
+        {countWarning && (
+          <div style={{ fontSize: 11, fontFamily: 'var(--font-body)', color: 'var(--blue)', letterSpacing: '0.03em', marginTop: 10 }}>
+            Remove assigned members first before reducing the count.
+          </div>
+        )}
+      </div>
+
       {/* New project reminder */}
       {isNew && (!nameDraft.trim() || !project.date || leadsArr.length === 0) && (
         <div style={{
           display: 'flex', alignItems: 'center', gap: 10,
-          background: 'rgba(245,200,0,0.14)', border: '1px solid rgba(200,160,0,0.3)',
+          background: 'rgba(228,110,136,0.14)', border: '1px solid rgba(200,160,0,0.3)',
           borderRadius: 12, padding: '10px 16px', marginBottom: 20,
         }}>
           <Sparkles size={16} color="#a89000" strokeWidth={1.5} />
-          <span style={{ fontSize: 12, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, color: '#7a5c00', letterSpacing: '0.04em' }}>
+          <span style={{ fontSize: 12, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, color: '#7a5c00', letterSpacing: '0.04em' }}>
             {(() => {
               const missing = [];
               if (!nameDraft.trim()) missing.push('a name');
@@ -794,17 +857,17 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
       {readyToComplete && (
         <div style={{
           display: 'flex', alignItems: 'center', gap: 14,
-          background: 'rgba(28,107,58,0.07)', border: '1px solid rgba(28,107,58,0.25)',
+          background: 'rgba(69,125,88,0.07)', border: '1px solid rgba(69,125,88,0.25)',
           borderRadius: 12, padding: '14px 20px', marginBottom: 20,
         }}>
           <CheckCircle2 size={20} color="var(--green)" strokeWidth={1.5} style={{ flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
-            <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: 12, color: 'var(--green)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 2 }}>Ready to wrap up</div>
-            <div style={{ fontSize: 12, color: 'var(--muted)', fontFamily: 'Barlow Condensed, sans-serif' }}>This project is approved and all tasks are complete.</div>
+            <div style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 12, color: 'var(--green)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 2 }}>Ready to wrap up</div>
+            <div style={{ fontSize: 12, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif' }}>This project is approved and all tasks are complete.</div>
           </div>
           <button
             onClick={() => { onUpdateProject({ ...project, completed: true }); fireConfetti(); setShowCompleteDownload(true); }}
-            style={{ background: 'var(--green)', color: '#fff', border: 'none', borderRadius: 8, padding: '9px 18px', fontSize: 11, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', cursor: 'pointer', flexShrink: 0, transition: 'filter 0.15s' }}
+            style={{ background: 'var(--green)', color: '#fff', border: 'none', borderRadius: 8, padding: '9px 18px', fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', cursor: 'pointer', flexShrink: 0, transition: 'filter 0.15s' }}
             onMouseOver={e => e.currentTarget.style.filter = 'brightness(0.9)'}
             onMouseOut={e => e.currentTarget.style.filter = 'none'}
           >
@@ -822,12 +885,12 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
         }}>
           <Trophy size={20} color="#C9A800" strokeWidth={1.5} style={{ flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
-            <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: 12, color: '#C9A800', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 2 }}>Project Complete</div>
-            <div style={{ fontSize: 12, color: 'var(--muted)', fontFamily: 'Barlow Condensed, sans-serif' }}>Wrapped up and featured in your completed projects.</div>
+            <div style={{ fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 12, color: '#C9A800', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 2 }}>Project Complete</div>
+            <div style={{ fontSize: 12, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif' }}>Wrapped up and featured in your completed projects.</div>
           </div>
           <button
             onClick={() => onUpdateProject({ ...project, completed: false })}
-            style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 12px', fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', cursor: 'pointer', color: 'var(--muted)', transition: 'all 0.15s', flexShrink: 0 }}
+            style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 12px', fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', cursor: 'pointer', color: 'var(--muted)', transition: 'all 0.15s', flexShrink: 0 }}
             onMouseOver={e => { e.currentTarget.style.borderColor = 'var(--blue)'; e.currentTarget.style.color = 'var(--blue)'; }}
             onMouseOut={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--muted)'; }}
           >
@@ -836,82 +899,14 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
         </div>
       )}
 
-      {/* Team count adjuster */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
-        <span style={{ fontSize: 11, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>
-          Team members:
-        </span>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <button onClick={() => changeDotCount(dotCount - 1)} disabled={dotCount <= 1}
-            style={{ width: 26, height: 26, borderRadius: 6, border: '1px solid var(--border)', background: 'var(--surface)', cursor: dotCount <= 1 ? 'not-allowed' : 'pointer', color: 'var(--text)', fontWeight: 700, fontSize: 14, opacity: dotCount <= 1 ? 0.3 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            −
-          </button>
-          <span style={{ width: 24, textAlign: 'center', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: 16, color: 'var(--green)' }}>{dotCount}</span>
-          <button onClick={() => changeDotCount(dotCount + 1)} disabled={dotCount >= 12}
-            style={{ width: 26, height: 26, borderRadius: 6, border: '1px solid var(--border)', background: 'var(--surface)', cursor: dotCount >= 12 ? 'not-allowed' : 'pointer', color: 'var(--text)', fontWeight: 700, fontSize: 14, opacity: dotCount >= 12 ? 0.3 : 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            +
-          </button>
-        </div>
-        {countWarning && (
-          <span style={{ fontSize: 11, fontFamily: 'Barlow Condensed, sans-serif', color: 'var(--blue)', letterSpacing: '0.03em' }}>
-            Remove assigned members first before reducing the count.
-          </span>
-        )}
-      </div>
-
       {/* Hub diagram */}
       <div className="hub-wrap">
         <div className="hub-grid">
           {(() => {
-            const hubBg = project.blessed ? 'var(--green)' : project.submitted ? 'var(--yellow)' : 'var(--blue)';
-            const hubOnColor = (project.submitted && !project.blessed) ? '#112275' : '#fff';
             const accentColor = project.blessed ? 'var(--green)' : project.submitted ? 'var(--yellow)' : 'var(--blue)';
-            return rows.map((row, r) => (
+            return rows.filter(row => row.length > 0).map((row, r) => (
             <div key={r} className="hub-row">
-              {row.map(cell =>
-            cell.type === 'hub' ? (
-              <div
-                key="hub"
-                className={`hub-center${isConnecting ? ' ctd-hub-animate' : ''}`}
-                style={{ position: 'relative', cursor: 'pointer', overflow: 'hidden', background: isConnecting ? undefined : hubBg }}
-                onClick={() => setShowIconPicker(true)}
-                onMouseEnter={() => setHubHover(true)}
-                onMouseLeave={() => setHubHover(false)}
-                title="Click to set an icon or logo"
-              >
-                <input
-                  ref={logoInputRef}
-                  type="file"
-                  accept="image/*"
-                  style={{ display: 'none' }}
-                  onChange={handleLogoUpload}
-                />
-                {project.logoUrl ? (
-                  <img
-                    src={project.logoUrl}
-                    alt="Project logo"
-                    style={{ width: '60%', maxHeight: '55%', objectFit: 'contain', borderRadius: 6 }}
-                  />
-                ) : project.iconName && ICON_MAP[project.iconName] ? (
-                  (() => { const Icon = ICON_MAP[project.iconName]; return <Icon size={52} color={hubOnColor} strokeWidth={1.5} />; })()
-                ) : (
-                  <LogoMark size={32} />
-                )}
-                <div className="hub-center-name" style={{ color: hubOnColor }}>{project.name}</div>
-                {/* Hover overlay */}
-                <div style={{
-                  position: 'absolute', inset: 0,
-                  background: 'rgba(0,0,0,0.28)',
-                  display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 4,
-                  opacity: hubHover ? 1 : 0, transition: 'opacity 0.15s', borderRadius: 'inherit',
-                }}>
-                  <Sparkles size={20} color="#fff" />
-                  <span style={{ color: '#fff', fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                    {project.logoUrl || project.iconName ? 'Change' : 'Add Icon'}
-                  </span>
-                </div>
-              </div>
-            ) : (
+              {row.map(cell => (
               <DotCell
                 key={cell.key}
                 dot={project.dots[cell.index] || { member: '', responsibilities: [] }}
@@ -924,15 +919,14 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
                 animDelay={isConnecting ? `${150 + Math.floor(cell.index / 4) * 150}ms` : '0ms'}
                 accentColor={accentColor}
               />
-            )
-              )}
+              ))}
             </div>
           ));
           })()}
         </div>
       </div>
 
-      <p style={{ textAlign: 'center', fontSize: 11, color: 'var(--muted)', marginTop: 14, fontFamily: 'Barlow Condensed, sans-serif', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+      <p style={{ textAlign: 'center', fontSize: 11, color: 'var(--muted)', marginTop: 14, fontFamily: 'Montserrat, sans-serif', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
         Click any box to assign a team member
       </p>
 
@@ -970,7 +964,7 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
               <div className="section-title" style={{ marginBottom: 0 }}>Notes</div>
               <button
                 onClick={() => { setShowAddNote(v => !v); setNewNoteText(''); }}
-                style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 6, padding: '3px 10px', fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
+                style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 6, padding: '3px 10px', fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4 }}
               >
                 <Plus size={10} /> Add
               </button>
@@ -989,8 +983,8 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
                   style={{ width: '100%', border: 'none', background: 'transparent', resize: 'none', outline: 'none', fontSize: 13, color: 'var(--text)', fontFamily: 'inherit', lineHeight: 1.6, boxSizing: 'border-box' }}
                 />
                 <div style={{ display: 'flex', gap: 6, marginTop: 8, justifyContent: 'flex-end' }}>
-                  <button onClick={() => { setShowAddNote(false); setNewNoteText(''); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--muted)', padding: '4px 8px' }}>Cancel</button>
-                  <button onClick={saveNote} disabled={!newNoteText.trim()} style={{ background: newNoteText.trim() ? '#c8b400' : 'var(--cream-dk)', border: 'none', borderRadius: 6, padding: '4px 12px', fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: newNoteText.trim() ? '#fff' : 'var(--muted)', cursor: newNoteText.trim() ? 'pointer' : 'not-allowed', transition: 'all 0.15s' }}>Save</button>
+                  <button onClick={() => { setShowAddNote(false); setNewNoteText(''); }} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--muted)', padding: '4px 8px' }}>Cancel</button>
+                  <button onClick={saveNote} disabled={!newNoteText.trim()} style={{ background: newNoteText.trim() ? '#c8b400' : 'var(--cream-dk)', border: 'none', borderRadius: 6, padding: '4px 12px', fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: newNoteText.trim() ? '#fff' : 'var(--muted)', cursor: newNoteText.trim() ? 'pointer' : 'not-allowed', transition: 'all 0.15s' }}>Save</button>
                 </div>
               </div>
             )}
@@ -1004,14 +998,14 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
                       onClick={() => markDone(note.id)}
                       title="Mark as done"
                       style={{ position: 'absolute', top: 8, right: 8, width: 20, height: 20, borderRadius: '50%', border: '1.5px solid #c8b400', background: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#c8b400', padding: 0, transition: 'all 0.15s' }}
-                      onMouseOver={e => { e.currentTarget.style.background = '#F5C800'; e.currentTarget.style.borderColor = '#F5C800'; e.currentTarget.style.color = '#fff'; }}
+                      onMouseOver={e => { e.currentTarget.style.background = '#E46E88'; e.currentTarget.style.borderColor = '#E46E88'; e.currentTarget.style.color = '#fff'; }}
                       onMouseOut={e => { e.currentTarget.style.background = 'none'; e.currentTarget.style.borderColor = '#c8b400'; e.currentTarget.style.color = '#c8b400'; }}
                     >
                       <CheckCircle2 size={11} />
                     </button>
                     <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6, paddingRight: 26, whiteSpace: 'pre-wrap' }}>{note.text}</div>
                     {note.createdAt && (
-                      <div style={{ fontSize: 10, color: 'var(--muted)', fontFamily: 'Barlow Condensed, sans-serif', letterSpacing: '0.04em', marginTop: 8 }}>
+                      <div style={{ fontSize: 10, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', letterSpacing: '0.04em', marginTop: 8 }}>
                         {new Date(note.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                       </div>
                     )}
@@ -1033,19 +1027,19 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
       {/* ── Print-only layout ──────────────────────────── */}
       <div ref={printRef} className="print-only">
         {/* Masthead */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 14, marginBottom: 20, borderBottom: '2.5px solid #112275' }}>
-          <div style={{ fontFamily: 'Commune, serif', fontSize: 24, letterSpacing: '-0.02em', color: '#112275', lineHeight: 1 }}>
-            Connect<span style={{ color: '#7EC4E8' }}>Hub</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 14, marginBottom: 20, borderBottom: '2.5px solid #175933' }}>
+          <div style={{ fontFamily: 'var(--font-heading)', fontSize: 24, letterSpacing: '-0.02em', color: '#175933', lineHeight: 1 }}>
+            Connect<span style={{ color: '#6EC8F5' }}>Hub</span>
           </div>
-          <div style={{ fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', border: `1.5px solid ${project.blessed ? '#1C6B3A' : project.submitted ? '#b45309' : '#ccc'}`, color: project.blessed ? '#1C6B3A' : project.submitted ? '#b45309' : '#999', borderRadius: 4, padding: '3px 10px' }}>
+          <div style={{ fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', border: `1.5px solid ${project.blessed ? '#457D58' : project.submitted ? '#b45309' : '#ccc'}`, color: project.blessed ? '#457D58' : project.submitted ? '#b45309' : '#999', borderRadius: 4, padding: '3px 10px' }}>
             {project.blessed ? '✓ Approved' : project.submitted ? 'Awaiting Approval' : 'Draft'}
           </div>
         </div>
 
         {/* Project title */}
         <div style={{ marginBottom: 22 }}>
-          <h1 style={{ fontFamily: 'Commune, serif', fontSize: 44, fontWeight: 'normal', color: '#112275', letterSpacing: '-0.03em', lineHeight: 1, marginBottom: 6 }}>{project.name}</h1>
-          <div style={{ display: 'flex', gap: 24, fontSize: 12, color: '#7A7E99', fontFamily: 'Barlow Condensed, sans-serif', letterSpacing: '0.04em', alignItems: 'center', flexWrap: 'wrap' }}>
+          <h1 style={{ fontFamily: 'var(--font-heading)', fontSize: 44, fontWeight: 'normal', color: '#175933', letterSpacing: '-0.03em', lineHeight: 1, marginBottom: 6 }}>{project.name}</h1>
+          <div style={{ display: 'flex', gap: 24, fontSize: 12, color: '#5E7A68', fontFamily: 'Montserrat, sans-serif', letterSpacing: '0.04em', alignItems: 'center', flexWrap: 'wrap' }}>
             {project.date && <span>{fmt(project.date)}</span>}
             {project.leads?.length > 0 && (() => {
               const leadsArr = Array.isArray(project.leads) ? project.leads : [project.leads];
@@ -1057,12 +1051,12 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
                     const initials = leadName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
                     return (
                       <span key={i} style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
-                        <span style={{ width: 22, height: 22, borderRadius: '50%', background: '#1C6B3A', flexShrink: 0, overflow: 'hidden', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
+                        <span style={{ width: 22, height: 22, borderRadius: '50%', background: '#457D58', flexShrink: 0, overflow: 'hidden', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
                           {member?.photoUrl
                             ? <img src={member.photoUrl} alt={leadName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                            : <span style={{ fontSize: 8, fontWeight: 700, color: '#fff', fontFamily: 'Barlow Condensed, sans-serif', lineHeight: 1 }}>{initials}</span>}
+                            : <span style={{ fontSize: 8, fontWeight: 700, color: '#fff', fontFamily: 'Montserrat, sans-serif', lineHeight: 1 }}>{initials}</span>}
                         </span>
-                        <strong style={{ color: '#0D1730' }}>{leadName}</strong>
+                        <strong style={{ color: '#0D2B1A' }}>{leadName}</strong>
                         {i < leadsArr.length - 1 && <span style={{ color: '#ccc' }}>·</span>}
                       </span>
                     );
@@ -1074,7 +1068,7 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
         </div>
 
         {/* Section label */}
-        <div style={{ fontSize: 9, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#7A7E99', marginBottom: 10 }}>
+        <div style={{ fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#5E7A68', marginBottom: 10 }}>
           Team Assignments
         </div>
 
@@ -1086,14 +1080,14 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
             return (
               <div key={i} style={{ border: '1px solid #ddd', borderRadius: 8, padding: '11px 14px', breakInside: 'avoid' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8, paddingBottom: 7, borderBottom: '1px solid #eee' }}>
-                  <span style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#112275' }}>{dot.member}</span>
-                  {tasks.length > 0 && <span style={{ fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', color: done === tasks.length ? '#1C6B3A' : '#999' }}>{done}/{tasks.length} done</span>}
+                  <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#175933' }}>{dot.member}</span>
+                  {tasks.length > 0 && <span style={{ fontSize: 10, fontFamily: 'Montserrat, sans-serif', color: done === tasks.length ? '#457D58' : '#999' }}>{done}/{tasks.length} done</span>}
                 </div>
                 {tasks.length === 0 ? (
                   <div style={{ fontSize: 11, color: '#bbb', fontStyle: 'italic' }}>No tasks assigned</div>
                 ) : tasks.map((task, ti) => (
                   <div key={ti} style={{ display: 'flex', alignItems: 'flex-start', gap: 7, marginBottom: 5 }}>
-                    <div style={{ width: 11, height: 11, border: `1.5px solid ${task.done ? '#1C6B3A' : '#bbb'}`, borderRadius: 2, flexShrink: 0, marginTop: 1, background: task.done ? '#1C6B3A' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: 11, height: 11, border: `1.5px solid ${task.done ? '#457D58' : '#bbb'}`, borderRadius: 2, flexShrink: 0, marginTop: 1, background: task.done ? '#457D58' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       {task.done && <span style={{ color: '#fff', fontSize: 8, lineHeight: 1 }}>✓</span>}
                     </div>
                     <span style={{ fontSize: 11, color: task.done ? '#bbb' : '#333', textDecoration: task.done ? 'line-through' : 'none', lineHeight: 1.4 }}>{task.text}</span>
@@ -1105,7 +1099,7 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
         </div>
 
         {/* Footer */}
-        <div style={{ marginTop: 20, paddingTop: 10, borderTop: '1px solid #eee', display: 'flex', justifyContent: 'space-between', fontSize: 9, color: '#bbb', fontFamily: 'Barlow Condensed, sans-serif', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
+        <div style={{ marginTop: 20, paddingTop: 10, borderTop: '1px solid #eee', display: 'flex', justifyContent: 'space-between', fontSize: 9, color: '#bbb', fontFamily: 'Montserrat, sans-serif', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
           <span>ConnectHub — Project Summary</span>
           <span>Generated {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
         </div>
@@ -1113,20 +1107,20 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
 
       {showCompleteDownload && (
         <>
-          <div onClick={() => setShowCompleteDownload(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(13,23,48,0.28)', zIndex: 300, backdropFilter: 'blur(4px)' }} />
+          <div onClick={() => setShowCompleteDownload(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(13,43,26,0.28)', zIndex: 300, backdropFilter: 'blur(4px)' }} />
           <div style={{
             position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)',
             background: '#fff', borderRadius: 14, zIndex: 301, width: 340,
-            boxShadow: '0 24px 64px rgba(13,23,48,0.18), 0 2px 8px rgba(13,23,48,0.07)',
+            boxShadow: '0 24px 64px rgba(13,43,26,0.18), 0 2px 8px rgba(13,43,26,0.07)',
             overflow: 'hidden',
           }}>
             <div style={{ height: 3, background: '#C9A800' }} />
             <div style={{ padding: '24px 24px 20px' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
                 <Trophy size={18} color="#C9A800" strokeWidth={1.8} />
-                <div style={{ fontFamily: 'Commune, serif', fontSize: 19, fontWeight: 700, color: 'var(--blue)' }}>Nice work!</div>
+                <div style={{ fontFamily: 'var(--font-heading)', fontSize: 19, fontWeight: 700, color: 'var(--blue)' }}>Nice work!</div>
               </div>
-              <div style={{ fontSize: 13, color: 'var(--muted)', fontFamily: 'Barlow Condensed, sans-serif', marginBottom: 20, lineHeight: 1.5 }}>
+              <div style={{ fontSize: 13, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', marginBottom: 20, lineHeight: 1.5 }}>
                 Want to download a copy of this project for your records?
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
@@ -1134,7 +1128,7 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
                   <button
                     key={fmt}
                     onClick={async () => { setShowCompleteDownload(false); await handleDownload(fmt); }}
-                    style={{ width: '100%', padding: '10px 0', background: 'var(--blue)', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#fff', transition: 'filter 0.15s' }}
+                    style={{ width: '100%', padding: '10px 0', background: 'var(--blue)', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 12, fontFamily: 'Montserrat, sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#fff', transition: 'filter 0.15s' }}
                     onMouseOver={e => e.currentTarget.style.filter = 'brightness(1.15)'}
                     onMouseOut={e => e.currentTarget.style.filter = 'none'}
                   >
@@ -1143,7 +1137,7 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
                 ))}
                 <button
                   onClick={() => setShowCompleteDownload(false)}
-                  style={{ width: '100%', padding: '9px 0', background: 'none', border: '1px solid var(--border)', borderRadius: 8, cursor: 'pointer', fontSize: 11, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--muted)', transition: 'all 0.15s' }}
+                  style={{ width: '100%', padding: '9px 0', background: 'none', border: '1px solid var(--border)', borderRadius: 8, cursor: 'pointer', fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--muted)', transition: 'all 0.15s' }}
                   onMouseOver={e => { e.currentTarget.style.borderColor = 'var(--blue)'; e.currentTarget.style.color = 'var(--blue)'; }}
                   onMouseOut={e => { e.currentTarget.style.borderColor = 'var(--border)'; e.currentTarget.style.color = 'var(--muted)'; }}
                 >

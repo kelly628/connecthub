@@ -3,15 +3,15 @@ import { Plus, Pencil, Trash2, Camera, X, Check, LayoutList, BookOpen, Clipboard
 import LogoMark from './LogoMark';
 
 const BINDER_COLORS = [
-  '#112275', // navy (theme blue)
-  '#1C6B3A', // forest (theme green)
+  '#175933', // navy (theme blue)
+  '#457D58', // forest (theme green)
   '#C04A18', // rust / burnt orange
   '#B83468', // rose pink
-  '#2D54A8', // cornflower blue
+  '#3A7355', // cornflower blue
   '#B89400', // deep gold
   '#1A7A50', // teal green
   '#C2305A', // deeper pink
-  '#1A3E8A', // medium navy
+  '#2E6E45', // medium navy
 ];
 
 function Avatar({ member, size = 48 }) {
@@ -20,7 +20,7 @@ function Avatar({ member, size = 48 }) {
     <div style={{ width: size, height: size, borderRadius: '50%', background: 'var(--green)', flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       {member.photoUrl
         ? <img src={member.photoUrl} alt={member.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-        : <span style={{ fontSize: size * 0.35, fontWeight: 700, color: '#fff', fontFamily: 'Barlow Condensed, sans-serif' }}>{initials}</span>
+        : <span style={{ fontSize: size * 0.35, fontWeight: 700, color: '#fff', fontFamily: 'Montserrat, sans-serif' }}>{initials}</span>
       }
     </div>
   );
@@ -104,16 +104,16 @@ function BinderInterior({ member, projects, color, onClose, onToggleTask, isAdmi
               <div style={{ width: 52, height: 52, borderRadius: '50%', background: color, overflow: 'hidden', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', border: '3px solid #fff', boxShadow: `0 0 0 1.5px ${color}40` }}>
                 {member.photoUrl
                   ? <img src={member.photoUrl} alt={member.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  : <span style={{ fontSize: 19, fontWeight: 700, color: '#fff', fontFamily: 'Barlow Condensed, sans-serif' }}>{initials}</span>}
+                  : <span style={{ fontSize: 19, fontWeight: 700, color: '#fff', fontFamily: 'Montserrat, sans-serif' }}>{initials}</span>}
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontFamily: 'Commune, serif', fontSize: 22, fontWeight: 700, color, lineHeight: 1 }}>{member.name}</div>
-                {member.title && <div style={{ fontSize: 9, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#bbb', marginTop: 4 }}>{member.title}</div>}
+                <div style={{ fontFamily: 'var(--font-heading)', fontSize: 22, fontWeight: 700, color, lineHeight: 1 }}>{member.name}</div>
+                {member.title && <div style={{ fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#bbb', marginTop: 4 }}>{member.title}</div>}
               </div>
               {activeProject && (
                 <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                  <div style={{ fontSize: 9, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#ccc', marginBottom: 2 }}>Tasks</div>
-                  <div style={{ fontSize: 13, fontFamily: 'Commune, serif', fontWeight: 700, color: done === activeTasks.length && activeTasks.length > 0 ? tabColor : 'var(--text)' }}>{done} / {activeTasks.length}</div>
+                  <div style={{ fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#ccc', marginBottom: 2 }}>Tasks</div>
+                  <div style={{ fontSize: 13, fontFamily: 'var(--font-body)', fontWeight: 700, color: done === activeTasks.length && activeTasks.length > 0 ? tabColor : 'var(--text)' }}>{done} / {activeTasks.length}</div>
                 </div>
               )}
               <button onClick={onClose} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 10px', cursor: 'pointer', color: 'var(--muted)', display: 'flex', alignItems: 'center', flexShrink: 0 }}>
@@ -124,7 +124,7 @@ function BinderInterior({ member, projects, color, onClose, onToggleTask, isAdmi
             {memberProjects.length === 0 ? (
               <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
                 <ClipboardList size={40} color="#ddd" strokeWidth={1.2} />
-                <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.09em', color: '#ccc' }}>No projects assigned yet</div>
+                <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.09em', color: '#ccc' }}>No projects assigned yet</div>
               </div>
             ) : (
               <>
@@ -138,7 +138,7 @@ function BinderInterior({ member, projects, color, onClose, onToggleTask, isAdmi
                         padding: isActive ? '8px 16px 10px' : '7px 16px 6px',
                         border: 'none', borderRadius: '7px 7px 0 0',
                         cursor: 'pointer',
-                        fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700,
+                        fontFamily: 'Montserrat, sans-serif', fontWeight: 700,
                         fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.07em',
                         background: isActive ? tc : 'rgba(0,0,0,0.06)',
                         color: isActive ? '#fff' : '#aaa',
@@ -160,7 +160,7 @@ function BinderInterior({ member, projects, color, onClose, onToggleTask, isAdmi
                       padding: showProud ? '8px 14px 10px' : '7px 14px 6px',
                       border: 'none', borderRadius: '7px 7px 0 0',
                       cursor: 'pointer',
-                      fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700,
+                      fontFamily: 'Montserrat, sans-serif', fontWeight: 700,
                       fontSize: 11, textTransform: 'uppercase', letterSpacing: '0.07em',
                       background: showProud ? '#C9A800' : 'rgba(197,163,0,0.12)',
                       color: showProud ? '#fff' : '#C9A800',
@@ -188,11 +188,11 @@ function BinderInterior({ member, projects, color, onClose, onToggleTask, isAdmi
                     {proudProjects.length === 0 ? (
                       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: 10, paddingTop: 40 }}>
                         <Trophy size={38} color="#ddd" strokeWidth={1.2} />
-                        <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.09em', color: '#ccc' }}>No completed projects yet</div>
+                        <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.09em', color: '#ccc' }}>No completed projects yet</div>
                       </div>
                     ) : (
                       <>
-                        <div style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#C9A800', fontWeight: 700, marginBottom: 16 }}>
+                        <div style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 10, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#C9A800', fontWeight: 700, marginBottom: 16 }}>
                           {proudProjects.length} {proudProjects.length === 1 ? 'Project' : 'Projects'} Completed
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
@@ -205,7 +205,7 @@ function BinderInterior({ member, projects, color, onClose, onToggleTask, isAdmi
                               <div key={p.id} style={{ background: '#fff', border: '1.5px solid rgba(201,168,0,0.25)', borderRadius: 10, overflow: 'hidden' }}>
                                 <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '10px 14px', borderBottom: '1px solid rgba(201,168,0,0.15)', background: 'rgba(201,168,0,0.05)' }}>
                                   <div style={{ width: 8, height: 8, borderRadius: '50%', background: pc, flexShrink: 0 }} />
-                                  <span style={{ fontFamily: 'Commune, serif', fontSize: 15, fontWeight: 700, color: pc }}>{p.name}</span>
+                                  <span style={{ fontFamily: 'var(--font-heading)', fontSize: 15, fontWeight: 700, color: pc }}>{p.name}</span>
                                   <Trophy size={12} color="#C9A800" strokeWidth={1.8} style={{ marginLeft: 'auto' }} />
                                 </div>
                                 <div style={{ padding: '8px 14px 12px', display: 'flex', flexDirection: 'column', gap: 4 }}>
@@ -215,7 +215,7 @@ function BinderInterior({ member, projects, color, onClose, onToggleTask, isAdmi
                                         <circle cx="5.5" cy="5.5" r="5" fill="#C9A800" />
                                         <polyline points="2.5,5.5 4.5,7.5 8.5,3.5" stroke="#fff" strokeWidth="1.6" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
                                       </svg>
-                                      <span style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: 13, color: '#888', letterSpacing: '0.02em' }}>{task.text}</span>
+                                      <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 13, color: '#888', letterSpacing: '0.02em' }}>{task.text}</span>
                                     </div>
                                   ))}
                                 </div>
@@ -235,7 +235,7 @@ function BinderInterior({ member, projects, color, onClose, onToggleTask, isAdmi
                     backgroundPositionY: '6px',
                   }}>
                     {activeTasks.length === 0 ? (
-                      <div style={{ paddingTop: 20, color: '#ccc', fontFamily: 'Barlow Condensed, sans-serif', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.08em' }}>No tasks for this project</div>
+                      <div style={{ paddingTop: 20, color: '#ccc', fontFamily: 'Montserrat, sans-serif', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.08em' }}>No tasks for this project</div>
                     ) : (
                       activeTasks.map(({ task, dotIdx, taskIdx }, i) => {
                         const canToggle = activeProject.blessed && (isAdmin || currentUser.trim().toLowerCase() === member.name.trim().toLowerCase());
@@ -248,7 +248,7 @@ function BinderInterior({ member, projects, color, onClose, onToggleTask, isAdmi
                           <div style={{ width: 15, height: 15, borderRadius: 4, flexShrink: 0, background: task.done ? tabColor : 'transparent', border: `2px solid ${task.done ? tabColor : '#ddd'}`, display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.15s' }}>
                             {task.done && <svg width="9" height="9" viewBox="0 0 9 9"><polyline points="1.5,4.5 3.5,6.5 7.5,2" stroke="#fff" strokeWidth="1.8" fill="none" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                           </div>
-                          <span style={{ fontFamily: 'Barlow Condensed, sans-serif', fontSize: 14, letterSpacing: '0.02em', color: task.done ? '#bbb' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none', transition: 'all 0.15s' }}>
+                          <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 14, letterSpacing: '0.02em', color: task.done ? '#bbb' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none', transition: 'all 0.15s' }}>
                             {task.text}
                           </span>
                         </div>
@@ -330,7 +330,7 @@ function BinderCard({ member, projects, onOpenBinder, colorIndex }) {
         <div style={{
           position: 'absolute', top: '46%', left: '50%',
           transform: 'translate(-50%, -50%)',
-          fontSize: 80, fontFamily: 'Commune, serif', fontWeight: 700,
+          fontSize: 80, fontFamily: 'var(--font-heading)', fontWeight: 700,
           color: color, opacity: 0.045,
           pointerEvents: 'none', userSelect: 'none', lineHeight: 1,
         }}>
@@ -357,16 +357,16 @@ function BinderCard({ member, projects, onOpenBinder, colorIndex }) {
           }}>
             {member.photoUrl
               ? <img src={member.photoUrl} alt={member.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              : <span style={{ fontSize: 22, fontWeight: 700, color: '#fff', fontFamily: 'Barlow Condensed, sans-serif' }}>{initials}</span>}
+              : <span style={{ fontSize: 22, fontWeight: 700, color: '#fff', fontFamily: 'Montserrat, sans-serif' }}>{initials}</span>}
           </div>
 
           {/* Name + title */}
           <div style={{ textAlign: 'center' }}>
-            <div style={{ fontFamily: 'Commune, serif', fontSize: 15, fontWeight: 700, color: color, lineHeight: 1.2, marginBottom: 4 }}>
+            <div style={{ fontFamily: 'var(--font-heading)', fontSize: 15, fontWeight: 700, color: color, lineHeight: 1.2, marginBottom: 4 }}>
               {member.name}
             </div>
             {member.title && (
-              <div style={{ fontSize: 7.5, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.13em', color: '#c0b8ae' }}>
+              <div style={{ fontSize: 7.5, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.13em', color: '#c0b8ae' }}>
                 {member.title}
               </div>
             )}
@@ -378,15 +378,15 @@ function BinderCard({ member, projects, onOpenBinder, colorIndex }) {
           {pct !== null ? (
             <>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-                <span style={{ fontSize: 7, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.09em', color: '#c8c0b4' }}>Progress</span>
-                <span style={{ fontSize: 7, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, color: pct === 100 ? color : '#c8c0b4' }}>{pct}%</span>
+                <span style={{ fontSize: 7, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.09em', color: '#c8c0b4' }}>Progress</span>
+                <span style={{ fontSize: 7, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, color: pct === 100 ? color : '#c8c0b4' }}>{pct}%</span>
               </div>
               <div style={{ height: 2, background: 'rgba(0,0,0,0.07)', borderRadius: 99, overflow: 'hidden' }}>
                 <div style={{ height: '100%', width: `${pct}%`, background: color, borderRadius: 99 }} />
               </div>
             </>
           ) : (
-            <div style={{ fontSize: 7, fontFamily: 'Barlow Condensed, sans-serif', textTransform: 'uppercase', letterSpacing: '0.09em', color: '#d4cdc6', textAlign: 'center' }}>No tasks yet</div>
+            <div style={{ fontSize: 7, fontFamily: 'Montserrat, sans-serif', textTransform: 'uppercase', letterSpacing: '0.09em', color: '#d4cdc6', textAlign: 'center' }}>No tasks yet</div>
           )}
         </div>
       </div>
@@ -408,16 +408,16 @@ function MemberRow({ member, projects, onEdit, onDelete, onSelect }) {
       <div style={{ flex: 1, minWidth: 0, cursor: 'pointer' }} onClick={() => onSelect(member.name)}>
         <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)' }}>{member.name}</div>
         {member.title && <div style={{ fontSize: 11, color: 'var(--muted)' }}>{member.title}</div>}
-        <div style={{ fontSize: 10, color: 'var(--muted)', fontFamily: 'Barlow Condensed, sans-serif', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 2 }}>
+        <div style={{ fontSize: 10, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 2 }}>
           {total} {total === 1 ? 'task' : 'tasks'} assigned
         </div>
         {total > 0 && (
           <div style={{ marginTop: 5 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
-              <span style={{ fontSize: 9, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: allDone ? 'var(--green)' : 'var(--muted)' }}>
+              <span style={{ fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: allDone ? 'var(--green)' : 'var(--muted)' }}>
                 Overall Progress
               </span>
-              <span style={{ fontSize: 9, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, color: allDone ? 'var(--green)' : 'var(--muted)' }}>
+              <span style={{ fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, color: allDone ? 'var(--green)' : 'var(--muted)' }}>
                 {pct}%
               </span>
             </div>
@@ -462,7 +462,7 @@ function MemberForm({ initial, onSave, onCancel }) {
           <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'var(--green)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {photoUrl
               ? <img src={photoUrl} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-              : <span style={{ fontSize: 20, fontWeight: 700, color: '#fff', fontFamily: 'Barlow Condensed, sans-serif' }}>{initials}</span>}
+              : <span style={{ fontSize: 20, fontWeight: 700, color: '#fff', fontFamily: 'Montserrat, sans-serif' }}>{initials}</span>}
           </div>
           <button
             onClick={() => fileRef.current.click()}
@@ -537,13 +537,13 @@ export default function PeopleView({ team, projects, onSaveTeam, onSelectPerson,
         <div style={{ display: 'flex', border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
           <button
             onClick={() => setViewMode('list')}
-            style={{ padding: '7px 12px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', background: viewMode === 'list' ? 'var(--blue)' : 'var(--surface)', color: viewMode === 'list' ? '#fff' : 'var(--muted)', transition: 'all 0.15s' }}
+            style={{ padding: '7px 12px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', background: viewMode === 'list' ? 'var(--blue)' : 'var(--surface)', color: viewMode === 'list' ? '#fff' : 'var(--muted)', transition: 'all 0.15s' }}
           >
             <LayoutList size={13} /> List
           </button>
           <button
             onClick={() => setViewMode('binder')}
-            style={{ padding: '7px 12px', border: 'none', borderLeft: '1px solid var(--border)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', background: viewMode === 'binder' ? 'var(--blue)' : 'var(--surface)', color: viewMode === 'binder' ? '#fff' : 'var(--muted)', transition: 'all 0.15s' }}
+            style={{ padding: '7px 12px', border: 'none', borderLeft: '1px solid var(--border)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', background: viewMode === 'binder' ? 'var(--blue)' : 'var(--surface)', color: viewMode === 'binder' ? '#fff' : 'var(--muted)', transition: 'all 0.15s' }}
           >
             <BookOpen size={13} /> Binder
           </button>

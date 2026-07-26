@@ -1,40 +1,38 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow:wght@300;400;500;600&family=Barlow+Condensed:wght@600;700;800&display=swap');
-
-@font-face {
-  font-family: 'Commune';
-  src: url('/GC-commune.woff2') format('woff2'),
-       url('/GC-commune.woff') format('woff');
-  font-weight: normal;
-  font-style: normal;
-  font-display: swap;
-}
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&display=swap');
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-  --bg:        #FFFDF5;
-  --cream:     #FFF8E8;
-  --cream-dk:  #EDE5CE;
+  /* ── PacketHub brand palette (shared with ChapelleHub) ───────── */
+  --bg:        #F4FAF6;
+  --cream:     #E0F1E6;          /* Panache */
+  --cream-dk:  #BEE5C3;          /* Lime Sorbet */
   --surface:   #FFFFFF;
-  --blue:      #112275;
-  --blue-dk:   #0A1650;
-  --blue-lt:   #E8EEFF;
-  --yellow:    #F5C800;
-  --yellow-lt: #FFFBE6;
-  --sky:       #7EC4E8;
-  --sky-lt:    #C8E8F8;
-  --red:       #E03A2A;
-  --green:     #1C6B3A;
-  --pink:      #D4186C;
-  --text:      #0D1730;
-  --muted:     #7A7E99;
-  --border:    rgba(13,23,48,0.1);
+  --blue:      #175933;          /* Green Pea — sidebar, headings */
+  --blue-dk:   #0D3D21;          /* darker hover */
+  --blue-lt:   #E0F1E6;          /* Panache tint */
+  --yellow:    #E46E88;          /* Deep Blush — accent */
+  --yellow-lt: #FDEEF2;
+  --sky:       #6EC8F5;          /* Malibu */
+  --sky-lt:    #E0F4FF;
+  --red:       #C0392B;
+  --green:     #457D58;          /* Lush Green — success */
+  --pink:      #E46E88;          /* Deep Blush */
+  --text:      #0D2B1A;
+  --muted:     #5E7A68;
+  --border:    rgba(23,89,51,0.12);
+  --accent:    #E46E88;
 
-  --platinum: #3558C6;
-  --gold:     #F5C800;
-  --silver:   #2A5C3F;
-  --bronze:   #E03A2A;
-  --friend:   #E05A85;
+  --platinum: #175933;
+  --gold:     #E46E88;
+  --silver:   #457D58;
+  --bronze:   #C0392B;
+  --friend:   #6EC8F5;
+
+  /* ── Typography ─────────────────────────────────────────────── */
+  --font-heading: 'Fraunces', serif;
+  --font-body:    'Montserrat', sans-serif;
+  --font-logo:    'Fraunces', serif;
 }
 
 html, body, #root { height: 100%; }
@@ -42,20 +40,19 @@ html, body, #root { height: 100%; }
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: 'Barlow', sans-serif;
+  font-family: var(--font-body);
   font-size: 15px;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
 h1, h2, h3, h4 {
-  font-family: 'Commune', serif;
-  font-weight: normal;
-  font-style: normal;
-  letter-spacing: -0.02em;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
-.script { font-family: 'Caveat', cursive; text-transform: none; letter-spacing: 0; }
+.script { font-family: var(--font-heading); font-style: italic; text-transform: none; letter-spacing: 0; }
 
 button { cursor: pointer; font-family: inherit; }
 input, select, textarea { font-family: inherit; }
@@ -80,7 +77,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .sidebar-logo {
-  font-family: 'Commune', serif;
+  font-family: var(--font-logo);
   font-size: 28px;
   font-weight: normal;
   font-style: normal;
@@ -95,7 +92,7 @@ a { color: inherit; text-decoration: none; }
 .sidebar-logo span {
   font-style: normal;
   font-weight: normal;
-  color: var(--sky);
+  color: var(--cream-dk);
 }
 
 .nav-btn {
@@ -109,7 +106,7 @@ a { color: inherit; text-decoration: none; }
   color: rgba(242,234,207,0.55);
   font-size: 13px;
   font-weight: 700;
-  font-family: 'Commune', serif;
+  font-family: var(--font-body);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   transition: background 0.15s, color 0.15s;
@@ -118,7 +115,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .nav-btn:hover { background: rgba(255,255,255,0.12); color: #fff; }
-.nav-btn.active { background: var(--sky); color: var(--blue-dk); }
+.nav-btn.active { background: var(--cream-dk); color: var(--blue-dk); }
 .nav-btn.active svg { color: var(--blue-dk); }
 
 .nav-btn.nav-sub {
@@ -145,7 +142,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .page-title {
-  font-family: 'Commune', serif;
+  font-family: var(--font-heading);
   font-size: 62px;
   font-weight: normal;
   font-style: normal;
@@ -162,7 +159,7 @@ a { color: inherit; text-decoration: none; }
   font-weight: 400;
   text-transform: none;
   letter-spacing: 0;
-  font-family: 'Barlow', sans-serif;
+  font-family: var(--font-body);
 }
 
 /* ── Stat cards ─────────────────────────────────── */
@@ -186,12 +183,12 @@ a { color: inherit; text-decoration: none; }
 }
 
 .stat-card.featured {
-  background: var(--sky-lt);
-  border-color: var(--sky);
+  background: var(--yellow-lt);
+  border-color: var(--yellow);
 }
 
 .stat-label {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-body);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -203,11 +200,11 @@ a { color: inherit; text-decoration: none; }
 .stat-card.featured .stat-label { color: var(--muted); }
 
 .stat-value {
-  font-family: 'Commune', serif;
+  font-family: var(--font-body);
   font-size: 40px;
-  font-weight: normal;
+  font-weight: 700;
   font-style: normal;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.01em;
   line-height: 1;
   color: var(--text);
 }
@@ -216,7 +213,7 @@ a { color: inherit; text-decoration: none; }
 
 /* ── Section title ─────────────────────────────────── */
 .section-title {
-  font-family: 'Commune', serif;
+  font-family: var(--font-body);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -274,7 +271,7 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Commune', serif;
+  font-family: var(--font-heading);
   font-weight: 800;
   font-size: 16px;
   color: #fff;
@@ -285,7 +282,7 @@ a { color: inherit; text-decoration: none; }
 .card-avatar img { width: 100%; height: 100%; object-fit: contain; }
 
 .card-name {
-  font-family: 'Commune', serif;
+  font-family: var(--font-heading);
   font-size: 17px;
   font-weight: normal;
   font-style: normal;
@@ -299,7 +296,7 @@ a { color: inherit; text-decoration: none; }
   font-size: 12px;
   color: var(--muted);
   margin-top: 2px;
-  font-family: 'Barlow', sans-serif;
+  font-family: var(--font-body);
   text-transform: none;
   letter-spacing: 0;
 }
@@ -312,11 +309,11 @@ a { color: inherit; text-decoration: none; }
 }
 
 .card-amount {
-  font-family: 'Commune', serif;
+  font-family: var(--font-body);
   font-size: 28px;
-  font-weight: normal;
+  font-weight: 700;
   font-style: normal;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.01em;
   color: var(--text);
 }
 
@@ -356,7 +353,7 @@ a { color: inherit; text-decoration: none; }
   font-weight: 700;
   padding: 3px 9px;
   border-radius: 20px;
-  font-family: 'Commune', serif;
+  font-family: var(--font-body);
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
@@ -496,7 +493,7 @@ a { color: inherit; text-decoration: none; }
   padding: 10px 20px;
   font-weight: 700;
   font-size: 13px;
-  font-family: 'Commune', serif;
+  font-family: var(--font-body);
   text-transform: uppercase;
   letter-spacing: 0.06em;
   transition: background 0.15s, transform 0.1s, box-shadow 0.15s;
@@ -521,7 +518,7 @@ a { color: inherit; text-decoration: none; }
   padding: 9px 16px;
   font-weight: 700;
   font-size: 13px;
-  font-family: 'Commune', serif;
+  font-family: var(--font-body);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   transition: border-color 0.15s, background 0.15s;
@@ -539,7 +536,7 @@ a { color: inherit; text-decoration: none; }
   border-radius: 8px;
   padding: 9px 16px;
   font-size: 13px;
-  font-family: 'Commune', serif;
+  font-family: var(--font-body);
   text-transform: uppercase;
   letter-spacing: 0.04em;
   transition: background 0.15s, border-color 0.15s;
@@ -587,7 +584,7 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Commune', serif;
+  font-family: var(--font-heading);
   font-weight: 800;
   font-size: 22px;
   color: #fff;
@@ -598,7 +595,7 @@ a { color: inherit; text-decoration: none; }
 .drawer-avatar img { width: 100%; height: 100%; object-fit: contain; }
 
 .drawer-name {
-  font-family: 'Commune', serif;
+  font-family: var(--font-heading);
   font-size: 32px;
   font-weight: normal;
   font-style: normal;
@@ -624,7 +621,7 @@ a { color: inherit; text-decoration: none; }
   border: 2px solid var(--border);
   color: var(--muted);
   background: var(--cream);
-  font-family: 'Commune', serif;
+  font-family: var(--font-body);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -638,7 +635,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .drawer-section-title {
-  font-family: 'Commune', serif;
+  font-family: var(--font-body);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -699,7 +696,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .form-section-title {
-  font-family: 'Commune', serif;
+  font-family: var(--font-body);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -713,7 +710,7 @@ a { color: inherit; text-decoration: none; }
 .form-field { display: flex; flex-direction: column; gap: 6px; }
 
 .form-label {
-  font-family: 'Commune', serif;
+  font-family: var(--font-body);
   font-size: 11px;
   font-weight: 700;
   color: var(--muted);
@@ -831,7 +828,7 @@ a { color: inherit; text-decoration: none; }
 
 .event-card:hover {
   border-color: var(--blue);
-  box-shadow: 0 4px 16px rgba(30,63,171,0.08);
+  box-shadow: 0 4px 16px rgba(23,89,51,0.10);
 }
 
 .event-card-header {
@@ -842,7 +839,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .event-name {
-  font-family: 'Commune', serif;
+  font-family: var(--font-heading);
   font-size: 22px;
   font-weight: normal;
   font-style: normal;
@@ -867,11 +864,11 @@ a { color: inherit; text-decoration: none; }
 }
 
 .event-stat-value {
-  font-family: 'Commune', serif;
+  font-family: var(--font-body);
   font-size: 20px;
-  font-weight: normal;
+  font-weight: 700;
   font-style: normal;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.01em;
   color: var(--text);
   line-height: 1;
 }
@@ -880,7 +877,7 @@ a { color: inherit; text-decoration: none; }
   font-size: 11px;
   color: var(--muted);
   margin-top: 2px;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-body);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
@@ -893,7 +890,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .empty-state h3 {
-  font-family: 'Commune', serif;
+  font-family: var(--font-heading);
   font-size: 28px;
   font-weight: 800;
   text-transform: uppercase;
@@ -908,13 +905,13 @@ a { color: inherit; text-decoration: none; }
   margin-left: -4px;
   margin-right: -4px;
   padding: 10px 10px;
-  background: #E05A85;
-  border: 1px solid #c44470;
+  background: var(--yellow);
+  border: 1px solid #cf5f78;
   border-radius: 12px;
 }
 
 .sidebar-countdown-label {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-body);
   font-size: 9px;
   font-weight: 700;
   text-transform: uppercase;
@@ -924,7 +921,7 @@ a { color: inherit; text-decoration: none; }
 }
 
 .sidebar-countdown-name {
-  font-family: 'Commune', serif;
+  font-family: var(--font-heading);
   font-size: 20px;
   font-weight: normal;
   letter-spacing: -0.02em;
@@ -951,14 +948,15 @@ a { color: inherit; text-decoration: none; }
 }
 
 .sidebar-countdown-num {
-  font-family: 'Commune', serif;
+  font-family: var(--font-body);
+  font-weight: 700;
   font-size: 17px;
   color: #fff;
   line-height: 1;
 }
 
 .sidebar-countdown-unit {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-body);
   font-size: 8px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
@@ -966,6 +964,190 @@ a { color: inherit; text-decoration: none; }
   margin-top: 1px;
 }
 
+/* ── Playbill header ────────────────────────────────────
+   The event announced like a printed program cover: crest,
+   season, title, rule, credits. Symmetry is the point, and
+   every line is still the live control. */
+.playbill {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 18px 26px 28px;
+  box-shadow: 0 1px 2px rgba(13,43,26,0.03), 0 14px 34px -22px rgba(13,43,26,0.26);
+  text-align: center;
+}
+
+/* Date left, status right — in flow, so they can never collide */
+.pb-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  min-height: 34px;
+}
+
+.pb-date {
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--muted);
+  background: none;
+  border: none;
+  border-radius: 7px;
+  padding: 7px 10px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, box-shadow 0.15s;
+}
+.pb-date:hover { background: rgba(69,125,88,0.07); color: var(--text); }
+.pb-date:focus-visible { outline: none; background: var(--cream); box-shadow: 0 0 0 3px rgba(69,125,88,0.16); }
+.pb-date.empty { font-style: italic; text-transform: none; letter-spacing: 0.03em; font-weight: 600; }
+
+.pb-date-input {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  background: var(--cream);
+  border: none;
+  border-radius: 7px;
+  padding: 6px 9px;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(69,125,88,0.16);
+}
+
+.pb-status {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 7px 10px;
+  white-space: nowrap;
+}
+
+/* The crest — icon or uploaded logo, click to change */
+.pb-crest {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: 1.5px solid var(--border);
+  background: #f4faf7;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  overflow: hidden;
+  margin: 2px auto 0;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.pb-crest:hover { border-color: var(--green); box-shadow: 0 2px 14px rgba(69,125,88,0.16); }
+.pb-crest:focus-visible { outline: none; border-color: var(--green); box-shadow: 0 0 0 4px rgba(69,125,88,0.16); }
+
+.pb-eyebrow {
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--green);
+  margin-top: 14px;
+}
+
+.pb-title {
+  font-family: var(--font-heading);
+  font-size: clamp(30px, 5.2vw, 54px);
+  font-weight: 400;
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  color: var(--blue);
+  text-align: center;
+  width: 100%;
+  display: block;
+  background: none;
+  border: none;
+  outline: none;
+  padding: 6px 4px 2px;
+  border-radius: 8px;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.pb-title::placeholder { color: var(--muted); opacity: 0.7; }
+.pb-title:hover { background: rgba(69,125,88,0.045); }
+.pb-title:focus { background: var(--cream); box-shadow: 0 0 0 3px rgba(69,125,88,0.16); }
+
+.pb-rule {
+  width: 46px;
+  height: 2px;
+  background: var(--yellow);
+  border-radius: 2px;
+  margin: 15px auto;
+}
+
+.pb-credit {
+  font-family: var(--font-body);
+  font-size: 12.5px;
+  color: var(--muted);
+  letter-spacing: 0.02em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+.pb-credit + .pb-credit { margin-top: 7px; }
+.pb-credit b { color: var(--text); font-weight: 600; }
+.pb-credit .num { font-family: var(--font-body); font-weight: 700; color: var(--blue); font-size: 14px; }
+
+.pb-leads {
+  font: inherit;
+  color: var(--muted);
+  background: none;
+  border: none;
+  border-radius: 7px;
+  padding: 5px 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.pb-leads:hover { background: rgba(69,125,88,0.07); }
+.pb-leads:focus-visible { outline: none; background: var(--cream); box-shadow: 0 0 0 3px rgba(69,125,88,0.16); }
+.pb-leads.empty { font-style: italic; }
+
+.pb-step {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: rgba(69,125,88,0.045);
+  color: var(--muted);
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+}
+.pb-step:hover:not(:disabled) { background: rgba(69,125,88,0.11); border-color: rgba(69,125,88,0.3); color: var(--blue); }
+.pb-step:focus-visible { outline: none; background: var(--cream); box-shadow: 0 0 0 3px rgba(69,125,88,0.16); }
+.pb-step:disabled { opacity: 0.3; cursor: default; }
+
+@media (max-width: 560px) {
+  .playbill { padding: 16px 16px 22px; }
+  .pb-topbar { justify-content: center; gap: 4px; }
+  .pb-rule { margin: 13px auto; }
+}
 /* ── Hub Diagram ────────────────────────────── */
 .hub-wrap {
   overflow-x: auto;
@@ -1005,7 +1187,7 @@ a { color: inherit; text-decoration: none; }
 
 .hub-dot:hover {
   border-color: var(--green);
-  box-shadow: 0 2px 12px rgba(28,107,58,0.12);
+  box-shadow: 0 2px 12px rgba(69,125,88,0.12);
 }
 
 .hub-dot.empty {
@@ -1015,12 +1197,12 @@ a { color: inherit; text-decoration: none; }
 
 .hub-dot.editing {
   border-color: var(--green);
-  box-shadow: 0 0 0 3px rgba(28,107,58,0.12);
+  box-shadow: 0 0 0 3px rgba(69,125,88,0.12);
   cursor: default;
 }
 
 .hub-dot-name {
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-body);
   font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
@@ -1043,7 +1225,7 @@ a { color: inherit; text-decoration: none; }
   justify-content: center;
   font-size: 11px;
   color: var(--muted);
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-body);
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -1064,7 +1246,7 @@ a { color: inherit; text-decoration: none; }
   border: none;
   border-bottom: 1.5px solid var(--green);
   background: transparent;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-body);
   font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
@@ -1080,7 +1262,7 @@ a { color: inherit; text-decoration: none; }
   border: 1px solid var(--border);
   border-radius: 6px;
   background: #fff;
-  font-family: 'Barlow', sans-serif;
+  font-family: var(--font-body);
   font-size: 12px;
   color: var(--text);
   outline: none;
@@ -1089,50 +1271,11 @@ a { color: inherit; text-decoration: none; }
   line-height: 1.5;
 }
 
-.hub-center {
-  width: clamp(160px, 18vw, 210px);
-  height: clamp(160px, 18vw, 210px);
-  flex-shrink: 0;
-  box-sizing: border-box;
-  background: var(--green);
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 16px;
-}
-
-.hub-center-name {
-  font-family: 'Commune', serif;
-  font-size: 14px;
-  color: #fff;
-  text-align: center;
-  line-height: 1.2;
-  max-width: 100%;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-}
-
 /* Connect the Dots animation */
-@keyframes ctd-hub-pulse {
-  0%   { background: var(--blue); box-shadow: 0 0 0 0 rgba(245,200,0,0); transform: scale(1); }
-  30%  { background: #d4a800; box-shadow: 0 0 0 12px rgba(245,200,0,0.25); transform: scale(1.045); }
-  65%  { background: var(--yellow); box-shadow: 0 0 0 24px rgba(245,200,0,0.08); transform: scale(1.03); }
-  100% { background: var(--yellow); box-shadow: 0 0 0 0 rgba(245,200,0,0); transform: scale(1); }
-}
-
 @keyframes ctd-dot-glow {
   0%   { border-color: var(--green); box-shadow: none; background: var(--surface); }
-  50%  { border-color: #d4a800; box-shadow: 0 0 14px rgba(245,200,0,0.35); background: #fffbe8; }
+  50%  { border-color: #d65b78; box-shadow: 0 0 14px rgba(228,110,136,0.35); background: #fdeef2; }
   100% { border-color: var(--green); box-shadow: none; background: var(--surface); }
-}
-
-.ctd-hub-animate {
-  animation: ctd-hub-pulse 1.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
 .ctd-dot-animate {
@@ -1145,7 +1288,7 @@ a { color: inherit; text-decoration: none; }
   border: none;
   border-radius: 8px;
   padding: 9px 20px;
-  font-family: 'Barlow Condensed', sans-serif;
+  font-family: var(--font-body);
   font-size: 13px;
   font-weight: 700;
   text-transform: uppercase;
@@ -1285,7 +1428,7 @@ a { color: inherit; text-decoration: none; }
     height: 52px;
     border-radius: 50%;
     background: var(--yellow);
-    color: #112275;
+    color: #fff;
     border: none;
     align-items: center;
     justify-content: center;

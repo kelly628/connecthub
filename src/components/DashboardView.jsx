@@ -37,10 +37,10 @@ function StatCard({ label, value, sub, accent, highlight = false, onClick }) {
         transition: 'background 0.2s, box-shadow 0.15s',
         cursor: onClick ? 'pointer' : 'default',
       }}
-      onMouseOver={e => { if (onClick) e.currentTarget.style.boxShadow = '0 4px 16px rgba(13,23,48,0.1)'; }}
+      onMouseOver={e => { if (onClick) e.currentTarget.style.boxShadow = '0 4px 16px rgba(13,43,26,0.1)'; }}
       onMouseOut={e => { e.currentTarget.style.boxShadow = 'none'; }}
     >
-      <div style={{ fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: highlight ? PINK : 'var(--muted)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 4 }}>
+      <div style={{ fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: highlight ? PINK : 'var(--muted)', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 4 }}>
         {label}
         {highlight && (
           <span style={{ color: PINK, opacity: 0.8, display: 'flex', alignItems: 'center' }} className="bounce-arrow">
@@ -48,8 +48,8 @@ function StatCard({ label, value, sub, accent, highlight = false, onClick }) {
           </span>
         )}
       </div>
-      <div style={{ fontFamily: 'Commune, serif', fontSize: 36, fontWeight: 700, color: highlight ? PINK : (accent || 'var(--blue)'), lineHeight: 1 }}>{value}</div>
-      {sub && <div style={{ fontSize: 11, color: highlight ? 'rgba(194,51,107,0.7)' : 'var(--muted)', marginTop: 6, fontFamily: 'Barlow Condensed, sans-serif' }}>{sub}</div>}
+      <div style={{ fontFamily: 'var(--font-body)', fontSize: 36, fontWeight: 700, color: highlight ? PINK : (accent || 'var(--blue)'), lineHeight: 1 }}>{value}</div>
+      {sub && <div style={{ fontSize: 11, color: highlight ? 'rgba(194,51,107,0.7)' : 'var(--muted)', marginTop: 6, fontFamily: 'Montserrat, sans-serif' }}>{sub}</div>}
     </div>
   );
 }
@@ -84,16 +84,16 @@ function EventRow({ project, onSelect, onSelectPerson }) {
       {/* Days badge */}
       <div style={{ width: 52, flexShrink: 0, textAlign: 'center' }}>
         {days === null ? (
-          <span style={{ fontSize: 10, color: 'var(--muted)', fontFamily: 'Barlow Condensed, sans-serif' }}>—</span>
+          <span style={{ fontSize: 10, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif' }}>—</span>
         ) : days < 0 ? (
-          <span style={{ fontSize: 10, color: 'var(--muted)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase' }}>Past</span>
+          <span style={{ fontSize: 10, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase' }}>Past</span>
         ) : (
           <div style={{
-            background: project.blessed ? 'rgba(28,107,58,0.13)' : project.submitted ? 'rgba(245,200,0,0.22)' : 'rgba(13,23,48,0.07)',
+            background: project.blessed ? 'rgba(69,125,88,0.13)' : project.submitted ? 'rgba(228,110,136,0.22)' : 'rgba(13,43,26,0.07)',
             borderRadius: 8, padding: '4px 6px',
           }}>
-            <div style={{ fontFamily: 'Commune, serif', fontSize: 20, fontWeight: 700, color: project.blessed ? 'var(--green)' : project.submitted ? '#5a3e00' : 'var(--blue)', lineHeight: 1, paddingTop: 3 }}>{days}</div>
-            <div style={{ fontSize: 8, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: project.blessed ? 'var(--green)' : project.submitted ? '#7a5500' : 'var(--blue)' }}>days</div>
+            <div style={{ fontFamily: 'var(--font-body)', fontSize: 20, fontWeight: 700, color: project.blessed ? 'var(--green)' : project.submitted ? '#FFFFFF' : 'var(--blue)', lineHeight: 1, paddingTop: 3 }}>{days}</div>
+            <div style={{ fontSize: 8, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: project.blessed ? 'var(--green)' : project.submitted ? '#7a5500' : 'var(--blue)' }}>days</div>
           </div>
         )}
       </div>
@@ -107,14 +107,14 @@ function EventRow({ project, onSelect, onSelectPerson }) {
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
           onClick={() => onSelect(project.id)}
-          style={{ fontFamily: 'Commune, serif', fontSize: 16, fontWeight: 700, color: 'var(--blue)', cursor: 'pointer', marginBottom: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          style={{ fontFamily: 'var(--font-heading)', fontSize: 16, fontWeight: 700, color: 'var(--blue)', cursor: 'pointer', marginBottom: 3, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
           onMouseOver={e => e.currentTarget.style.textDecoration = 'underline'}
           onMouseOut={e => e.currentTarget.style.textDecoration = 'none'}
         >
           {project.name}
         </div>
         <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
-          <span style={{ fontSize: 11, color: 'var(--muted)', fontFamily: 'Barlow Condensed, sans-serif' }}>{fmt(project.date)}</span>
+          <span style={{ fontSize: 11, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif' }}>{fmt(project.date)}</span>
         </div>
       </div>
 
@@ -122,8 +122,8 @@ function EventRow({ project, onSelect, onSelectPerson }) {
       {pct !== null && (
         <div style={{ width: 80, flexShrink: 0 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-            <span style={{ fontSize: 9, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', color: 'var(--muted)' }}>Tasks</span>
-            <span style={{ fontSize: 9, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, color: pct === 100 ? 'var(--green)' : 'var(--muted)' }}>{pct}%</span>
+            <span style={{ fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', color: 'var(--muted)' }}>Tasks</span>
+            <span style={{ fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, color: pct === 100 ? 'var(--green)' : 'var(--muted)' }}>{pct}%</span>
           </div>
           <div style={{ height: 5, background: 'var(--cream-dk)', borderRadius: 99, overflow: 'hidden' }}>
             <div style={{ height: '100%', width: `${pct}%`, background: 'var(--green)', borderRadius: 99, opacity: pct === 100 ? 1 : 0.75 }} />
@@ -286,15 +286,15 @@ export default function DashboardView({ projects, team, onSelectProject, onSelec
                     return <div style={{ position: 'absolute', right: 90, top: '50%', transform: 'translateY(-50%)', opacity: 0.07, pointerEvents: 'none' }}><Icon size={180} color="#fff" strokeWidth={0.8} /></div>;
                   })()}
                   <div>
-                    <div style={{ fontSize: 9, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)', marginBottom: 6 }}>
+                    <div style={{ fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'rgba(255,255,255,0.6)', marginBottom: 6 }}>
                       {labels[Math.min(safeIdx, labels.length - 1)]}
                     </div>
-                    <div style={{ fontFamily: 'Commune, serif', fontSize: 28, fontWeight: 700, color: '#fff', lineHeight: 1.1, marginBottom: 6 }}>{event.name}</div>
-                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', fontFamily: 'Barlow Condensed, sans-serif' }}>{fmt(event.date)}</div>
+                    <div style={{ fontFamily: 'var(--font-heading)', fontSize: 28, fontWeight: 700, color: '#fff', lineHeight: 1.1, marginBottom: 6 }}>{event.name}</div>
+                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', fontFamily: 'Montserrat, sans-serif' }}>{fmt(event.date)}</div>
                   </div>
                   <div style={{ textAlign: 'center', flexShrink: 0 }}>
-                    <div style={{ fontFamily: 'Commune, serif', fontSize: 52, fontWeight: 700, color: 'var(--yellow)', lineHeight: 1, paddingTop: 3 }}>{days}</div>
-                    <div style={{ fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.6)' }}>days away</div>
+                    <div style={{ fontFamily: 'var(--font-body)', fontSize: 52, fontWeight: 700, color: 'var(--yellow)', lineHeight: 1, paddingTop: 3 }}>{days}</div>
+                    <div style={{ fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.6)' }}>days away</div>
                   </div>
                 </div>
                 {/* Dot nav */}
@@ -321,9 +321,9 @@ export default function DashboardView({ projects, team, onSelectProject, onSelec
           <div style={{ border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden' }}>
             <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8 }}>
               <Calendar size={12} color="var(--blue)" />
-              <span style={{ fontSize: 11, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--blue)' }}>All Projects</span>
+              <span style={{ fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--blue)' }}>All Projects</span>
               {(upcoming.length + past.length) > 0 && (
-                <span style={{ marginLeft: 'auto', background: 'var(--cream-dk)', borderRadius: 99, padding: '1px 8px', fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, color: 'var(--muted)' }}>
+                <span style={{ marginLeft: 'auto', background: 'var(--cream-dk)', borderRadius: 99, padding: '1px 8px', fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, color: 'var(--muted)' }}>
                   {upcoming.length + past.length}
                 </span>
               )}
@@ -344,24 +344,24 @@ export default function DashboardView({ projects, team, onSelectProject, onSelec
           {/* Featured wins */}
           {featuredWins.length > 0 && (
             <div style={{ background: 'var(--surface)', border: '1px solid rgba(201,168,0,0.3)', borderRadius: 14, overflow: 'hidden' }}>
-              <div style={{ padding: '14px 18px', borderBottom: '1px solid rgba(201,168,0,0.2)', background: 'rgba(245,200,0,0.07)', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ padding: '14px 18px', borderBottom: '1px solid rgba(201,168,0,0.2)', background: 'rgba(228,110,136,0.07)', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Trophy size={12} color="#C9A800" strokeWidth={2} />
-                <span style={{ fontSize: 11, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C9A800' }}>Completed</span>
-                <span style={{ marginLeft: 'auto', background: '#C9A800', color: '#fff', borderRadius: 99, padding: '1px 8px', fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700 }}>{featuredWins.length}</span>
+                <span style={{ fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#C9A800' }}>Completed</span>
+                <span style={{ marginLeft: 'auto', background: '#C9A800', color: '#fff', borderRadius: 99, padding: '1px 8px', fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700 }}>{featuredWins.length}</span>
               </div>
               {featuredWins.map(p => (
                 <div key={p.id}
                   onClick={() => onSelectProject(p.id)}
                   style={{ padding: '12px 18px', borderBottom: '1px solid rgba(201,168,0,0.12)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 12, transition: 'background 0.12s' }}
-                  onMouseOver={e => e.currentTarget.style.background = 'rgba(245,200,0,0.06)'}
+                  onMouseOver={e => e.currentTarget.style.background = 'rgba(228,110,136,0.06)'}
                   onMouseOut={e => e.currentTarget.style.background = 'transparent'}
                 >
                   <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(201,168,0,0.12)', flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                     <ProjectIcon project={p} size={14} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontFamily: 'Commune, serif', fontSize: 14, fontWeight: 700, color: 'var(--blue)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</div>
-                    <div style={{ fontSize: 10, color: 'var(--muted)', fontFamily: 'Barlow Condensed, sans-serif', marginTop: 1 }}>{fmt(p.date)}</div>
+                    <div style={{ fontFamily: 'var(--font-heading)', fontSize: 14, fontWeight: 700, color: 'var(--blue)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{p.name}</div>
+                    <div style={{ fontSize: 10, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', marginTop: 1 }}>{fmt(p.date)}</div>
                   </div>
                   <CheckCircle2 size={14} color="#C9A800" strokeWidth={1.8} style={{ flexShrink: 0 }} />
                 </div>
@@ -374,8 +374,8 @@ export default function DashboardView({ projects, team, onSelectProject, onSelec
             <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden' }}>
               <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <Clock size={12} color="#b45309" />
-                <span style={{ fontSize: 11, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#b45309' }}>Needs Approval</span>
-                <span style={{ marginLeft: 'auto', background: 'var(--yellow)', color: '#5a3e00', borderRadius: 99, padding: '1px 8px', fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700 }}>{pendingApprovals}</span>
+                <span style={{ fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#b45309' }}>Needs Approval</span>
+                <span style={{ marginLeft: 'auto', background: 'var(--yellow)', color: '#FFFFFF', borderRadius: 99, padding: '1px 8px', fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700 }}>{pendingApprovals}</span>
               </div>
               {projects.filter(p => p.submitted && !p.blessed).map(p => (
                 <div key={p.id}
@@ -386,7 +386,7 @@ export default function DashboardView({ projects, team, onSelectProject, onSelec
                 >
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 13, color: 'var(--text)' }}>{p.name}</div>
-                    <div style={{ fontSize: 11, color: 'var(--muted)', fontFamily: 'Barlow Condensed, sans-serif' }}>{fmt(p.date)}</div>
+                    <div style={{ fontSize: 11, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif' }}>{fmt(p.date)}</div>
                   </div>
                   <ArrowRight size={12} color="var(--muted)" />
                 </div>
@@ -399,7 +399,7 @@ export default function DashboardView({ projects, team, onSelectProject, onSelec
             <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden' }}>
               <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <TrendingUp size={12} color="var(--green)" />
-                <span style={{ fontSize: 11, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--green)' }}>Team Progress</span>
+                <span style={{ fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--green)' }}>Team Progress</span>
               </div>
               {memberStats.map(m => {
                 const initials = m.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
@@ -414,10 +414,10 @@ export default function DashboardView({ projects, team, onSelectProject, onSelec
                       <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--green)', flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         {m.photoUrl
                           ? <img src={m.photoUrl} alt={m.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                          : <span style={{ fontSize: 10, fontWeight: 700, color: '#fff', fontFamily: 'Barlow Condensed, sans-serif' }}>{initials}</span>}
+                          : <span style={{ fontSize: 10, fontWeight: 700, color: '#fff', fontFamily: 'Montserrat, sans-serif' }}>{initials}</span>}
                       </div>
                       <span style={{ flex: 1, fontWeight: 700, fontSize: 13, color: 'var(--text)', minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{m.name}</span>
-                      <span style={{ fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, color: m.pct === 100 ? 'var(--green)' : 'var(--muted)', flexShrink: 0 }}>{m.pct}%</span>
+                      <span style={{ fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, color: m.pct === 100 ? 'var(--green)' : 'var(--muted)', flexShrink: 0 }}>{m.pct}%</span>
                     </div>
                     <div style={{ height: 4, background: 'var(--cream-dk)', borderRadius: 99, overflow: 'hidden' }}>
                       <div style={{ height: '100%', width: `${m.pct}%`, background: 'var(--green)', borderRadius: 99, opacity: m.pct === 100 ? 1 : 0.7 }} />

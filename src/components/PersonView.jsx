@@ -51,7 +51,7 @@ export default function PersonView({ name, projects, team = [], onBack, onToggle
       }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, marginBottom: 10 }}>
           <div>
-            <div style={{ fontFamily: 'Commune, serif', fontSize: 20, fontWeight: 700, color: 'var(--blue)', marginBottom: 4 }}>
+            <div style={{ fontFamily: 'var(--font-heading)', fontSize: 20, fontWeight: 700, color: 'var(--blue)', marginBottom: 4 }}>
               {a.projectName}
             </div>
             <div style={{ display: 'flex', gap: 14, alignItems: 'center', flexWrap: 'wrap' }}>
@@ -60,7 +60,7 @@ export default function PersonView({ name, projects, team = [], onBack, onToggle
                 <span style={{ fontSize: 12, color: 'var(--muted)' }}>Lead: <strong style={{ color: 'var(--text)' }}>{Array.isArray(a.leads) ? a.leads.join(', ') : a.leads}</strong></span>
               )}
               <span style={{
-                fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700,
+                fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700,
                 textTransform: 'uppercase', letterSpacing: '0.08em',
                 color: a.blessed ? 'var(--green)' : 'var(--muted)',
                 display: 'flex', alignItems: 'center', gap: 3,
@@ -78,10 +78,10 @@ export default function PersonView({ name, projects, team = [], onBack, onToggle
         </div>
 
         <div style={{
-          background: '#f4faf7', border: '1px solid rgba(28,107,58,0.15)',
+          background: '#f4faf7', border: '1px solid rgba(69,125,88,0.15)',
           borderRadius: 8, padding: '12px 14px',
         }}>
-          <div style={{ fontSize: 9, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--green)', marginBottom: 8 }}>
+          <div style={{ fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--green)', marginBottom: 8 }}>
             Your Responsibilities
           </div>
           {(() => {
@@ -119,7 +119,7 @@ export default function PersonView({ name, projects, team = [], onBack, onToggle
       {/* Header */}
       <button
         onClick={onBack}
-        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: 12, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: 4, padding: 0, marginBottom: 16 }}
+        style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', fontSize: 12, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', display: 'flex', alignItems: 'center', gap: 4, padding: 0, marginBottom: 16 }}
       >
         <ArrowLeft size={13} /> Team
       </button>
@@ -131,7 +131,7 @@ export default function PersonView({ name, projects, team = [], onBack, onToggle
             <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'var(--green)', flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               {member?.photoUrl
                 ? <img src={member.photoUrl} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                : <span style={{ fontSize: 20, fontWeight: 700, color: '#fff', fontFamily: 'Barlow Condensed, sans-serif' }}>{initials}</span>}
+                : <span style={{ fontSize: 20, fontWeight: 700, color: '#fff', fontFamily: 'Montserrat, sans-serif' }}>{initials}</span>}
             </div>
           );
         })()}

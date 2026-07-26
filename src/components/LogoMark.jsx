@@ -8,10 +8,10 @@ export default function LogoMark({ size = 36, onClick, style }) {
       style={{ display: 'block', cursor: onClick ? 'pointer' : 'default', ...style }}
       onClick={onClick}
     >
-      <polygon points="18,0 0,40 18,30"   fill="#112275" />
-      <polygon points="18,0 36,40 18,30"  fill="#3558C6" />
-      <polygon points="0,40 18,30 9,48"   fill="#F5C800" />
-      <polygon points="36,40 18,30 27,48" fill="#F5C800" />
+      <polygon points="18,0 0,40 18,30"   fill="#175933" />
+      <polygon points="18,0 36,40 18,30"  fill="#457D58" />
+      <polygon points="0,40 18,30 9,48"   fill="#E46E88" />
+      <polygon points="36,40 18,30 27,48" fill="#E46E88" />
     </svg>
   );
 }

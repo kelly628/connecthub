@@ -68,7 +68,7 @@ export default function TasksView({ projects, team, onToggleTask, onOpenStickyNo
 
   const selectStyle = {
     border: '1px solid var(--border)', borderRadius: 20, padding: '5px 14px',
-    fontSize: 11, cursor: 'pointer', fontFamily: 'Barlow Condensed, sans-serif',
+    fontSize: 11, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif',
     fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em',
     background: 'var(--surface)', color: 'var(--muted)', outline: 'none',
   };
@@ -87,10 +87,10 @@ export default function TasksView({ projects, team, onToggleTask, onOpenStickyNo
       {totalAll > 0 && (
         <div style={{ marginBottom: 24 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 5 }}>
-            <span style={{ fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>
+            <span style={{ fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>
               Overall Team Progress
             </span>
-            <span style={{ fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, color: pct === 100 ? 'var(--green)' : 'var(--muted)' }}>
+            <span style={{ fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, color: pct === 100 ? 'var(--green)' : 'var(--muted)' }}>
               {pct}%
             </span>
           </div>
@@ -107,7 +107,7 @@ export default function TasksView({ projects, team, onToggleTask, onOpenStickyNo
             border: '1px solid',
             borderColor: statusFilter === f ? 'var(--green)' : 'var(--border)',
             borderRadius: 20, padding: '5px 14px', fontSize: 11, cursor: 'pointer',
-            fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700,
+            fontFamily: 'Montserrat, sans-serif', fontWeight: 700,
             textTransform: 'uppercase', letterSpacing: '0.06em',
             background: statusFilter === f ? 'var(--green)' : 'var(--surface)',
             color: statusFilter === f ? '#fff' : 'var(--muted)',
@@ -130,7 +130,7 @@ export default function TasksView({ projects, team, onToggleTask, onOpenStickyNo
         )}
         {(statusFilter !== 'all' || projectFilter || memberFilter) && (
           <button onClick={() => { setStatusFilter('all'); setProjectFilter(''); setMemberFilter(''); }}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, color: 'var(--muted)', fontFamily: 'Barlow Condensed, sans-serif', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             Clear
           </button>
         )}
@@ -146,11 +146,11 @@ export default function TasksView({ projects, team, onToggleTask, onOpenStickyNo
           <div key={projectId} style={{ marginBottom: 28 }}>
             {/* Project header */}
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 8 }}>
-              <div style={{ fontFamily: 'Commune, serif', fontSize: 18, fontWeight: 700, color: 'var(--blue)' }}>
+              <div style={{ fontFamily: 'var(--font-heading)', fontSize: 18, fontWeight: 700, color: 'var(--blue)' }}>
                 {group.name}
               </div>
               {group.date && (
-                <div style={{ fontSize: 11, color: 'var(--muted)', fontFamily: 'Barlow Condensed, sans-serif' }}>
+                <div style={{ fontSize: 11, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif' }}>
                   {fmt(group.date)}
                 </div>
               )}
@@ -178,13 +178,13 @@ export default function TasksView({ projects, team, onToggleTask, onOpenStickyNo
                       {task.taskText}
                     </span>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-                      <span style={{ fontSize: 12, color: 'var(--muted)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, whiteSpace: 'nowrap' }}>
+                      <span style={{ fontSize: 12, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', fontWeight: 700, whiteSpace: 'nowrap' }}>
                         {task.memberName}
                       </span>
                       <div style={{ width: 30, height: 30, borderRadius: '50%', background: 'var(--green)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                         {task.memberPhoto
                           ? <img src={task.memberPhoto} alt={task.memberName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                          : <span style={{ fontSize: 10, fontWeight: 700, color: '#fff', fontFamily: 'Barlow Condensed, sans-serif' }}>{initials}</span>}
+                          : <span style={{ fontSize: 10, fontWeight: 700, color: '#fff', fontFamily: 'Montserrat, sans-serif' }}>{initials}</span>}
                       </div>
                     </div>
                   </div>

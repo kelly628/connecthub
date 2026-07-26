@@ -38,7 +38,7 @@ function ApprovalCard({ project, onToggle, onSelect, approved, isAdmin = false }
         <div>
           <div
             onClick={onSelect}
-            style={{ fontFamily: 'Commune, serif', fontSize: 18, fontWeight: 700, color: 'var(--blue)', cursor: 'pointer', lineHeight: 1.1, marginBottom: 4 }}
+            style={{ fontFamily: 'var(--font-heading)', fontSize: 18, fontWeight: 700, color: 'var(--blue)', cursor: 'pointer', lineHeight: 1.1, marginBottom: 4 }}
             onMouseOver={e => e.currentTarget.style.textDecoration = 'underline'}
             onMouseOut={e => e.currentTarget.style.textDecoration = 'none'}
           >
@@ -58,7 +58,7 @@ function ApprovalCard({ project, onToggle, onSelect, approved, isAdmin = false }
           <button
             onClick={() => {
               if (!approved) {
-                confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 }, colors: ['#1C6B3A', '#F5C800', '#0D1730'] });
+                confetti({ particleCount: 90, spread: 70, origin: { y: 0.6 }, colors: ['#457D58', '#E46E88', '#0D2B1A'] });
               }
               onToggle();
             }}
@@ -67,7 +67,7 @@ function ApprovalCard({ project, onToggle, onSelect, approved, isAdmin = false }
               border: `1.5px solid ${approved ? 'var(--border)' : 'var(--green)'}`,
               background: approved ? 'transparent' : 'var(--green)',
               color: approved ? 'var(--muted)' : '#fff',
-              fontSize: 11, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700,
+              fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 700,
               textTransform: 'uppercase', letterSpacing: '0.06em', cursor: 'pointer',
               display: 'flex', alignItems: 'center', gap: 5, transition: 'all 0.15s',
             }}
@@ -77,10 +77,10 @@ function ApprovalCard({ project, onToggle, onSelect, approved, isAdmin = false }
         ) : (
           <span style={{
             flexShrink: 0, padding: '6px 12px', borderRadius: 8,
-            border: `1.5px solid ${approved ? 'rgba(28,107,58,0.3)' : 'var(--border)'}`,
-            background: approved ? 'rgba(28,107,58,0.07)' : 'transparent',
+            border: `1.5px solid ${approved ? 'rgba(69,125,88,0.3)' : 'var(--border)'}`,
+            background: approved ? 'rgba(69,125,88,0.07)' : 'transparent',
             color: approved ? 'var(--green)' : 'var(--muted)',
-            fontSize: 11, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700,
+            fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 700,
             textTransform: 'uppercase', letterSpacing: '0.06em',
             display: 'flex', alignItems: 'center', gap: 5,
           }}>
@@ -93,10 +93,10 @@ function ApprovalCard({ project, onToggle, onSelect, approved, isAdmin = false }
       {totalTasks > 0 && (
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-            <span style={{ fontSize: 9, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>
+            <span style={{ fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>
               Team Progress
             </span>
-            <span style={{ fontSize: 9, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, color: pct === 100 ? 'var(--green)' : 'var(--muted)' }}>
+            <span style={{ fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, color: pct === 100 ? 'var(--green)' : 'var(--muted)' }}>
               {pct}%
             </span>
           </div>
@@ -128,11 +128,11 @@ export default function ApprovalsView({ projects, isAdmin = false, onToggleBless
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
             <Clock size={13} color="var(--muted)" />
-            <span style={{ fontSize: 11, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)' }}>
+            <span style={{ fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)' }}>
               Awaiting Approval
             </span>
             {pending.length > 0 && (
-              <span style={{ background: '#F5C800', color: '#5a3e00', borderRadius: 99, padding: '1px 8px', fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700 }}>
+              <span style={{ background: '#E46E88', color: '#FFFFFF', borderRadius: 99, padding: '1px 8px', fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700 }}>
                 {pending.length}
               </span>
             )}
@@ -161,11 +161,11 @@ export default function ApprovalsView({ projects, isAdmin = false, onToggleBless
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14 }}>
             <CheckCircle2 size={13} color="var(--green)" />
-            <span style={{ fontSize: 11, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--green)' }}>
+            <span style={{ fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--green)' }}>
               Approved
             </span>
             {approved.length > 0 && (
-              <span style={{ background: 'var(--green)', color: '#fff', borderRadius: 99, padding: '1px 8px', fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700 }}>
+              <span style={{ background: 'var(--green)', color: '#fff', borderRadius: 99, padding: '1px 8px', fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700 }}>
                 {approved.length}
               </span>
             )}

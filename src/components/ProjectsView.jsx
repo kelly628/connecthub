@@ -14,7 +14,7 @@ function daysUntil(dateStr) {
 
 const selectStyle = {
   border: '1px solid var(--border)', borderRadius: 8, padding: '7px 12px',
-  fontSize: 12, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700,
+  fontSize: 12, fontFamily: 'Montserrat, sans-serif', fontWeight: 700,
   textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text)',
   background: 'var(--surface)', cursor: 'pointer', outline: 'none',
 };
@@ -62,14 +62,14 @@ function CalendarView({ projects, onSelect }) {
         <button onClick={prevMonth} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', color: 'var(--muted)' }}>
           <ChevronLeft size={15} />
         </button>
-        <div style={{ fontFamily: 'Commune, serif', fontSize: 20, fontWeight: 700, color: 'var(--blue)', minWidth: 180, textAlign: 'center' }}>
+        <div style={{ fontFamily: 'var(--font-heading)', fontSize: 20, fontWeight: 700, color: 'var(--blue)', minWidth: 180, textAlign: 'center' }}>
           {monthLabel}
         </div>
         <button onClick={nextMonth} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', color: 'var(--muted)' }}>
           <ChevronRight size={15} />
         </button>
         <button onClick={() => { setMonth(today.getMonth()); setYear(today.getFullYear()); }}
-          style={{ marginLeft: 4, background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontSize: 11, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--muted)' }}>
+          style={{ marginLeft: 4, background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 12px', cursor: 'pointer', fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--muted)' }}>
           Today
         </button>
       </div>
@@ -77,7 +77,7 @@ function CalendarView({ projects, onSelect }) {
       {/* Day headers */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 1, marginBottom: 1 }}>
         {DAYS.map(d => (
-          <div key={d} style={{ textAlign: 'center', padding: '6px 0', fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>
+          <div key={d} style={{ textAlign: 'center', padding: '6px 0', fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>
             {d}
           </div>
         ))}
@@ -117,7 +117,7 @@ function CalendarView({ projects, onSelect }) {
                           onClick={() => onSelect(p.id)}
                           title={p.name}
                           style={{
-                            fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700,
+                            fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700,
                             background: color, color: '#fff', borderRadius: 4,
                             padding: '2px 5px', cursor: 'pointer', overflow: 'hidden',
                             whiteSpace: 'nowrap', textOverflow: 'ellipsis',
@@ -161,7 +161,7 @@ function LeadAvatars({ leads, team }) {
             }}>
               {member?.photoUrl
                 ? <img src={member.photoUrl} alt={name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                : <span style={{ fontSize: 9, fontWeight: 700, color: '#fff', fontFamily: 'Barlow Condensed, sans-serif', letterSpacing: '0.04em' }}>{initials}</span>}
+                : <span style={{ fontSize: 9, fontWeight: 700, color: '#fff', fontFamily: 'Montserrat, sans-serif', letterSpacing: '0.04em' }}>{initials}</span>}
             </div>
           );
         })}
@@ -196,11 +196,11 @@ function ListRow({ p, i, last }) {
       onMouseOut={e => e.currentTarget.style.background = i % 2 === 0 ? 'var(--surface)' : 'var(--cream)'}
       ref={el => { if (el) el._onSelect = null; }}
     >
-      <span style={{ fontFamily: 'Commune, serif', fontSize: 17, fontWeight: 700, color: 'var(--blue)', lineHeight: 1.1 }}>{p.name}</span>
+      <span style={{ fontFamily: 'var(--font-heading)', fontSize: 17, fontWeight: 700, color: 'var(--blue)', lineHeight: 1.1 }}>{p.name}</span>
       <div>
         <div style={{ fontSize: 12, color: 'var(--text)' }}>{p.date ? fmt(p.date) : '—'}</div>
       </div>
-      <span style={{ fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: p.blessed ? 'var(--green)' : p.submitted ? 'var(--yellow)' : 'var(--muted)', display: 'flex', alignItems: 'center', gap: 3 }}>
+      <span style={{ fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: p.blessed ? 'var(--green)' : p.submitted ? 'var(--yellow)' : 'var(--muted)', display: 'flex', alignItems: 'center', gap: 3 }}>
         {p.blessed ? <><CheckCircle2 size={10} /> Approved</> : p.submitted ? <><Clock size={10} /> Awaiting</> : <><Clock size={10} /> Draft</>}
       </span>
       <span style={{ fontSize: 12, color: 'var(--muted)' }}>{leads.length > 0 ? leads.join(', ') : '—'}</span>
@@ -208,7 +208,7 @@ function ListRow({ p, i, last }) {
         <div style={{ flex: 1, height: 5, background: 'var(--cream-dk)', borderRadius: 99, overflow: 'hidden' }}>
           <div style={{ height: '100%', width: `${pct ?? 0}%`, background: 'var(--green)', borderRadius: 99, opacity: pct === 100 ? 1 : 0.7 }} />
         </div>
-        <span style={{ fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', color: 'var(--muted)', minWidth: 26, textAlign: 'right' }}>{pct !== null ? `${pct}%` : '—'}</span>
+        <span style={{ fontSize: 10, fontFamily: 'Montserrat, sans-serif', color: 'var(--muted)', minWidth: 26, textAlign: 'right' }}>{pct !== null ? `${pct}%` : '—'}</span>
       </div>
     </div>
   );
@@ -222,7 +222,7 @@ function ListTable({ rows, onSelect }) {
     <div style={{ border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden' }}>
       <div style={HEADER_STYLE}>
         {['Project', 'Date', 'Status', 'Lead', 'Progress'].map(h => (
-          <span key={h} style={{ fontSize: 9, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)' }}>{h}</span>
+          <span key={h} style={{ fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)' }}>{h}</span>
         ))}
       </div>
       {rows.map((p, i) => (
@@ -245,7 +245,7 @@ function ListView({ projects, team, onSelect }) {
       {dated.length > 0 && <ListTable rows={dated} onSelect={onSelect} />}
       {undated.length > 0 && (
         <div>
-          <div style={{ fontSize: 10, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)', marginBottom: 10, display: 'flex', alignItems: 'center', gap: 8 }}>
             <span style={{ flex: 1, height: 1, background: 'var(--border)', display: 'inline-block' }} />
             No Date
             <span style={{ flex: 1, height: 1, background: 'var(--border)', display: 'inline-block' }} />
@@ -295,19 +295,19 @@ export default function ProjectsView({ projects, team = [], onSelect, onNew, onA
         <div style={{ display: 'flex', border: '1px solid var(--border)', borderRadius: 8, overflow: 'hidden' }}>
           <button
             onClick={() => setView('grid')}
-            style={{ padding: '7px 12px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', background: view === 'grid' ? 'var(--blue)' : 'var(--surface)', color: view === 'grid' ? '#fff' : 'var(--muted)', transition: 'all 0.15s' }}
+            style={{ padding: '7px 12px', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', background: view === 'grid' ? 'var(--blue)' : 'var(--surface)', color: view === 'grid' ? '#fff' : 'var(--muted)', transition: 'all 0.15s' }}
           >
             <LayoutGrid size={13} /> Grid
           </button>
           <button
             onClick={() => setView('calendar')}
-            style={{ padding: '7px 12px', border: 'none', borderLeft: '1px solid var(--border)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', background: view === 'calendar' ? 'var(--blue)' : 'var(--surface)', color: view === 'calendar' ? '#fff' : 'var(--muted)', transition: 'all 0.15s' }}
+            style={{ padding: '7px 12px', border: 'none', borderLeft: '1px solid var(--border)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', background: view === 'calendar' ? 'var(--blue)' : 'var(--surface)', color: view === 'calendar' ? '#fff' : 'var(--muted)', transition: 'all 0.15s' }}
           >
             <CalendarDays size={13} /> Calendar
           </button>
           <button
             onClick={() => setView('list')}
-            style={{ padding: '7px 12px', border: 'none', borderLeft: '1px solid var(--border)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', background: view === 'list' ? 'var(--blue)' : 'var(--surface)', color: view === 'list' ? '#fff' : 'var(--muted)', transition: 'all 0.15s' }}
+            style={{ padding: '7px 12px', border: 'none', borderLeft: '1px solid var(--border)', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 5, fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', background: view === 'list' ? 'var(--blue)' : 'var(--surface)', color: view === 'list' ? '#fff' : 'var(--muted)', transition: 'all 0.15s' }}
           >
             <List size={13} /> List
           </button>
@@ -329,7 +329,7 @@ export default function ProjectsView({ projects, team = [], onSelect, onNew, onA
 
           {(leadFilter || dateFilter !== 'all') && (
             <button onClick={() => { setLeadFilter(''); setDateFilter('all'); }}
-              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, color: 'var(--muted)', fontFamily: 'Barlow Condensed, sans-serif', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 11, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
               Clear filters
             </button>
           )}
@@ -369,7 +369,7 @@ export default function ProjectsView({ projects, team = [], onSelect, onNew, onA
                 >
                   {/* Top row: status + date/countdown */}
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
-                    <div style={{ fontSize: 9, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: p.blessed ? 'var(--green)' : p.submitted ? '#b45309' : 'var(--muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                    <div style={{ fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: p.blessed ? 'var(--green)' : p.submitted ? '#b45309' : 'var(--muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
                       {p.blessed ? <><CheckCircle2 size={11} /> Approved</> : p.submitted ? <><Clock size={11} /> Awaiting Approval</> : <><Clock size={11} /> Draft</>}
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 3 }}>
@@ -381,14 +381,14 @@ export default function ProjectsView({ projects, team = [], onSelect, onNew, onA
                       )}
                     </div>
                   </div>
-                  <div style={{ fontFamily: 'Commune, serif', fontSize: 22, fontWeight: 700, color: 'var(--blue)', marginBottom: 4, lineHeight: 1.1 }}>
+                  <div style={{ fontFamily: 'var(--font-heading)', fontSize: 22, fontWeight: 700, color: 'var(--blue)', marginBottom: 4, lineHeight: 1.1 }}>
                     {p.name}
                   </div>
                   <LeadAvatars leads={p.leads} team={team} />
                   <div style={{ marginTop: 14 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 4 }}>
-                      <span style={{ fontSize: 9, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>Team Progress</span>
-                      <span style={{ fontSize: 9, fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, color: allDone ? 'var(--green)' : 'var(--muted)' }}>{totalTasks > 0 ? `${pct}%` : '—'}</span>
+                      <span style={{ fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>Team Progress</span>
+                      <span style={{ fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, color: allDone ? 'var(--green)' : 'var(--muted)' }}>{totalTasks > 0 ? `${pct}%` : '—'}</span>
                     </div>
                     <div style={{ height: 6, background: 'var(--cream-dk)', borderRadius: 99, overflow: 'hidden' }}>
                       <div style={{ height: '100%', width: `${pct}%`, background: 'var(--green)', borderRadius: 99, transition: 'width 0.4s', opacity: allDone ? 1 : 0.7 }} />

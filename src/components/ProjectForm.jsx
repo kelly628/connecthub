@@ -91,7 +91,7 @@ export default function ProjectForm({ initial, team = [], onSave, onCancel }) {
                           border: `1.5px solid ${selected ? 'var(--blue)' : 'var(--border)'}`,
                           background: selected ? 'var(--blue)' : 'var(--cream)',
                           color: selected ? '#fff' : 'var(--muted)',
-                          fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700,
+                          fontFamily: 'Montserrat, sans-serif', fontWeight: 700,
                           fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.06em',
                           cursor: 'pointer', transition: 'all 0.15s',
                         }}
@@ -102,7 +102,7 @@ export default function ProjectForm({ initial, team = [], onSave, onCancel }) {
                   })}
                 </div>
                 {form.leads.length === 0 && !errors.leads && (
-                  <p style={{ fontSize: 11, color: 'var(--muted)', marginTop: 4, fontFamily: 'Barlow Condensed, sans-serif' }}>
+                  <p style={{ fontSize: 11, color: 'var(--muted)', marginTop: 4, fontFamily: 'Montserrat, sans-serif' }}>
                     Select one or more leads.
                   </p>
                 )}
@@ -116,7 +116,7 @@ export default function ProjectForm({ initial, team = [], onSave, onCancel }) {
                   onChange={e => set('leads', e.target.value.split(',').map(s => s.trim()).filter(Boolean))}
                   style={errors.leads ? { borderColor: 'var(--yellow)' } : {}}
                 />
-                <p style={{ fontSize: 11, color: 'var(--muted)', marginTop: 4, fontFamily: 'Barlow Condensed, sans-serif' }}>
+                <p style={{ fontSize: 11, color: 'var(--muted)', marginTop: 4, fontFamily: 'Montserrat, sans-serif' }}>
                   No team members yet — go to the <strong>Team</strong> tab to build your roster first.
                 </p>
               </>
@@ -137,7 +137,7 @@ export default function ProjectForm({ initial, team = [], onSave, onCancel }) {
                   borderColor: form.dotCount === n ? 'var(--green)' : 'var(--border)',
                   background: form.dotCount === n ? 'var(--green)' : 'var(--surface)',
                   color: form.dotCount === n ? '#fff' : 'var(--text)',
-                  fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, fontSize: 15,
+                  fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 15,
                   cursor: 'pointer', transition: 'all 0.15s',
                 }}
               >
@@ -145,7 +145,7 @@ export default function ProjectForm({ initial, team = [], onSave, onCancel }) {
               </button>
             ))}
           </div>
-          <p style={{ fontSize: 11, color: 'var(--muted)', marginTop: 6, fontFamily: 'Barlow Condensed, sans-serif', letterSpacing: '0.04em' }}>
+          <p style={{ fontSize: 11, color: 'var(--muted)', marginTop: 6, fontFamily: 'Montserrat, sans-serif', letterSpacing: '0.04em' }}>
             You can change this later in the project.
           </p>
         </div>
@@ -159,7 +159,7 @@ export default function ProjectForm({ initial, team = [], onSave, onCancel }) {
           </button>
           <button
             onClick={onCancel}
-            style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 18px', fontSize: 13, cursor: 'pointer', color: 'var(--muted)', fontFamily: 'Barlow Condensed, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}
+            style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '8px 18px', fontSize: 13, cursor: 'pointer', color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}
           >
             Cancel
           </button>
