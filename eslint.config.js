@@ -18,4 +18,11 @@ export default defineConfig([
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
   },
+  {
+    // Netlify Functions run on Node, not in the browser — they legitimately
+    // read process.env, which is the whole point of keeping the secrets there.
+    files: ['netlify/functions/**/*.js'],
+    languageOptions: { globals: globals.node },
+    rules: { 'react-refresh/only-export-components': 'off' },
+  },
 ])

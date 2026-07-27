@@ -54,10 +54,8 @@ function StatCard({ label, value, sub, accent, highlight = false, onClick }) {
   );
 }
 
-function EventRow({ project, onSelect, onSelectPerson }) {
+function EventRow({ project, onSelect }) {
   const days = daysUntil(project.date);
-  const urgent = days !== null && days <= 7 && days >= 0;
-  const soon = days !== null && days <= 30 && days > 7;
 
   let totalTasks = 0, doneTasks = 0;
   (project.dots || []).forEach(d => {
@@ -66,10 +64,6 @@ function EventRow({ project, onSelect, onSelectPerson }) {
     doneTasks += tasks.filter(t => t.done).length;
   });
   const pct = totalTasks > 0 ? Math.round((doneTasks / totalTasks) * 100) : null;
-
-  const leadsArr = project.leads
-    ? (Array.isArray(project.leads) ? project.leads : [project.leads]).filter(Boolean)
-    : [];
 
   return (
     <div style={{
@@ -203,11 +197,71 @@ export default function DashboardView({ projects, team, onSelectProject, onSelec
     return { ...m, total: mt, done: md, pct: mt > 0 ? Math.round((md / mt) * 100) : null };
   }).filter(m => m.total > 0).sort((a, b) => (a.pct ?? 101) - (b.pct ?? 101));
 
+  // First run: no team, no projects. Four zeroed stat cards and an empty list
+  // tell a new staffer nothing about what to do, so show the setup path
+  // instead — one obvious next action.
+  if (projects.length === 0 && team.length === 0) {
+    return (
+      <div className="page">
+        <div className="page-header">
+          <h1 className="page-title">Welcome to ConnectHub</h1>
+          <LogoMark size={36} onClick={onOpenStickyNote} />
+        </div>
+
+        <div style={{ maxWidth: 620 }}>
+          <p style={{ fontSize: 15, lineHeight: 1.7, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', marginBottom: 28 }}>
+            Every event here is a board of dots — one dot per person, each holding that
+            person’s checklist. Fill them in, then press <strong style={{ color: 'var(--blue)' }}>Connect
+            the Dots</strong> to send the plan to the office for approval.
+          </p>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+            <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, padding: '22px 24px' }}>
+              <div style={{ fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--yellow)', marginBottom: 8 }}>
+                Step 1
+              </div>
+              <div style={{ fontFamily: 'var(--font-heading)', fontSize: 21, fontWeight: 700, color: 'var(--blue)', marginBottom: 8 }}>
+                Add your team
+              </div>
+              <div style={{ fontSize: 14, lineHeight: 1.65, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', marginBottom: isAdmin ? 18 : 0 }}>
+                {isAdmin
+                  ? 'Everyone who helps run events. You can add photos and roles later.'
+                  : 'An admin sets up the team. Ask the office to add everyone, then come back here.'}
+              </div>
+              {isAdmin && (
+                <button
+                  onClick={() => onNavigate?.('people')}
+                  style={{ padding: '14px 28px', background: 'var(--yellow)', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 12, fontFamily: 'Montserrat, sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#fff' }}
+                >
+                  Add Team Members
+                </button>
+              )}
+            </div>
+
+            <div style={{ background: 'var(--cream)', border: '1px solid var(--border)', borderRadius: 14, padding: '22px 24px', opacity: 0.75 }}>
+              <div style={{ fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.12em', color: 'var(--muted)', marginBottom: 8 }}>
+                Step 2
+              </div>
+              <div style={{ fontFamily: 'var(--font-heading)', fontSize: 21, fontWeight: 700, color: 'var(--blue)', marginBottom: 8 }}>
+                Create your first event
+              </div>
+              <div style={{ fontSize: 14, lineHeight: 1.65, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif' }}>
+                Unlocks once there’s at least one person on the team.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="page">
       <div className="page-header">
         <div>
-          <h1 className="page-title">What Up, {currentUser ? currentUser.split(' ')[0] : 'Kelly'}!</h1>
+          <h1 className="page-title">
+            {currentUser ? `${greeting}, ${currentUser.split(' ')[0]}!` : 'Welcome to ConnectHub'}
+          </h1>
         </div>
         {isFlying && (
           <style>{`
@@ -332,7 +386,7 @@ export default function DashboardView({ projects, team, onSelectProject, onSelec
               <div style={{ padding: '32px 18px', textAlign: 'center', color: 'var(--muted)', fontSize: 13, fontStyle: 'italic' }}>No events yet. Create one to get started.</div>
             ) : (
               [...upcoming, ...past].map(p => (
-                <EventRow key={p.id} project={p} onSelect={onSelectProject} onSelectPerson={onSelectPerson} />
+                <EventRow key={p.id} project={p} onSelect={onSelectProject} />
               ))
             )}
           </div>

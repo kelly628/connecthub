@@ -12,7 +12,7 @@ function fmt(dateStr) {
   return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-export default function TasksView({ projects, team, onToggleTask, onOpenStickyNote }) {
+export default function TasksView({ projects, team, onToggleTask, onOpenStickyNote, isAdmin = false, currentUser = '' }) {
   const [statusFilter, setStatusFilter] = useState('all');
   const [projectFilter, setProjectFilter] = useState('');
   const [memberFilter, setMemberFilter] = useState('');
@@ -30,6 +30,7 @@ export default function TasksView({ projects, team, onToggleTask, onOpenStickyNo
           projectId: project.id,
           projectName: project.name,
           projectDate: project.date,
+          blessed: !!project.blessed,
           dotIndex: dotIdx,
           taskIndex: taskIdx,
           memberName: dot.member,
@@ -160,6 +161,10 @@ export default function TasksView({ projects, team, onToggleTask, onOpenStickyNo
             <div style={{ border: '1px solid var(--border)', borderRadius: 12, overflow: 'hidden', background: 'var(--surface)' }}>
               {group.tasks.map((task, i) => {
                 const initials = task.memberName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+                // Same rule the project board and the person page already use:
+                // a project has to be approved first, and you tick your own
+                // boxes unless you're an admin. This list had no check at all.
+                const canToggle = task.blessed && (isAdmin || currentUser.trim().toLowerCase() === task.memberName.trim().toLowerCase());
                 return (
                   <div key={i} style={{
                     display: 'flex', alignItems: 'center', gap: 12,
@@ -171,8 +176,10 @@ export default function TasksView({ projects, team, onToggleTask, onOpenStickyNo
                     <input
                       type="checkbox"
                       checked={task.done}
-                      onChange={() => onToggleTask(task.projectId, task.dotIndex, task.taskIndex)}
-                      style={{ width: 16, height: 16, accentColor: 'var(--green)', cursor: 'pointer', flexShrink: 0 }}
+                      disabled={!canToggle}
+                      title={canToggle ? '' : task.blessed ? `Only ${task.memberName} or an admin can check this off` : 'This project hasn’t been approved yet'}
+                      onChange={() => canToggle && onToggleTask(task.projectId, task.dotIndex, task.taskIndex)}
+                      style={{ width: 16, height: 16, accentColor: 'var(--green)', cursor: canToggle ? 'pointer' : 'not-allowed', flexShrink: 0, opacity: canToggle ? 1 : 0.45 }}
                     />
                     <span style={{ flex: 1, fontSize: 14, color: task.done ? 'var(--muted)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none', lineHeight: 1.4 }}>
                       {task.taskText}

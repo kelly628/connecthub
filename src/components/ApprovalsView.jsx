@@ -1,4 +1,4 @@
-import { CheckCircle2, Clock, ArrowRight } from 'lucide-react';
+import { CheckCircle2, Clock } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import LogoMark from './LogoMark';
 

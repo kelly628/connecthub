@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { ArrowLeft, CheckCircle2, Clock } from 'lucide-react';
 
 function normalizeTasks(responsibilities) {

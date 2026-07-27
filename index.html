@@ -2,9 +2,36 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <title>ConnectHub — Archbishop Chapelle High School</title>
+    <meta name="description" content="Plan school events as a team. Every event is a board of dots — one per person, each holding that person's checklist." />
+    <!-- Internal staff tool. It should never turn up in a search result. -->
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#175933" />
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ConnectHub</title>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ConnectHub" />
+    <meta property="og:title" content="ConnectHub — Archbishop Chapelle High School" />
+    <meta property="og:description" content="Plan school events as a team. Every event is a board of dots — one per person, each holding that person's checklist." />
+    <!-- No og:image yet: a 1200x630 card needs Fraunces, which isn't available
+         to the build. The link still previews with title + description. -->
+    <meta name="twitter:card" content="summary" />
+
+    <!--
+      Fonts are linked here rather than @import-ed from index.css. An @import
+      serializes three round trips before first paint: the browser has to parse
+      the CSS before it even discovers the font stylesheet.
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;0,9..144,800;1,9..144,400&display=swap"
+    />
   </head>
   <body>
     <div id="root"></div>

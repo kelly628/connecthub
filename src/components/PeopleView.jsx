@@ -1,6 +1,8 @@
 import { useState, useRef } from 'react';
-import { Plus, Pencil, Trash2, Camera, X, Check, LayoutList, BookOpen, ClipboardList, Trophy } from 'lucide-react';
+import { Plus, Pencil, Trash2, Camera, X, Check, LayoutList, BookOpen, ClipboardList, Trophy, LoaderCircle } from 'lucide-react';
 import LogoMark from './LogoMark';
+import { downscale } from '../lib/downscale';
+import { uploadImage } from '../lib/api';
 
 const BINDER_COLORS = [
   '#175933', // navy (theme blue)
@@ -196,7 +198,7 @@ function BinderInterior({ member, projects, color, onClose, onToggleTask, isAdmi
                           {proudProjects.length} {proudProjects.length === 1 ? 'Project' : 'Projects'} Completed
                         </div>
                         <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
-                          {proudProjects.map((p, pi) => {
+                          {proudProjects.map(p => {
                             const tasks = (p.dots || [])
                               .filter(d => d.member?.trim().toLowerCase() === lname)
                               .flatMap(d => Array.isArray(d.responsibilities) ? d.responsibilities : []);
@@ -394,7 +396,7 @@ function BinderCard({ member, projects, onOpenBinder, colorIndex }) {
   );
 }
 
-function MemberRow({ member, projects, onEdit, onDelete, onSelect }) {
+function MemberRow({ member, projects, onEdit, onDelete, onSelect, canManage = false }) {
   const { total, done, pct } = memberStats(member, projects);
   const allDone = total > 0 && done === total;
 
@@ -427,14 +429,16 @@ function MemberRow({ member, projects, onEdit, onDelete, onSelect }) {
           </div>
         )}
       </div>
-      <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-        <button onClick={() => onEdit(member)} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 6, padding: '5px 8px', cursor: 'pointer', color: 'var(--muted)', display: 'flex', alignItems: 'center' }}>
-          <Pencil size={12} />
-        </button>
-        <button onClick={() => onDelete(member.id)} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 6, padding: '5px 8px', cursor: 'pointer', color: 'var(--muted)', display: 'flex', alignItems: 'center' }}>
-          <Trash2 size={12} />
-        </button>
-      </div>
+      {canManage && (
+        <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+          <button onClick={() => onEdit(member)} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 6, padding: '5px 8px', cursor: 'pointer', color: 'var(--muted)', display: 'flex', alignItems: 'center' }}>
+            <Pencil size={12} />
+          </button>
+          <button onClick={() => onDelete(member.id)} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 6, padding: '5px 8px', cursor: 'pointer', color: 'var(--muted)', display: 'flex', alignItems: 'center' }}>
+            <Trash2 size={12} />
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -443,14 +447,29 @@ function MemberForm({ initial, onSave, onCancel }) {
   const [name, setName] = useState(initial?.name || '');
   const [title, setTitle] = useState(initial?.title || '');
   const [photoUrl, setPhotoUrl] = useState(initial?.photoUrl || null);
+  const [uploading, setUploading] = useState(false);
+  const [photoError, setPhotoError] = useState('');
   const fileRef = useRef();
 
-  function handlePhoto(e) {
+  // Photos are downscaled to 512px and uploaded to storage. They used to be
+  // read straight into the record as base64 with no size cap — three phone
+  // photos would blow the browser's storage quota and silently lose the save.
+  async function handlePhoto(e) {
     const file = e.target.files[0];
+    e.target.value = '';
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => setPhotoUrl(ev.target.result);
-    reader.readAsDataURL(file);
+    setUploading(true);
+    setPhotoError('');
+    try {
+      const blob = await downscale(file);
+      const { url, error } = await uploadImage('ctd-avatars', blob);
+      if (error) throw new Error(error);
+      setPhotoUrl(url);
+    } catch {
+      setPhotoError('Couldn’t upload that photo. Try a different one.');
+    } finally {
+      setUploading(false);
+    }
   }
 
   const initials = name.trim().split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase() || '?';
@@ -460,12 +479,15 @@ function MemberForm({ initial, onSave, onCancel }) {
       <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
         <div style={{ position: 'relative', flexShrink: 0 }}>
           <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'var(--green)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            {photoUrl
+            {uploading
+              ? <LoaderCircle size={20} color="#fff" strokeWidth={2} style={{ animation: 'ctd-spin 0.9s linear infinite' }} />
+              : photoUrl
               ? <img src={photoUrl} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
               : <span style={{ fontSize: 20, fontWeight: 700, color: '#fff', fontFamily: 'Montserrat, sans-serif' }}>{initials}</span>}
           </div>
           <button
-            onClick={() => fileRef.current.click()}
+            onClick={() => !uploading && fileRef.current.click()}
+            disabled={uploading}
             title="Upload photo"
             style={{ position: 'absolute', bottom: -2, right: -2, width: 22, height: 22, borderRadius: '50%', background: 'var(--green)', border: '2px solid #fff', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Camera size={10} color="#fff" />
@@ -475,9 +497,12 @@ function MemberForm({ initial, onSave, onCancel }) {
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
           <input className="form-input" placeholder="Full name" value={name} onChange={e => setName(e.target.value)} autoFocus style={{ marginBottom: 0 }} />
           <input className="form-input" placeholder="Title or role (optional)" value={title} onChange={e => setTitle(e.target.value)} style={{ marginBottom: 0 }} />
+          {photoError && (
+            <div style={{ fontSize: 11, color: '#b45309', fontFamily: 'Montserrat, sans-serif', lineHeight: 1.5 }}>{photoError}</div>
+          )}
           <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
-            <button className="btn-primary" style={{ fontSize: 11, padding: '6px 14px', display: 'flex', alignItems: 'center', gap: 4 }}
-              onClick={() => { if (name.trim()) onSave({ name: name.trim(), title: title.trim(), photoUrl }); }}>
+            <button className="btn-primary" disabled={uploading || !name.trim()} style={{ fontSize: 11, padding: '6px 14px', display: 'flex', alignItems: 'center', gap: 4, opacity: uploading || !name.trim() ? 0.5 : 1, cursor: uploading || !name.trim() ? 'not-allowed' : 'pointer' }}
+              onClick={() => { if (name.trim() && !uploading) onSave({ name: name.trim(), title: title.trim(), photoUrl }); }}>
               <Check size={12} /> Save
             </button>
             <button onClick={onCancel} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 6, padding: '6px 12px', fontSize: 11, cursor: 'pointer', color: 'var(--muted)' }}>
@@ -495,24 +520,26 @@ function MemberForm({ initial, onSave, onCancel }) {
   );
 }
 
-export default function PeopleView({ team, projects, onSaveTeam, onSelectPerson, onOpenStickyNote, onToggleTask, isAdmin = false, currentUser = '' }) {
+export default function PeopleView({ team, projects, onAddMember, onUpdateMember, onDeleteMember, onSelectPerson, onOpenStickyNote, onToggleTask, isAdmin = false, currentUser = '' }) {
   const [adding, setAdding] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [viewMode, setViewMode] = useState('list');
   const [binderOpen, setBinderOpen] = useState(null);
 
+  // The roster is admin-only. The database revokes these writes from staff
+  // outright, so an ungated button here would just 401 confusingly.
   function handleAdd(data) {
-    onSaveTeam([...team, { id: crypto.randomUUID(), ...data }]);
+    onAddMember(data);
     setAdding(false);
   }
 
   function handleEdit(data) {
-    onSaveTeam(team.map(m => m.id === editingId ? { ...m, ...data } : m));
+    onUpdateMember(editingId, data);
     setEditingId(null);
   }
 
   function handleDelete(id) {
-    onSaveTeam(team.filter(m => m.id !== id));
+    onDeleteMember(id);
   }
 
   const sortedTeam = [...team].sort((a, b) => a.name.localeCompare(b.name));
@@ -522,12 +549,15 @@ export default function PeopleView({ team, projects, onSaveTeam, onSelectPerson,
       <div className="page-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <h1 className="page-title">Team</h1>
-          <button
-            onClick={() => { setAdding(true); setEditingId(null); }}
-            style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--yellow)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 4 }}
-          >
-            <Plus size={16} color="var(--blue)" strokeWidth={2.5} />
-          </button>
+          {isAdmin && (
+            <button
+              onClick={() => { setAdding(true); setEditingId(null); }}
+              title="Add a team member"
+              style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--yellow)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 4 }}
+            >
+              <Plus size={16} color="#fff" strokeWidth={2.5} />
+            </button>
+          )}
         </div>
         <LogoMark size={36} onClick={onOpenStickyNote} />
       </div>
@@ -590,7 +620,7 @@ export default function PeopleView({ team, projects, onSaveTeam, onSelectPerson,
                     <MemberForm initial={member} onSave={handleEdit} onCancel={() => setEditingId(null)} />
                   </div>
                 ) : (
-                  <MemberRow key={member.id} member={member} projects={projects} onEdit={m => setEditingId(m.id)} onDelete={handleDelete} onSelect={onSelectPerson} />
+                  <MemberRow key={member.id} member={member} projects={projects} onEdit={m => setEditingId(m.id)} onDelete={handleDelete} onSelect={onSelectPerson} canManage={isAdmin} />
                 )
               ))
             )}

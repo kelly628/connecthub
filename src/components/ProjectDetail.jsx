@@ -1,7 +1,7 @@
-import { useState, useRef, useEffect } from 'react';
-import html2canvas from 'html2canvas';
-import { jsPDF } from 'jspdf';
-import { ArrowLeft, Pencil, Trash2, CheckCircle2, Clock, Plus, X, Copy, Download, GraduationCap, BookOpen, Heart, Users, Globe, HandHeart, Music, Palette, Baby, Camera, Trophy, Award, Star, Sparkles, Martini, Sun, PartyPopper, Gift, Leaf, Ribbon, Handshake, Crown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useRef } from 'react';
+import { downscale } from '../lib/downscale';
+import { uploadImage } from '../lib/api';
+import { ArrowLeft, Pencil, Trash2, CheckCircle2, Clock, Plus, X, Copy, Download, LoaderCircle, GraduationCap, BookOpen, Heart, Users, Globe, HandHeart, Music, Palette, Baby, Camera, Trophy, Award, Star, Sparkles, Martini, Sun, PartyPopper, Gift, Leaf, Ribbon, Handshake, Crown, ChevronLeft, ChevronRight } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import LogoMark from './LogoMark';
 
@@ -107,11 +107,6 @@ function fireConfetti() {
   const colors = ['#457D58', '#6EC8F5', '#E46E88', '#C0392B', '#E46E88'];
   confetti({ particleCount: 120, spread: 80, origin: { y: 0.6 }, colors });
   setTimeout(() => confetti({ particleCount: 60, spread: 120, origin: { y: 0.55 }, colors }), 250);
-}
-
-function fmtLeads(leads) {
-  if (!leads) return '';
-  return Array.isArray(leads) ? leads.join(', ') : leads;
 }
 
 function fmt(dateStr) {
@@ -450,7 +445,7 @@ function DoneNotesStack({ notes }) {
   );
 }
 
-export default function ProjectDetail({ project, projects = [], team = [], onUpdateDots, onUpdateProject, onEdit, onDelete, onDuplicate, onBack, onSelectPerson, isNew = false, isAdmin = false, currentUser = '' }) {
+export default function ProjectDetail({ project, projects = [], team = [], onSaveDot, onUpdateProject, onDelete, onDuplicate, onBack, isNew = false, isAdmin = false, currentUser = '' }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [editingDotIndex, setEditingDotIndex] = useState(null);
   const [showIconPicker, setShowIconPicker] = useState(false);
@@ -459,6 +454,9 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
   const logoInputRef = useRef(null);
   const printRef = useRef(null);
   const [showDownloadMenu, setShowDownloadMenu] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const [exportError, setExportError] = useState('');
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [showCompleteDownload, setShowCompleteDownload] = useState(false);
   const [showAddNote, setShowAddNote] = useState(false);
   const [newNoteText, setNewNoteText] = useState('');
@@ -466,9 +464,14 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
   const [showLeadsPicker, setShowLeadsPicker] = useState(false);
   const [editingDate, setEditingDate] = useState(false);
 
-  useEffect(() => {
+  // Reset the name box when a different project is opened. Adjusted during
+  // render rather than in an effect so it doesn't cause a second pass — and so
+  // a background refresh can't stomp on what someone is currently typing.
+  const [shownProjectId, setShownProjectId] = useState(project.id);
+  if (shownProjectId !== project.id) {
+    setShownProjectId(project.id);
     setNameDraft(project.name || '');
-  }, [project.id]);
+  }
 
   // Playbill eyebrow — the season is read off the event's own date.
   const season = seasonOf(project.date);
@@ -497,36 +500,69 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
   async function captureCanvas() {
     const el = printRef.current;
     if (!el) return null;
+
+    // html2canvas and jsPDF are ~550kB between them and only about one session
+    // in twenty exports anything, so they're fetched on the click instead of
+    // riding along in the main bundle.
+    const { default: html2canvas } = await import('html2canvas');
+
+    // html2canvas re-renders into a detached iframe. If the webfonts haven't
+    // finished loading, it races them and the export silently comes out in
+    // Times New Roman — which a warm local cache hides completely.
+    if (document.fonts?.ready) await document.fonts.ready;
+
     Object.assign(el.style, {
       display: 'block', position: 'fixed', top: '-9999px', left: '0',
       width: '816px', background: '#fff', padding: '62px 72px', boxSizing: 'border-box',
     });
     try {
-      return await html2canvas(el, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
+      // iOS Safari caps total canvas area, and a full 12-dot board at scale 2
+      // can exceed it and come back blank. Touch devices get a smaller scale.
+      const scale = window.matchMedia?.('(pointer: coarse)').matches ? 1.5 : 2;
+      return await html2canvas(el, { scale, useCORS: true, backgroundColor: '#ffffff' });
     } finally {
       Object.assign(el.style, { display: '', position: '', top: '', left: '', width: '', background: '', padding: '', boxSizing: '' });
     }
   }
 
   async function handleDownload(format) {
+    if (exporting) return;
     setShowDownloadMenu(false);
-    const slug = project.name.replace(/[^a-z0-9]/gi, '_');
-    const canvas = await captureCanvas();
-    if (!canvas) return;
-    if (format === 'pdf') {
-      const pdf = new jsPDF({ orientation: 'portrait', unit: 'in', format: 'letter' });
-      const margin = 0.65;
-      const contentW = 8.5 - margin * 2;
-      const imgH = (canvas.height / canvas.width) * contentW;
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, margin, contentW, imgH);
-      pdf.save(`${slug}_summary.pdf`);
-    } else {
-      const mime = format === 'jpg' ? 'image/jpeg' : 'image/png';
-      const ext = format === 'jpg' ? 'jpg' : 'png';
-      const quality = format === 'jpg' ? 0.92 : undefined;
-      const url = quality ? canvas.toDataURL(mime, quality) : canvas.toDataURL(mime);
-      const a = document.createElement('a');
-      a.href = url; a.download = `${slug}_summary.${ext}`; a.click();
+    setExporting(true);
+    try {
+      const slug = project.name.replace(/[^a-z0-9]/gi, '_') || 'project';
+      const canvas = await captureCanvas();
+      if (!canvas) throw new Error('nothing to capture');
+
+      if (format === 'pdf') {
+        const { jsPDF } = await import('jspdf');
+        const pdf = new jsPDF({ orientation: 'portrait', unit: 'in', format: 'letter' });
+        const margin = 0.65;
+        const contentW = 8.5 - margin * 2;
+        const imgH = (canvas.height / canvas.width) * contentW;
+        pdf.addImage(canvas.toDataURL('image/png'), 'PNG', margin, margin, contentW, imgH);
+        pdf.save(`${slug}_summary.pdf`);
+      } else {
+        const mime = format === 'jpg' ? 'image/jpeg' : 'image/png';
+        const ext = format === 'jpg' ? 'jpg' : 'png';
+        const quality = format === 'jpg' ? 0.92 : undefined;
+        const url = quality ? canvas.toDataURL(mime, quality) : canvas.toDataURL(mime);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${slug}_summary.${ext}`;
+        // Safari won't follow a click on a link that isn't in the document.
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }
+      setExportError('');
+    } catch {
+      // Previously this failed silently, which on a phone is indistinguishable
+      // from a dead button.
+      setExportError('Couldn’t build that file. Try again.');
+      setTimeout(() => setExportError(''), 4000);
+    } finally {
+      setExporting(false);
     }
   }
 
@@ -539,19 +575,31 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
   }
   const dotCount = project.dotCount || 8;
 
-  function handleLogoUpload(e) {
+  // Logos are downscaled and uploaded to storage. They used to be stuffed into
+  // the record as base64, which meant a phone-sized image rode along on every
+  // read of the project.
+  async function handleLogoUpload(e) {
     const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = ev => onUpdateProject({ ...project, logoUrl: ev.target.result });
-    reader.readAsDataURL(file);
     e.target.value = '';
+    if (!file) return;
+    setUploadingLogo(true);
+    try {
+      const blob = await downscale(file);
+      const { url, error } = await uploadImage('ctd-logos', blob);
+      if (error) throw new Error(error);
+      onUpdateProject({ ...project, logoUrl: url });
+    } catch {
+      setExportError('Couldn’t upload that image. Try a different one.');
+      setTimeout(() => setExportError(''), 4000);
+    } finally {
+      setUploadingLogo(false);
+    }
   }
 
+  // Save just this dot. Sending the whole dots array would mean two staff
+  // editing different dots of the same project overwrite each other.
   function handleDotSave(index, dot) {
-    const updated = [...project.dots];
-    updated[index] = dot;
-    onUpdateDots(updated);
+    onSaveDot(index, dot);
   }
 
   function handleToggleDone(index, taskIdx) {
@@ -630,22 +678,28 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
               Back to Draft
             </button>
           )}
-          <button
-            onClick={onDuplicate}
-            title="Duplicate project"
-            style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '7px 10px', cursor: 'pointer', color: 'var(--muted)', display: 'flex', alignItems: 'center' }}
-          >
-            <Copy size={13} />
-          </button>
-          <div style={{ position: 'relative' }}>
+          {/* Nothing to duplicate until the project has been saved. */}
+          {!isNew && (
             <button
-              onClick={() => setShowDownloadMenu(v => !v)}
-              title="Download"
+              onClick={onDuplicate}
+              title="Duplicate project"
               style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '7px 10px', cursor: 'pointer', color: 'var(--muted)', display: 'flex', alignItems: 'center' }}
             >
-              <Download size={13} />
+              <Copy size={13} />
             </button>
-            {showDownloadMenu && (
+          )}
+          <div style={{ position: 'relative' }}>
+            <button
+              onClick={() => !exporting && setShowDownloadMenu(v => !v)}
+              disabled={exporting}
+              title={exporting ? 'Preparing your file…' : 'Download'}
+              style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '7px 10px', cursor: exporting ? 'wait' : 'pointer', color: 'var(--muted)', display: 'flex', alignItems: 'center', gap: 6 }}
+            >
+              {exporting
+                ? <><LoaderCircle size={13} style={{ animation: 'ctd-spin 0.9s linear infinite' }} /><span style={{ fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>Preparing</span></>
+                : <Download size={13} />}
+            </button>
+            {showDownloadMenu && !exporting && (
               <>
                 <div onClick={() => setShowDownloadMenu(false)} style={{ position: 'fixed', inset: 0, zIndex: 100 }} />
                 <div style={{
@@ -690,6 +744,13 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
           )}
         </div>
       </div>
+
+      {exportError && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: 'var(--yellow-lt)', border: '1px solid rgba(228,110,136,0.35)', borderRadius: 10, padding: '11px 15px', marginBottom: 16, fontSize: 13, fontFamily: 'Montserrat, sans-serif', color: 'var(--text)' }}>
+          <X size={14} strokeWidth={2.2} style={{ flexShrink: 0 }} />
+          {exportError}
+        </div>
+      )}
 
       {/* ── The Playbill ──────────────────────────────────
           The event announced like a printed program cover:
@@ -744,10 +805,13 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
         />
         <button
           className="pb-crest"
-          onClick={() => setShowIconPicker(true)}
-          title={project.logoUrl || project.iconName ? 'Change icon or logo' : 'Add an icon or logo'}
+          onClick={() => !uploadingLogo && setShowIconPicker(true)}
+          disabled={uploadingLogo}
+          title={uploadingLogo ? 'Uploading…' : project.logoUrl || project.iconName ? 'Change icon or logo' : 'Add an icon or logo'}
         >
-          {project.logoUrl ? (
+          {uploadingLogo ? (
+            <LoaderCircle size={21} color="var(--blue)" strokeWidth={1.6} style={{ animation: 'ctd-spin 0.9s linear infinite' }} />
+          ) : project.logoUrl ? (
             <img src={project.logoUrl} alt="Event logo" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 6, boxSizing: 'border-box' }} />
           ) : project.iconName && ICON_MAP[project.iconName] ? (
             (() => { const Icon = ICON_MAP[project.iconName]; return <Icon size={25} color="var(--blue)" strokeWidth={1.5} />; })()
@@ -1027,12 +1091,22 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
       {/* ── Print-only layout ──────────────────────────── */}
       <div ref={printRef} className="print-only">
         {/* Masthead */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: 14, marginBottom: 20, borderBottom: '2.5px solid #175933' }}>
-          <div style={{ fontFamily: 'var(--font-heading)', fontSize: 24, letterSpacing: '-0.02em', color: '#175933', lineHeight: 1 }}>
-            Connect<span style={{ color: '#6EC8F5' }}>Hub</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', paddingBottom: 14, marginBottom: 20, borderBottom: '2.5px solid #175933' }}>
+          <div>
+            <div style={{ fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.14em', color: '#5E7A68', marginBottom: 5 }}>
+              Archbishop Chapelle High School
+            </div>
+            {/* The accent was sky blue here — a colour that appears nowhere
+                else in the palette. It's the Deep Blush accent now. */}
+            <div style={{ fontFamily: 'var(--font-heading)', fontSize: 24, letterSpacing: '-0.02em', color: '#175933', lineHeight: 1 }}>
+              Connect<span style={{ color: '#E46E88' }}>Hub</span>
+            </div>
           </div>
           <div style={{ fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', border: `1.5px solid ${project.blessed ? '#457D58' : project.submitted ? '#b45309' : '#ccc'}`, color: project.blessed ? '#457D58' : project.submitted ? '#b45309' : '#999', borderRadius: 4, padding: '3px 10px' }}>
-            {project.blessed ? '✓ Approved' : project.submitted ? 'Awaiting Approval' : 'Draft'}
+            {/* No U+2713 here: Montserrat doesn't carry it, so html2canvas
+                falls back to a system font and it can come out as tofu in the
+                exported PDF. The border colour already says "approved". */}
+            {project.blessed ? 'Approved' : project.submitted ? 'Awaiting Approval' : 'Draft'}
           </div>
         </div>
 
@@ -1087,8 +1161,14 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
                   <div style={{ fontSize: 11, color: '#bbb', fontStyle: 'italic' }}>No tasks assigned</div>
                 ) : tasks.map((task, ti) => (
                   <div key={ti} style={{ display: 'flex', alignItems: 'flex-start', gap: 7, marginBottom: 5 }}>
+                    {/* Drawn, not typed: a U+2713 character would fall back to
+                        a system font inside html2canvas and risk tofu. */}
                     <div style={{ width: 11, height: 11, border: `1.5px solid ${task.done ? '#457D58' : '#bbb'}`, borderRadius: 2, flexShrink: 0, marginTop: 1, background: task.done ? '#457D58' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                      {task.done && <span style={{ color: '#fff', fontSize: 8, lineHeight: 1 }}>✓</span>}
+                      {task.done && (
+                        <svg width="7" height="7" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      )}
                     </div>
                     <span style={{ fontSize: 11, color: task.done ? '#bbb' : '#333', textDecoration: task.done ? 'line-through' : 'none', lineHeight: 1.4 }}>{task.text}</span>
                   </div>
@@ -1100,7 +1180,7 @@ export default function ProjectDetail({ project, projects = [], team = [], onUpd
 
         {/* Footer */}
         <div style={{ marginTop: 20, paddingTop: 10, borderTop: '1px solid #eee', display: 'flex', justifyContent: 'space-between', fontSize: 9, color: '#bbb', fontFamily: 'Montserrat, sans-serif', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-          <span>ConnectHub — Project Summary</span>
+          <span>Archbishop Chapelle High School · ConnectHub — Project Summary</span>
           <span>Generated {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</span>
         </div>
       </div>

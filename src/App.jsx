@@ -1,16 +1,19 @@
-import { useState, useEffect } from 'react';
-import { Network, Plus, Users, ListChecks, BadgeCheck, X, LayoutDashboard, Lock, Unlock, UserCircle } from 'lucide-react';
-import { load, save, loadTeam, saveTeam } from './data/store';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Network, Plus, Users, ListChecks, BadgeCheck, X, LayoutDashboard, Lock, Unlock, UserCircle, LoaderCircle, TriangleAlert } from 'lucide-react';
+import * as api from './lib/api';
+import { staffLogin, hasStaffSession, adminLogin, adminLogout, adminToken } from './lib/auth';
+import LogoMark from './components/LogoMark';
 import ProjectsView from './components/ProjectsView';
 import ProjectDetail from './components/ProjectDetail';
-import ProjectForm from './components/ProjectForm';
 import PeopleView from './components/PeopleView';
 import PersonView from './components/PersonView';
 import TasksView from './components/TasksView';
 import ApprovalsView from './components/ApprovalsView';
 import DashboardView from './components/DashboardView';
 
-const ADMIN_PIN = '1234';
+// How often to pick up other people's changes. Short enough that an approval
+// lands while you're still looking at the screen, long enough to be invisible.
+const POLL_MS = 30_000;
 
 function UserPickerModal({ team, onSelect }) {
   const [selected, setSelected] = useState('');
@@ -54,23 +57,30 @@ function UserPickerModal({ team, onSelect }) {
   );
 }
 
-function PinModal({ onUnlock, onClose }) {
-  const [pin, setPin] = useState('');
-  const [error, setError] = useState(false);
+// Admin sign-in. The password is checked by the admin-login function, so
+// nothing about it is present in this bundle — unlike the PIN this replaced.
+function PasswordModal({ onUnlock, onClose }) {
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
 
-  function handleSubmit() {
-    if (pin === ADMIN_PIN) {
-      onUnlock();
-    } else {
-      setError(true);
-      setPin('');
+  async function handleSubmit() {
+    if (!password || busy) return;
+    setBusy(true);
+    const { error: err } = await adminLogin(password);
+    setBusy(false);
+    if (err) {
+      setError(err);
+      setPassword('');
+      return;
     }
+    onUnlock();
   }
 
   return (
     <>
       <div onClick={onClose} style={{ position: 'fixed', inset: 0, background: 'rgba(13,43,26,0.28)', zIndex: 400, backdropFilter: 'blur(4px)' }} />
-      <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: '#fff', borderRadius: 14, zIndex: 401, width: 300, boxShadow: '0 24px 64px rgba(13,43,26,0.18), 0 2px 8px rgba(13,43,26,0.07)', overflow: 'hidden' }}>
+      <div style={{ position: 'fixed', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', background: '#fff', borderRadius: 14, zIndex: 401, width: 320, boxShadow: '0 24px 64px rgba(13,43,26,0.18), 0 2px 8px rgba(13,43,26,0.07)', overflow: 'hidden' }}>
         <div style={{ height: 3, background: 'var(--blue)' }} />
         <div style={{ padding: '24px 24px 20px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 6 }}>
@@ -78,35 +88,120 @@ function PinModal({ onUnlock, onClose }) {
             <div style={{ fontFamily: 'var(--font-heading)', fontSize: 20, fontWeight: 700, color: 'var(--blue)' }}>Admin Access</div>
           </div>
           <div style={{ fontSize: 12, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', marginBottom: 20, lineHeight: 1.5 }}>
-            Enter your PIN to unlock admin controls.
+            Enter the admin password to approve projects and manage the team.
           </div>
           <input
             type="password"
-            inputMode="numeric"
-            maxLength={4}
-            value={pin}
-            onChange={e => { setPin(e.target.value.replace(/\D/g, '')); setError(false); }}
+            value={password}
+            onChange={e => { setPassword(e.target.value); setError(''); }}
             onKeyDown={e => e.key === 'Enter' && handleSubmit()}
             autoFocus
-            placeholder="••••"
-            style={{ width: '100%', boxSizing: 'border-box', padding: '12px 14px', border: `1.5px solid ${error ? '#E46E88' : 'var(--border)'}`, borderRadius: 8, fontSize: 22, textAlign: 'center', fontFamily: 'monospace', letterSpacing: '0.3em', outline: 'none', marginBottom: error ? 8 : 16 }}
+            placeholder="Password"
+            style={{ width: '100%', boxSizing: 'border-box', padding: '12px 14px', border: `1.5px solid ${error ? '#E46E88' : 'var(--border)'}`, borderRadius: 8, fontSize: 15, fontFamily: 'Montserrat, sans-serif', outline: 'none', marginBottom: error ? 8 : 16 }}
           />
           {error && (
-            <div style={{ fontSize: 11, color: '#b45309', fontFamily: 'Montserrat, sans-serif', marginBottom: 16, textAlign: 'center' }}>
-              Incorrect PIN — try again.
+            <div style={{ fontSize: 11, color: '#b45309', fontFamily: 'Montserrat, sans-serif', marginBottom: 16, textAlign: 'center', lineHeight: 1.5 }}>
+              {error}
             </div>
           )}
           <div style={{ display: 'flex', gap: 8 }}>
-            <button onClick={onClose} style={{ flex: 1, padding: '9px', background: 'none', border: '1px solid var(--border)', borderRadius: 8, cursor: 'pointer', fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--muted)' }}>
+            <button onClick={onClose} style={{ flex: 1, padding: '11px', background: 'none', border: '1px solid var(--border)', borderRadius: 8, cursor: 'pointer', fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--muted)' }}>
               Cancel
             </button>
-            <button onClick={handleSubmit} style={{ flex: 2, padding: '9px 20px', background: 'var(--blue)', border: 'none', borderRadius: 8, cursor: 'pointer', fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#fff' }}>
-              Unlock
+            <button onClick={handleSubmit} disabled={busy || !password} style={{ flex: 2, padding: '11px 20px', background: busy || !password ? 'var(--cream-dk)' : 'var(--blue)', border: 'none', borderRadius: 8, cursor: busy || !password ? 'not-allowed' : 'pointer', fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: busy || !password ? 'var(--muted)' : '#fff' }}>
+              {busy ? 'Checking…' : 'Unlock'}
             </button>
           </div>
         </div>
       </div>
     </>
+  );
+}
+
+// The front door. One shared code for the whole staff, checked server-side.
+function StaffCodeGate({ onSignedIn }) {
+  const [code, setCode] = useState('');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  async function handleSubmit() {
+    if (!code.trim() || busy) return;
+    setBusy(true);
+    const { error: err } = await staffLogin(code.trim());
+    setBusy(false);
+    if (err) { setError(err); return; }
+    onSignedIn();
+  }
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'var(--blue)', zIndex: 600, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
+      <div style={{ background: '#fff', borderRadius: 16, width: '100%', maxWidth: 380, overflow: 'hidden', boxShadow: '0 24px 64px rgba(13,43,26,0.35)' }}>
+        <div style={{ height: 4, background: 'var(--yellow)' }} />
+        <div style={{ padding: '32px 28px 28px' }}>
+          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 18 }}>
+            <LogoMark size={52} />
+          </div>
+          <div style={{ fontFamily: 'var(--font-logo)', fontSize: 27, fontWeight: 700, color: 'var(--blue)', textAlign: 'center', letterSpacing: '-0.01em' }}>
+            Connect<span style={{ color: 'var(--yellow)' }}>Hub</span>
+          </div>
+          <div style={{ fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.16em', color: 'var(--muted)', textAlign: 'center', marginTop: 6, marginBottom: 24 }}>
+            Archbishop Chapelle
+          </div>
+          <label htmlFor="staff-code" style={{ display: 'block', fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)', marginBottom: 7 }}>
+            Staff Code
+          </label>
+          <input
+            id="staff-code"
+            type="password"
+            value={code}
+            onChange={e => { setCode(e.target.value); setError(''); }}
+            onKeyDown={e => e.key === 'Enter' && handleSubmit()}
+            autoFocus
+            autoComplete="off"
+            placeholder="Enter your staff code"
+            style={{ width: '100%', boxSizing: 'border-box', padding: '14px 16px', border: `1.5px solid ${error ? '#E46E88' : 'var(--border)'}`, borderRadius: 10, fontSize: 16, fontFamily: 'Montserrat, sans-serif', outline: 'none', marginBottom: error ? 10 : 18, background: 'var(--bg)' }}
+          />
+          {error && (
+            <div style={{ fontSize: 12, color: '#b45309', fontFamily: 'Montserrat, sans-serif', marginBottom: 18, lineHeight: 1.5, display: 'flex', gap: 7, alignItems: 'flex-start' }}>
+              <TriangleAlert size={14} strokeWidth={2} style={{ flexShrink: 0, marginTop: 1 }} />
+              <span>{error}</span>
+            </div>
+          )}
+          <button
+            onClick={handleSubmit}
+            disabled={busy || !code.trim()}
+            style={{ width: '100%', padding: '15px', background: busy || !code.trim() ? 'var(--cream-dk)' : 'var(--yellow)', border: 'none', borderRadius: 10, cursor: busy || !code.trim() ? 'not-allowed' : 'pointer', fontSize: 12, fontFamily: 'Montserrat, sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.09em', color: busy || !code.trim() ? 'var(--muted)' : '#fff' }}
+          >
+            {busy ? 'Signing in…' : 'Sign In'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Boot states. Deliberately no localStorage fallback: two staff each quietly
+// working on their own diverging copy is the exact bug this app now exists to
+// prevent, so a failed load has to stop and say so.
+function BootScreen({ error, onRetry }) {
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: 'var(--bg)', zIndex: 600, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 18, padding: 24, textAlign: 'center' }}>
+      {error ? (
+        <>
+          <TriangleAlert size={30} color="var(--blue)" strokeWidth={1.6} />
+          <div style={{ fontFamily: 'var(--font-heading)', fontSize: 21, fontWeight: 700, color: 'var(--blue)' }}>Couldn’t load your projects</div>
+          <div style={{ fontSize: 13, fontFamily: 'Montserrat, sans-serif', color: 'var(--muted)', maxWidth: 340, lineHeight: 1.6 }}>{error}</div>
+          <button onClick={onRetry} style={{ marginTop: 4, padding: '13px 30px', background: 'var(--blue)', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#fff' }}>
+            Try Again
+          </button>
+        </>
+      ) : (
+        <>
+          <LoaderCircle size={26} color="var(--blue)" strokeWidth={1.8} style={{ animation: 'ctd-spin 0.9s linear infinite' }} />
+          <div style={{ fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)' }}>Loading</div>
+        </>
+      )}
+    </div>
   );
 }
 
@@ -175,64 +270,105 @@ function StickyNoteModal({ projects, onSave, onClose }) {
   );
 }
 
-function CountdownWidget({ events = [] }) {
-  const [now, setNow] = useState(() => new Date());
-  useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(id);
-  }, []);
-
-  const todayStr = now.toISOString().slice(0, 10);
-  const next = [...events]
-    .filter(e => e.date >= todayStr)
-    .sort((a, b) => a.date.localeCompare(b.date))[0];
-  if (!next) return null;
-
-  const diff = Math.max(0, new Date(next.date + 'T00:00:00') - now);
-  const days  = Math.floor(diff / 86400000);
-  const hours = Math.floor((diff % 86400000) / 3600000);
-  const mins  = Math.floor((diff % 3600000) / 60000);
-  const secs  = Math.floor((diff % 60000) / 1000);
-
-  return (
-    <div className="sidebar-countdown">
-      <div className="sidebar-countdown-label">Next Event</div>
-      <div className="sidebar-countdown-name">{next.name}</div>
-      <div className="sidebar-countdown-grid">
-        {[['d', days], ['h', hours], ['m', mins], ['s', secs]].map(([label, val]) => (
-          <div key={label} className="sidebar-countdown-cell">
-            <div className="sidebar-countdown-num">{String(val).padStart(2, '0')}</div>
-            <div className="sidebar-countdown-unit">{label}</div>
-          </div>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export default function App() {
-  const [projects, setProjects] = useState(load);
+  const [projects, setProjects] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
-  const [showForm, setShowForm] = useState(false);
-  const [editingProject, setEditingProject] = useState(null);
   const [navView, setNavView] = useState('dashboard');
   const [selectedPerson, setSelectedPerson] = useState(null);
-  const [team, setTeam] = useState(loadTeam);
+  const [team, setTeam] = useState([]);
   const [showStickyModal, setShowStickyModal] = useState(false);
   const [draftProject, setDraftProject] = useState(null);
   const [toast, setToast] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(() => localStorage.getItem('ctd_is_admin') === 'true');
-  const [showPinModal, setShowPinModal] = useState(false);
+  // isAdmin is now derived from a server-signed token, not a localStorage flag
+  // anyone could set. Even if someone forces it true, the database refuses the
+  // writes it unlocks — see ctd-provision.sql §3.
+  const [isAdmin, setIsAdmin] = useState(() => !!adminToken());
+  const [showAdminModal, setShowAdminModal] = useState(false);
   const [currentUser, setCurrentUser] = useState(() => localStorage.getItem('ctd_current_user') || '');
+  const [signedIn, setSignedIn] = useState(null);   // null = still checking
+  const [booting, setBooting] = useState(true);
+  const [bootError, setBootError] = useState('');
+
+  // A background refresh must never yank the screen out from under someone
+  // mid-edit, so it skips while a write is in flight or a modal is open.
+  const writesInFlight = useRef(0);
+  const uiBusy = useRef(false);
+  const uiIsBusy = showStickyModal || showAdminModal || !!draftProject;
+  useEffect(() => { uiBusy.current = uiIsBusy; }, [uiIsBusy]);
+
+  function showToast(msg) {
+    setToast(msg);
+    setTimeout(() => setToast(null), 4000);
+  }
+
+  const refresh = useCallback(async () => {
+    const res = await api.loadAll();
+    if (res.error) return res.error;
+    setProjects(res.projects);
+    setTeam(res.team);
+    return null;
+  }, []);
+
+  // ── boot ────────────────────────────────────────────────────────────────
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const ok = await hasStaffSession();
+      if (cancelled) return;
+      setSignedIn(ok);
+      if (!ok) { setBooting(false); return; }
+      const err = await refresh();
+      if (cancelled) return;
+      setBootError(err || '');
+      setBooting(false);
+    })();
+    return () => { cancelled = true; };
+  }, [refresh]);
+
+  // ── stay current with what other people are doing ───────────────────────
+  useEffect(() => {
+    if (!signedIn || booting || bootError) return;
+
+    const tick = () => {
+      if (writesInFlight.current > 0 || uiBusy.current || document.hidden) return;
+      refresh();
+    };
+    const id = setInterval(tick, POLL_MS);
+    // The one that actually matters day to day: you switch back to the tab and
+    // want to be looking at current data, not a snapshot from lunchtime.
+    const onVisible = () => { if (!document.hidden) tick(); };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => { clearInterval(id); document.removeEventListener('visibilitychange', onVisible); };
+  }, [signedIn, booting, bootError, refresh]);
+
+  // Every mutation goes through here: update the screen immediately so the app
+  // still feels instant, then reconcile. A failed write reloads the truth and
+  // says what happened, rather than leaving a lie on screen.
+  const runWrite = useCallback(async (fn, optimistic) => {
+    writesInFlight.current += 1;
+    if (optimistic) optimistic();
+    let res;
+    try {
+      res = await fn();
+    } catch {
+      res = { error: 'Couldn’t save — check your connection.' };
+    }
+    writesInFlight.current -= 1;
+    if (res?.error) {
+      showToast(res.error);
+      await refresh();
+      return null;
+    }
+    return res;
+  }, [refresh]);
 
   function handleUnlock() {
     setIsAdmin(true);
-    localStorage.setItem('ctd_is_admin', 'true');
-    setShowPinModal(false);
+    setShowAdminModal(false);
   }
   function handleLock() {
+    adminLogout();
     setIsAdmin(false);
-    localStorage.removeItem('ctd_is_admin');
   }
   function handleSelectUser(name) {
     setCurrentUser(name);
@@ -243,68 +379,103 @@ export default function App() {
     localStorage.removeItem('ctd_current_user');
   }
 
-  function showToast(msg) {
-    setToast(msg);
-    setTimeout(() => setToast(null), 4000);
-  }
-
   function maybeDiscardDraft() {
     if (draftProject) {
       setDraftProject(null);
-      showToast("Almost! A project needs a name + lead before it saves ✨");
+      showToast('Almost! A project needs a name, a date and a lead before it saves.');
     }
   }
 
-  function handleUpdateDraft(project) {
+  // Replace one project in local state, keeping the rest untouched.
+  function applyProject(project) {
+    setProjects(ps => ps.some(p => p.id === project.id)
+      ? ps.map(p => (p.id === project.id ? project : p))
+      : [...ps, project]);
+  }
+
+  // A draft lives only in local state until it has enough to be a real event.
+  // Once it does, this is the insert.
+  async function handleUpdateDraft(project) {
     const leadsArr = Array.isArray(project.leads) ? project.leads : project.leads ? [project.leads] : [];
-    if (project.name?.trim() && project.date && leadsArr.length > 0) {
-      persist([...projects, project]);
-      setSelectedId(project.id);
-      setDraftProject(null);
-    } else {
+    if (!(project.name?.trim() && project.date && leadsArr.length > 0)) {
       setDraftProject(project);
+      return;
     }
+    const res = await runWrite(() => api.createProject(project));
+    if (!res?.project) return;
+    applyProject(res.project);
+    setSelectedId(res.project.id);
+    setDraftProject(null);
   }
 
   function handleDiscardDraft() {
     setDraftProject(null);
   }
 
-  function handleAddNote(projectId, text) {
-    persist(projects.map(p => p.id === projectId ? {
-      ...p,
-      notes: [...(p.notes || []), { id: crypto.randomUUID(), text, createdAt: new Date().toISOString() }],
-    } : p));
+  async function handleAddNote(projectId, text) {
+    const res = await runWrite(() => api.addNote(projectId, text, currentUser || null));
+    if (!res) return;
+    setProjects(ps => ps.map(p => (p.id === projectId ? { ...p, notes: res.notes } : p)));
   }
 
-  function handleToggleBlessed(id) {
-    persist(projects.map(p => p.id === id ? { ...p, blessed: !p.blessed } : p));
+  async function handleToggleBlessed(id) {
+    const project = projects.find(p => p.id === id);
+    if (!project) return;
+    const res = await runWrite(
+      () => (project.blessed ? api.revokeProject(id) : api.approveProject(id, currentUser || null)),
+      () => applyProject({ ...project, blessed: !project.blessed })
+    );
+    if (res) await refresh();
   }
 
-  function persistTeam(updated) { setTeam(updated); saveTeam(updated); }
-
-  function persist(updated) {
-    setProjects(updated);
-    save(updated);
+  // Roster changes are admin-only and go through the Netlify function, because
+  // the database revokes them from staff outright.
+  async function handleAddMember(data) {
+    const res = await runWrite(() => api.saveMember(data));
+    if (res) await refresh();
+  }
+  async function handleUpdateMember(id, data) {
+    const res = await runWrite(() => api.saveMember({ id, ...data }));
+    if (res) await refresh();
+  }
+  async function handleDeleteMember(id) {
+    const res = await runWrite(
+      () => api.deleteMember(id),
+      () => setTeam(t => t.filter(m => m.id !== id))
+    );
+    if (res) await refresh();
   }
 
-  function handleSaveProject(project) {
-    const isNew = !projects.find(p => p.id === project.id);
-    const updated = isNew
-      ? [...projects, project]
-      : projects.map(p => p.id === project.id ? project : p);
-    persist(updated);
-    setShowForm(false);
-    setEditingProject(null);
-    setSelectedId(project.id);
+  // One dot at a time. Two staff editing different dots of the same project
+  // touch different rows, so neither can overwrite the other.
+  async function handleSaveDot(projectId, slot, dot) {
+    const prev = projects.find(p => p.id === projectId);
+    const res = await runWrite(
+      () => api.saveDot(projectId, slot, dot),
+      () => {
+        if (!prev) return;
+        const dots = [...(prev.dots || [])];
+        dots[slot] = dot;
+        applyProject({ ...prev, dots });
+      }
+    );
+    if (res?.project) applyProject(res.project);
   }
 
-  function handleUpdateDots(id, dots) {
-    persist(projects.map(p => p.id === id ? { ...p, dots } : p));
-  }
+  async function handleUpdateProject(project) {
+    const prev = projects.find(p => p.id === project.id);
+    if (!prev) return;
 
-  function handleUpdateProject(project) {
-    persist(projects.map(p => p.id === project.id ? project : p));
+    // Approving is admin-only and lives behind the function, so a change to
+    // `blessed` has to be split out from the ordinary field patch.
+    if (!!prev.blessed !== !!project.blessed) {
+      await handleToggleBlessed(project.id);
+      return;
+    }
+    await runWrite(
+      () => api.updateProjectFields(project.id, prev, project),
+      () => applyProject(project)
+    );
   }
 
   function handleNewProject() {
@@ -323,67 +494,63 @@ export default function App() {
     setDraftProject(draft);
     setSelectedId(null);
     setNavView('projects');
-    setShowForm(false);
-    setEditingProject(null);
     setSelectedPerson(null);
   }
 
-  function handleDelete(id) {
-    persist(projects.filter(p => p.id !== id));
-    setSelectedId(null);
+  async function handleDelete(id) {
+    const res = await runWrite(
+      () => api.deleteProject(id),
+      () => setProjects(ps => ps.filter(p => p.id !== id))
+    );
+    if (res) setSelectedId(null);
   }
 
-  function handleDuplicate(project) {
-    const copy = {
-      ...project,
-      id: crypto.randomUUID(),
-      name: `${project.name} (Copy)`,
-      dots: (project.dots || []).map(d => ({
-        ...d,
-        responsibilities: Array.isArray(d.responsibilities)
-          ? d.responsibilities.map(t => ({ ...t, done: false }))
-          : [],
-      })),
-    };
-    persist([...projects, copy]);
-    setSelectedId(copy.id);
+  async function handleDuplicate(project) {
+    const res = await runWrite(() => api.duplicateProject(project.id));
+    if (!res?.project) return;
+    applyProject(res.project);
+    setSelectedId(res.project.id);
   }
 
   const selected = projects.find(p => p.id === selectedId) || null;
-  const upcomingEvents = projects.map(p => ({ name: p.name, date: p.date }));
 
-  function handleToggleTask(projectId, dotIndex, taskIndex) {
-    const updated = projects.map(p => {
-      if (p.id !== projectId) return p;
-      const dots = (p.dots || []).map((d, di) => {
-        if (di !== dotIndex) return d;
-        const tasks = Array.isArray(d.responsibilities) ? d.responsibilities : [];
-        return { ...d, responsibilities: tasks.map((t, ti) => ti === taskIndex ? { ...t, done: !t.done } : t) };
-      });
-      return { ...p, dots };
-    });
-    persist(updated);
+  // One row, one boolean. This is the interaction the whole schema was shaped
+  // around: two people ticking their own boxes at the same moment both stick.
+  async function handleToggleTask(projectId, dotIndex, taskIndex) {
+    const project = projects.find(p => p.id === projectId);
+    const task = project?.dots?.[dotIndex]?.responsibilities?.[taskIndex];
+    if (!task?.id) return;
+    const done = !task.done;
+
+    await runWrite(
+      () => api.toggleTask(task.id, done, currentUser || null),
+      () => setProjects(ps => ps.map(p => {
+        if (p.id !== projectId) return p;
+        const dots = (p.dots || []).map((d, di) => {
+          if (di !== dotIndex) return d;
+          const tasks = Array.isArray(d.responsibilities) ? d.responsibilities : [];
+          return { ...d, responsibilities: tasks.map((t, ti) => (ti === taskIndex ? { ...t, done } : t)) };
+        });
+        return { ...p, dots };
+      }))
+    );
   }
 
   function goToProjects() {
     maybeDiscardDraft();
-    setNavView('projects'); setSelectedId(null); setShowForm(false);
-    setEditingProject(null); setSelectedPerson(null);
+    setNavView('projects'); setSelectedId(null); setSelectedPerson(null);
   }
   function goToPeople() {
     maybeDiscardDraft();
-    setNavView('people'); setSelectedId(null); setShowForm(false);
-    setEditingProject(null); setSelectedPerson(null);
+    setNavView('people'); setSelectedId(null); setSelectedPerson(null);
   }
   function goToTasks() {
     maybeDiscardDraft();
-    setNavView('tasks'); setSelectedId(null); setShowForm(false);
-    setEditingProject(null); setSelectedPerson(null);
+    setNavView('tasks'); setSelectedId(null); setSelectedPerson(null);
   }
   function goToApprovals() {
     maybeDiscardDraft();
-    setNavView('approvals'); setSelectedId(null); setShowForm(false);
-    setEditingProject(null); setSelectedPerson(null);
+    setNavView('approvals'); setSelectedId(null); setSelectedPerson(null);
   }
 
   const showDashboard = navView === 'dashboard';
@@ -393,23 +560,44 @@ export default function App() {
   const showApprovals = navView === 'approvals';
   const pendingCount = projects.filter(p => p.submitted && !p.blessed).length;
 
+  if (signedIn === false) {
+    return <StaffCodeGate onSignedIn={async () => {
+      setSignedIn(true);
+      setBooting(true);
+      const err = await refresh();
+      setBootError(err || '');
+      setBooting(false);
+    }} />;
+  }
+
+  if (booting || bootError) {
+    return <BootScreen error={bootError} onRetry={async () => {
+      setBooting(true);
+      setBootError('');
+      const err = await refresh();
+      setBootError(err || '');
+      setBooting(false);
+    }} />;
+  }
+
   return (
     <div className="layout">
       <aside className="sidebar">
         <div className="sidebar-logo">
           Connect<span>Hub</span>
+          <div className="sidebar-logo-school">Archbishop Chapelle</div>
         </div>
 
         <button
-          className={`nav-btn ${showDashboard && !selected && !showForm ? 'active' : ''}`}
-          onClick={() => { maybeDiscardDraft(); setNavView('dashboard'); setSelectedId(null); setShowForm(false); setEditingProject(null); setSelectedPerson(null); }}
+          className={`nav-btn ${showDashboard && !selected ? 'active' : ''}`}
+          onClick={() => { maybeDiscardDraft(); setNavView('dashboard'); setSelectedId(null); setSelectedPerson(null); }}
         >
           <LayoutDashboard size={16} />
           Home
         </button>
 
         <button
-          className={`nav-btn ${showProjects && !showForm ? 'active' : ''}`}
+          className={`nav-btn ${showProjects ? 'active' : ''}`}
           onClick={goToProjects}
         >
           <Network size={16} />
@@ -486,7 +674,7 @@ export default function App() {
           </div>
         )}
 
-        <div style={{ marginTop: 'auto', paddingTop: 12 }}>
+        <div className="sidebar-admin" style={{ marginTop: 'auto', paddingTop: 12 }}>
           {isAdmin ? (
             <button
               onClick={handleLock}
@@ -498,7 +686,7 @@ export default function App() {
             </button>
           ) : (
             <button
-              onClick={() => setShowPinModal(true)}
+              onClick={() => setShowAdminModal(true)}
               style={{ width: '100%', display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', background: 'none', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8, cursor: 'pointer', color: 'rgba(255,255,255,0.35)', fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}
             >
               <Lock size={13} strokeWidth={2} />
@@ -509,14 +697,27 @@ export default function App() {
       </aside>
 
       <main className="main">
-        {showForm ? (
-          <ProjectForm
-            initial={editingProject}
-            team={team}
-            onSave={handleSaveProject}
-            onCancel={() => { setShowForm(false); setEditingProject(null); }}
-          />
-        ) : draftProject ? (
+        {/* Mobile only — the bottom nav has no room for these, and knowing who
+            you're signed in as decides which tasks you can check off. */}
+        <div className="mobile-utility">
+          {currentUser && (
+            <button onClick={handleSwitchUser} title="Sign in as someone else">
+              <UserCircle size={14} strokeWidth={2} />
+              {currentUser} · Switch
+            </button>
+          )}
+          {isAdmin ? (
+            <button className="is-admin" onClick={handleLock}>
+              <Unlock size={13} strokeWidth={2} /> Admin · Lock
+            </button>
+          ) : (
+            <button onClick={() => setShowAdminModal(true)}>
+              <Lock size={13} strokeWidth={2} /> Admin
+            </button>
+          )}
+        </div>
+
+        {draftProject ? (
           <ProjectDetail
             project={draftProject}
             isNew={true}
@@ -524,11 +725,13 @@ export default function App() {
             team={team}
             isAdmin={isAdmin}
             currentUser={currentUser}
-            onUpdateDots={dots => setDraftProject(p => ({ ...p, dots }))}
+            onSaveDot={(slot, dot) => setDraftProject(p => {
+              const dots = [...(p.dots || [])];
+              dots[slot] = dot;
+              return { ...p, dots };
+            })}
             onUpdateProject={handleUpdateDraft}
-            onEdit={() => {}}
             onDelete={handleDiscardDraft}
-            onDuplicate={() => {}}
             onBack={handleDiscardDraft}
             onSelectPerson={name => { setDraftProject(null); setNavView('people'); setSelectedId(null); setSelectedPerson(name); }}
           />
@@ -539,9 +742,8 @@ export default function App() {
             team={team}
             isAdmin={isAdmin}
             currentUser={currentUser}
-            onUpdateDots={dots => handleUpdateDots(selected.id, dots)}
+            onSaveDot={(slot, dot) => handleSaveDot(selected.id, slot, dot)}
             onUpdateProject={handleUpdateProject}
-            onEdit={() => { setEditingProject(selected); setShowForm(true); }}
             onDelete={() => handleDelete(selected.id)}
             onDuplicate={() => handleDuplicate(selected)}
             onBack={() => setSelectedId(null)}
@@ -562,7 +764,9 @@ export default function App() {
           <PeopleView
             team={team}
             projects={projects}
-            onSaveTeam={persistTeam}
+            onAddMember={handleAddMember}
+            onUpdateMember={handleUpdateMember}
+            onDeleteMember={handleDeleteMember}
             isAdmin={isAdmin}
             currentUser={currentUser}
             onToggleTask={handleToggleTask}
@@ -573,6 +777,8 @@ export default function App() {
           <TasksView
             projects={projects}
             team={team}
+            isAdmin={isAdmin}
+            currentUser={currentUser}
             onToggleTask={handleToggleTask}
             onOpenStickyNote={() => setShowStickyModal(true)}
           />
@@ -592,7 +798,7 @@ export default function App() {
             onSelectProject={id => { setSelectedId(id); setNavView('projects'); }}
             onSelectPerson={name => { setNavView('people'); setSelectedId(null); setSelectedPerson(name); }}
             onOpenStickyNote={() => setShowStickyModal(true)}
-            onNavigate={view => { maybeDiscardDraft(); setNavView(view); setSelectedId(null); setShowForm(false); setEditingProject(null); setSelectedPerson(null); }}
+            onNavigate={view => { maybeDiscardDraft(); setNavView(view); setSelectedId(null); setSelectedPerson(null); }}
             currentUser={currentUser}
           />
         ) : (
@@ -637,10 +843,10 @@ export default function App() {
         />
       )}
 
-      {showPinModal && (
-        <PinModal
+      {showAdminModal && (
+        <PasswordModal
           onUnlock={handleUnlock}
-          onClose={() => setShowPinModal(false)}
+          onClose={() => setShowAdminModal(false)}
         />
       )}
 

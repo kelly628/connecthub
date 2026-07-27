@@ -174,7 +174,6 @@ function LeadAvatars({ leads, team }) {
 }
 
 function ListRow({ p, i, last }) {
-  const days = daysUntil(p.date);
   let totalTasks = 0, doneTasks = 0;
   (p.dots || []).forEach(d => {
     const tasks = Array.isArray(d.responsibilities) ? d.responsibilities : [];
@@ -234,9 +233,27 @@ function ListTable({ rows, onSelect }) {
   );
 }
 
-function ListView({ projects, team, onSelect }) {
+function ListView({ projects, onSelect, anyProjects = true, onNew }) {
   if (projects.length === 0) {
-    return <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--muted)', fontSize: 14 }}>No projects match the current filters.</div>;
+    // "No matches" is misleading when there's simply nothing here yet and no
+    // filter is set — it reads as though something is being hidden.
+    return (
+      <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--muted)', fontSize: 14 }}>
+        {anyProjects ? (
+          'No projects match the current filters.'
+        ) : (
+          <>
+            <p style={{ marginBottom: 20, fontSize: 15 }}>No events yet.</p>
+            <button
+              onClick={onNew}
+              style={{ padding: '14px 28px', background: 'var(--yellow)', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 12, fontFamily: 'Montserrat, sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#fff' }}
+            >
+              Create Your First Event
+            </button>
+          </>
+        )}
+      </div>
+    );
   }
   const dated = projects.filter(p => p.date).sort((a, b) => a.date.localeCompare(b.date));
   const undated = projects.filter(p => !p.date);
@@ -257,7 +274,7 @@ function ListView({ projects, team, onSelect }) {
   );
 }
 
-export default function ProjectsView({ projects, team = [], onSelect, onNew, onAddNote, onOpenStickyNote }) {
+export default function ProjectsView({ projects, team = [], onSelect, onNew, onOpenStickyNote }) {
   const [leadFilter, setLeadFilter] = useState('');
   const [dateFilter, setDateFilter] = useState('all');
   const [view, setView] = useState('grid'); // 'grid' | 'calendar' | 'list'
@@ -340,13 +357,25 @@ export default function ProjectsView({ projects, team = [], onSelect, onNew, onA
       {view === 'calendar' && <CalendarView projects={projects} onSelect={onSelect} />}
 
       {/* List view */}
-      {view === 'list' && <ListView projects={[...filtered].sort((a, b) => (a.date || '9999') < (b.date || '9999') ? -1 : 1)} team={team} onSelect={onSelect} />}
+      {view === 'list' && <ListView projects={[...filtered].sort((a, b) => (a.date || '9999') < (b.date || '9999') ? -1 : 1)} onSelect={onSelect} anyProjects={projects.length > 0} onNew={onNew} />}
 
       {/* Grid view */}
       {view === 'grid' && (
         filtered.length === 0 ? (
-          <div style={{ textAlign: 'center', padding: '60px 0', color: 'var(--muted)', fontSize: 14 }}>
-            <p>{projects.length === 0 ? 'No projects yet. Create your first one.' : 'No projects match the current filters.'}</p>
+          <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--muted)', fontSize: 14 }}>
+            {projects.length === 0 ? (
+              <>
+                <p style={{ marginBottom: 20, fontSize: 15 }}>No events yet.</p>
+                <button
+                  onClick={onNew}
+                  style={{ padding: '14px 28px', background: 'var(--yellow)', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 12, fontFamily: 'Montserrat, sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#fff' }}
+                >
+                  Create Your First Event
+                </button>
+              </>
+            ) : (
+              <p>No projects match the current filters.</p>
+            )}
           </div>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: 16 }}>
