@@ -11,9 +11,9 @@ anything a regular staff member isn't allowed to do.
 
 ## How staff use it
 
-1. **Sign in** with the staff code the office gives out. One code for everyone.
-2. **Pick your name** from the team list. That's how the app knows which tasks
-   are yours.
+1. **Sign in** with your own code — your first name and your class year, like
+   `Connie-88`. The office sets these on the Team screen.
+2. That's it: the code says who you are, so there's no name to pick.
 3. **Open an event.** Each dot is one person. Tap a dot to add their tasks.
 4. **Connect the Dots** when the plan is ready — that sends it to the office.
 5. **The office approves it.** Only then can anyone start ticking things off.
@@ -70,8 +70,10 @@ Then, in the SQL editor, run:
 1. `supabase/ctd-provision.sql` — tables, row-level security, the admin
    boundary, and the helper functions.
 2. `supabase/ctd-storage.sql` — the two image buckets.
+3. `supabase/ctd-staff-codes.sql` — per-person sign-in codes, the failed-attempt
+   throttle, and the starting roster.
 
-Both are idempotent; re-running them changes nothing.
+All three are idempotent; re-running them changes nothing.
 
 Finally, under **Authentication → Users → Add user**, create the one shared
 staff identity (auto-confirm it). Use the email and password you're going to put
@@ -87,7 +89,7 @@ Environment variables**.
 
 Only `VITE_`-prefixed variables end up in the browser bundle. Everything else
 stays on the server — **never** add a `VITE_` prefix to `SUPABASE_SERVICE_ROLE_KEY`,
-`STAFF_CODE`, `ADMIN_PASSWORD` or `ADMIN_TOKEN_SECRET`.
+`ADMIN_PASSWORD` or `ADMIN_TOKEN_SECRET`.
 
 ---
 
@@ -111,10 +113,26 @@ in devtools makes the buttons appear, and the database still refuses the write.
 **Everyone's screen stays current** via a 30-second poll plus a refresh whenever
 you switch back to the tab. Both skip while you're mid-edit or a dialog is open.
 
-One honest limitation: because all staff share a single sign-in, the database
-can't tell Sarah from James. "Only Sarah ticks Sarah's boxes" is a courtesy rail
-in the interface, not a security boundary. What *is* enforced is the part that
-matters — staff cannot approve, delete, or edit the roster.
+**Identity comes from the code, not from the browser.** Each person signs in
+with their own code and the server answers with *who that is*. The app used to
+ask people to pick their own name off a list, which meant "these are Shannon's
+tasks" was a claim the browser made about itself and anyone could make it about
+anyone.
+
+One honest limitation remains: every code still exchanges for the *same* shared
+Supabase session, so as far as Postgres is concerned there is one staffer. "Only
+Sarah ticks Sarah's boxes" is therefore still a courtesy rail in the interface,
+not a database boundary — someone determined could edit the cached name in
+devtools. What *is* enforced is the part that matters: staff cannot approve,
+delete, or edit the roster.
+
+**Codes are memorable on purpose, so the throttle carries the weight.** A name
+and a class year is a small search space — roughly sixty plausible years, and an
+alumna's real one is often on the school's own website. `ctd_login_throttle`
+counts failures against the *name* half of the attempt, because someone walking
+shannon-01, shannon-02, shannon-03 submits a different string every time and a
+per-code counter would never trip. Five wrong gets a minute, ten gets fifteen,
+fifteen gets the rest of the day.
 
 ---
 

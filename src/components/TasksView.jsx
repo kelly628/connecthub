@@ -79,7 +79,7 @@ export default function TasksView({ projects, team, onToggleTask, onOpenStickyNo
       <div className="page-header">
         <div>
           <h1 className="page-title">Tasks</h1>
-          <p className="page-subtitle">{doneAll} of {totalAll} completed across all events</p>
+          <p className="page-subtitle">{doneAll} of {totalAll} completed across all projects</p>
         </div>
         <LogoMark size={36} onClick={onOpenStickyNote} />
       </div>
@@ -119,7 +119,7 @@ export default function TasksView({ projects, team, onToggleTask, onOpenStickyNo
         ))}
         {projects.length > 1 && (
           <select value={projectFilter} onChange={e => setProjectFilter(e.target.value)} style={selectStyle}>
-            <option value="">All Events</option>
+            <option value="">All Projects</option>
             {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
           </select>
         )}

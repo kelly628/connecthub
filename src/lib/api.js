@@ -62,6 +62,11 @@ function toClientMember(row) {
     name: row.name,
     title: row.title || '',
     photoUrl: row.photo_url || null,
+    iconName: row.icon_name || null,
+    color: row.color || null,
+    // Readable by everyone on purpose: "who do I send this to?" is a question
+    // the interface should answer without anyone having to ask the office.
+    isAdmin: !!row.is_admin,
   };
 }
 
@@ -262,5 +267,45 @@ export async function approveProject(id, by)  { return adminFetch('approve',  { 
 export async function revokeProject(id)       { return adminFetch('revoke',   { id }); }
 export async function unsubmitProject(id)     { return adminFetch('unsubmit', { id }); }
 export async function deleteProject(id)       { return adminFetch('delete_project', { id }); }
+// Adding a person is open to all staff and goes straight to the table — the
+// database grants insert on exactly four columns, so there is nothing here to
+// gate in the interface. Editing and deleting still route through adminFetch
+// below, because renaming has to cascade to dots and leads.
+export async function addMember(member) {
+  const row = {
+    name:       String(member.name || '').trim(),
+    title:      String(member.title || '').trim(),
+    photo_url:  member.photoUrl || null,
+    sort_order: Number.isFinite(member.sortOrder) ? member.sortOrder : 0,
+  };
+  if (!row.name) return { error: 'A team member needs a name.' };
+
+  const { data, error } = await supabase.from('ctd_members').insert(row).select('*').single();
+  if (error) {
+    // The unique index is on lower(trim(name)), so this is the same person
+    // typed slightly differently rather than a genuine failure.
+    if (error.code === '23505') return { error: 'Someone with that name is already on the team.' };
+    return { error: error.message };
+  }
+  return { data: { ok: true, member: toClientMember(data) } };
+}
+
+// Icon, colour and photo — the three things anyone may change about how a
+// person appears. Deliberately not a general member update: the database only
+// grants these columns, so a name slipped in here would be rejected outright.
+export async function updateMemberLook(id, look) {
+  const patch = {};
+  if ('iconName' in look) patch.icon_name = look.iconName || null;
+  if ('color' in look)    patch.color     = look.color || null;
+  if ('photoUrl' in look) patch.photo_url = look.photoUrl || null;
+  if (!Object.keys(patch).length) return { data: { ok: true } };
+
+  const { error } = await supabase.from('ctd_members').update(patch).eq('id', id);
+  if (error) return { error: error.message };
+  return { data: { ok: true } };
+}
+
 export async function saveMember(member)      { return adminFetch('save_member',   { member }); }
 export async function deleteMember(id)        { return adminFetch('delete_member', { id }); }
+export async function listCodes()             { return adminFetch('list_codes',    {}); }
+export async function setMemberCode(id, code) { return adminFetch('set_member_code', { id, code }); }

@@ -137,7 +137,7 @@ export default function PersonView({ name, projects, team = [], onBack, onToggle
         <div>
           <h1 className="page-title" style={{ marginBottom: 2 }}>{name}</h1>
           <p className="page-subtitle">
-            {upcoming.length} upcoming {upcoming.length === 1 ? 'event' : 'events'}
+            {upcoming.length} upcoming {upcoming.length === 1 ? 'project' : 'projects'}
             {past.length > 0 ? ` · ${past.length} past` : ''}
           </p>
         </div>
@@ -156,7 +156,7 @@ export default function PersonView({ name, projects, team = [], onBack, onToggle
       {/* Past */}
       {past.length > 0 && (
         <div>
-          <div className="section-title">Past Events</div>
+          <div className="section-title">Past Projects</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
             {past.map((a, i) => <AssignmentCard key={i} a={a} />)}
           </div>

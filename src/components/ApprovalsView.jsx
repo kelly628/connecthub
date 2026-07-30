@@ -172,7 +172,7 @@ export default function ApprovalsView({ projects, isAdmin = false, onToggleBless
           </div>
           {approved.length === 0 ? (
             <div style={{ padding: '40px 0', textAlign: 'center', color: 'var(--muted)', fontSize: 13, fontStyle: 'italic' }}>
-              No events approved yet.
+              No projects approved yet.
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>

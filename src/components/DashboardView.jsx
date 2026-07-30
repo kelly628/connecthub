@@ -210,7 +210,7 @@ export default function DashboardView({ projects, team, onSelectProject, onSelec
 
         <div style={{ maxWidth: 620 }}>
           <p style={{ fontSize: 15, lineHeight: 1.7, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', marginBottom: 28 }}>
-            Every event here is a board of dots — one dot per person, each holding that
+            Every project here is a board of dots — one dot per person, each holding that
             person’s checklist. Fill them in, then press <strong style={{ color: 'var(--blue)' }}>Connect
             the Dots</strong> to send the plan to the office for approval.
           </p>
@@ -225,7 +225,7 @@ export default function DashboardView({ projects, team, onSelectProject, onSelec
               </div>
               <div style={{ fontSize: 14, lineHeight: 1.65, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', marginBottom: isAdmin ? 18 : 0 }}>
                 {isAdmin
-                  ? 'Everyone who helps run events. You can add photos and roles later.'
+                  ? 'Everyone who helps run projects. You can add photos and roles later.'
                   : 'An admin sets up the team. Ask the office to add everyone, then come back here.'}
               </div>
               {isAdmin && (
@@ -243,7 +243,7 @@ export default function DashboardView({ projects, team, onSelectProject, onSelec
                 Step 2
               </div>
               <div style={{ fontFamily: 'var(--font-heading)', fontSize: 21, fontWeight: 700, color: 'var(--blue)', marginBottom: 8 }}>
-                Create your first event
+                Create your first project
               </div>
               <div style={{ fontSize: 14, lineHeight: 1.65, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif' }}>
                 Unlocks once there’s at least one person on the team.
@@ -285,7 +285,7 @@ export default function DashboardView({ projects, team, onSelectProject, onSelec
             transformOrigin: 'center',
           }}>
             <LogoMark
-              size={isFlying ? 22 : 36}
+              size={isFlying ? 34 : 56}
               onClick={() => { onOpenStickyNote(); flyingRef.current = false; setIsFlying(false); }}
               style={{ transition: 'width 0.4s, height 0.4s' }}
             />
@@ -322,7 +322,7 @@ export default function DashboardView({ projects, team, onSelectProject, onSelec
           {upcoming.length > 0 && (() => {
             const event = upcoming[safeIdx];
             const days = daysUntil(event.date);
-            const labels = ['Next Event', 'Coming Up', 'On the Horizon', 'Also Ahead'];
+            const labels = ['Next Project', 'Coming Up', 'On the Horizon', 'Also Ahead'];
             return (
               <div style={{ marginBottom: 6 }}>
                 <div
@@ -383,7 +383,7 @@ export default function DashboardView({ projects, team, onSelectProject, onSelec
               )}
             </div>
             {upcoming.length === 0 && past.length === 0 ? (
-              <div style={{ padding: '32px 18px', textAlign: 'center', color: 'var(--muted)', fontSize: 13, fontStyle: 'italic' }}>No events yet. Create one to get started.</div>
+              <div style={{ padding: '32px 18px', textAlign: 'center', color: 'var(--muted)', fontSize: 13, fontStyle: 'italic' }}>No projects yet. Create one to get started.</div>
             ) : (
               [...upcoming, ...past].map(p => (
                 <EventRow key={p.id} project={p} onSelect={onSelectProject} />

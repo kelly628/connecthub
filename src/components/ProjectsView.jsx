@@ -243,12 +243,12 @@ function ListView({ projects, onSelect, anyProjects = true, onNew }) {
           'No projects match the current filters.'
         ) : (
           <>
-            <p style={{ marginBottom: 20, fontSize: 15 }}>No events yet.</p>
+            <p style={{ marginBottom: 20, fontSize: 15 }}>No projects yet.</p>
             <button
               onClick={onNew}
               style={{ padding: '14px 28px', background: 'var(--yellow)', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 12, fontFamily: 'Montserrat, sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#fff' }}
             >
-              Create Your First Event
+              Create Your First Project
             </button>
           </>
         )}
@@ -365,12 +365,12 @@ export default function ProjectsView({ projects, team = [], onSelect, onNew, onO
           <div style={{ textAlign: 'center', padding: '60px 20px', color: 'var(--muted)', fontSize: 14 }}>
             {projects.length === 0 ? (
               <>
-                <p style={{ marginBottom: 20, fontSize: 15 }}>No events yet.</p>
+                <p style={{ marginBottom: 20, fontSize: 15 }}>No projects yet.</p>
                 <button
                   onClick={onNew}
                   style={{ padding: '14px 28px', background: 'var(--yellow)', border: 'none', borderRadius: 10, cursor: 'pointer', fontSize: 12, fontFamily: 'Montserrat, sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#fff' }}
                 >
-                  Create Your First Event
+                  Create Your First Project
                 </button>
               </>
             ) : (

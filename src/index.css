@@ -990,10 +990,12 @@ a { color: inherit; text-decoration: none; }
 }
 
 /* Date left, status right — in flow, so they can never collide */
+/* The date moved down into the credits, so the status badge is the only thing
+   left up here and it keeps its right-hand corner. */
 .pb-topbar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 10px;
   flex-wrap: wrap;
   min-height: 34px;
@@ -1077,7 +1079,10 @@ a { color: inherit; text-decoration: none; }
   font-size: clamp(30px, 5.2vw, 54px);
   font-weight: 400;
   letter-spacing: -0.025em;
-  line-height: 1.05;
+  /* Fraunces has deep descenders, and at 54px a 1.05 line-height sheared the
+     tails off any p, g or y — "Spring" lost the leg of its p. An input clips
+     to its content box, so the fix is room below the baseline, not overflow. */
+  line-height: 1.28;
   color: var(--blue);
   text-align: center;
   width: 100%;
@@ -1085,7 +1090,7 @@ a { color: inherit; text-decoration: none; }
   background: none;
   border: none;
   outline: none;
-  padding: 6px 4px 2px;
+  padding: 6px 4px 10px;
   border-radius: 8px;
   transition: background 0.15s, box-shadow 0.15s;
 }
@@ -1101,64 +1106,129 @@ a { color: inherit; text-decoration: none; }
   margin: 15px auto;
 }
 
-.pb-credit {
-  font-family: var(--font-body);
-  font-size: 12.5px;
-  color: var(--muted);
-  letter-spacing: 0.02em;
+/* One meta line, not three stacked ones. Date, leads and team size are peers —
+   the same kind of fact about the project — so they read as a single row of
+   small caps divided by hairlines, the way a masthead sets its credits. Three
+   centred italic lines each doing their own thing was the sloppiness. */
+.pb-meta {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 7px;
   flex-wrap: wrap;
+  gap: 2px;
+  font-family: var(--font-body);
 }
-.pb-credit + .pb-credit { margin-top: 7px; }
-.pb-credit b { color: var(--text); font-weight: 600; }
-.pb-credit .num { font-family: var(--font-body); font-weight: 700; color: var(--blue); font-size: 14px; }
 
+.pb-meta-sep {
+  width: 1px;
+  height: 13px;
+  background: var(--border);
+  margin: 0 8px;
+  flex-shrink: 0;
+}
+
+.pb-meta-item { display: inline-flex; align-items: center; gap: 8px; }
+
+.pb-meta-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Date and leads share one control style so neither looks like an afterthought
+   next to the other. Set in the same small caps as the labels around them. */
+.pb-date,
 .pb-leads {
-  font: inherit;
+  font-family: var(--font-body);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
   color: var(--muted);
   background: none;
   border: none;
-  border-radius: 7px;
-  padding: 5px 8px;
+  border-radius: 99px;
+  padding: 6px 12px;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   max-width: 100%;
-  transition: background 0.15s, box-shadow 0.15s;
+  transition: background 0.16s, color 0.16s, box-shadow 0.16s;
 }
-.pb-leads:hover { background: rgba(69,125,88,0.07); }
+.pb-date:hover,
+.pb-leads:hover { background: var(--cream); color: var(--blue); }
+.pb-date:focus-visible,
 .pb-leads:focus-visible { outline: none; background: var(--cream); box-shadow: 0 0 0 3px rgba(69,125,88,0.16); }
-.pb-leads.empty { font-style: italic; }
+
+/* Nothing filled in yet reads as lighter, not as italic — the slant was what
+   made an empty state look like a mistake rather than an invitation. */
+.pb-date.empty,
+.pb-leads.empty {
+  font-style: normal;
+  text-transform: uppercase;
+  letter-spacing: 0.13em;
+  font-weight: 700;
+  opacity: 0.6;
+}
+
+.pb-leads b { color: var(--blue); font-weight: 700; }
+
+/* A single segmented pill rather than two buttons floating beside a number.
+   The count lives inside the control it belongs to. */
+.pb-stepper {
+  display: inline-flex;
+  align-items: stretch;
+  height: 26px;
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+  background: var(--surface);
+}
 
 .pb-step {
-  width: 30px;
-  height: 30px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  background: rgba(69,125,88,0.045);
+  width: 26px;
+  border: none;
+  background: none;
   color: var(--muted);
   font-family: var(--font-body);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s;
+  transition: background 0.14s, color 0.14s;
 }
-.pb-step:hover:not(:disabled) { background: rgba(69,125,88,0.11); border-color: rgba(69,125,88,0.3); color: var(--blue); }
-.pb-step:focus-visible { outline: none; background: var(--cream); box-shadow: 0 0 0 3px rgba(69,125,88,0.16); }
-.pb-step:disabled { opacity: 0.3; cursor: default; }
+.pb-step:hover:not(:disabled) { background: var(--cream); color: var(--blue); }
+.pb-step:focus-visible { outline: none; background: var(--cream); color: var(--blue); }
+.pb-step:disabled { opacity: 0.28; cursor: not-allowed; }
+
+.pb-stepper .num {
+  min-width: 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-left: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--blue);
+  letter-spacing: 0;
+}
 
 @media (max-width: 560px) {
   .playbill { padding: 16px 16px 22px; }
   .pb-topbar { justify-content: center; gap: 4px; }
   .pb-rule { margin: 13px auto; }
+  /* Hairlines between wrapped rows read as debris, so they go and the row
+     spacing carries the separation instead. */
+  .pb-meta { gap: 6px 2px; }
+  .pb-meta-sep { display: none; }
 }
 /* ── Hub Diagram ────────────────────────────── */
 .hub-wrap {
@@ -1497,4 +1567,45 @@ a { color: inherit; text-decoration: none; }
     transition: filter 0.15s;
   }
   .mobile-fab:hover { filter: brightness(0.92); }
+}
+
+/* ── Chippy ─────────────────────────────────── */
+/* She animates on hover, and it is her real footage rather than a CSS
+   approximation: 17 frames lifted from a mascot video, keyed off its black
+   background and laid out in one strip. steps() walks the strip a frame at a
+   time, so no interpolation smears one pose into the next.
+
+   Two strips are built and either can be the hover — swap the url below:
+     chippy-wink.png  she tilts and winks   ← in use
+     chippy-zoom.png  she leans in until her face fills the frame
+   The crop is identical in both, so frame 0 is the same resting pose whichever
+   is in use and there is nothing to jump.
+
+   --ctd-frame is set per instance by LogoMark, which is what lets one sprite
+   serve every size from the 21px project-detail slot to the 73px dashboard. */
+.ctd-mark {
+  position: relative;
+  display: inline-block;
+  width: var(--ctd-frame);
+  height: var(--ctd-frame);
+  background-image: url('/chippy-wink.png');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: calc(var(--ctd-frame) * 17) var(--ctd-frame);
+}
+
+.ctd-mark.is-live:hover,
+.ctd-mark.is-live:focus-visible {
+  animation: ctd-wink 0.62s steps(16) forwards;
+}
+
+@keyframes ctd-wink {
+  to { background-position: calc(var(--ctd-frame) * -16) 0; }
+}
+
+/* A wink is decoration. Anyone who has asked the system to calm motion down
+   gets her holding still. */
+@media (prefers-reduced-motion: reduce) {
+  .ctd-mark.is-live:hover,
+  .ctd-mark.is-live:focus-visible { animation: none; }
 }

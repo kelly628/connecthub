@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { Network, Plus, Users, ListChecks, BadgeCheck, X, LayoutDashboard, Lock, Unlock, UserCircle, LoaderCircle, TriangleAlert } from 'lucide-react';
 import * as api from './lib/api';
-import { staffLogin, hasStaffSession, adminLogin, adminLogout, adminToken } from './lib/auth';
+import { staffLogin, staffLogout, hasStaffSession, adminLogin, adminLogout, adminToken } from './lib/auth';
 import LogoMark from './components/LogoMark';
 import ProjectsView from './components/ProjectsView';
 import ProjectDetail from './components/ProjectDetail';
@@ -15,47 +15,9 @@ import DashboardView from './components/DashboardView';
 // lands while you're still looking at the screen, long enough to be invisible.
 const POLL_MS = 30_000;
 
-function UserPickerModal({ team, onSelect }) {
-  const [selected, setSelected] = useState('');
-  return (
-    <div style={{ position: 'fixed', inset: 0, background: 'rgba(13,43,26,0.55)', zIndex: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(6px)' }}>
-      <div style={{ background: '#fff', borderRadius: 14, width: 320, overflow: 'hidden', boxShadow: '0 24px 64px rgba(13,43,26,0.22)' }}>
-        <div style={{ height: 3, background: 'var(--yellow)' }} />
-        <div style={{ padding: '24px' }}>
-          <div style={{ fontFamily: 'var(--font-heading)', fontSize: 22, fontWeight: 700, color: 'var(--blue)', marginBottom: 4 }}>Who are you?</div>
-          <div style={{ fontSize: 12, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', marginBottom: 18, lineHeight: 1.5 }}>
-            Select your name to get started. You'll only be able to check off your own tasks.
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, maxHeight: 260, overflowY: 'auto', marginBottom: 16 }}>
-            {team.map(m => (
-              <button
-                key={m.id}
-                onClick={() => setSelected(m.name)}
-                style={{
-                  textAlign: 'left', padding: '10px 14px', borderRadius: 8, cursor: 'pointer',
-                  fontFamily: 'Montserrat, sans-serif', fontWeight: 700, fontSize: 14,
-                  background: selected === m.name ? 'var(--blue)' : 'var(--cream)',
-                  color: selected === m.name ? '#fff' : 'var(--text)',
-                  border: `1.5px solid ${selected === m.name ? 'var(--blue)' : 'transparent'}`,
-                  transition: 'all 0.12s',
-                }}
-              >
-                {m.name}
-              </button>
-            ))}
-          </div>
-          <button
-            onClick={() => selected && onSelect(selected)}
-            disabled={!selected}
-            style={{ width: '100%', padding: '11px', background: selected ? 'var(--yellow)' : 'var(--cream-dk)', border: 'none', borderRadius: 8, cursor: selected ? 'pointer' : 'not-allowed', fontSize: 12, fontFamily: 'Montserrat, sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: selected ? 'var(--blue)' : 'var(--muted)' }}
-          >
-            Continue
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
+// The "Who are you?" picker that used to live here is gone. Your code names
+// you now, so asking again would be asking a question we already have a better
+// answer to — and the old answer was whatever the person happened to click.
 
 // Admin sign-in. The password is checked by the admin-login function, so
 // nothing about it is present in this bundle — unlike the PIN this replaced.
@@ -118,7 +80,8 @@ function PasswordModal({ onUnlock, onClose }) {
   );
 }
 
-// The front door. One shared code for the whole staff, checked server-side.
+// The front door. One code per person, checked server-side — and the answer
+// tells us who just walked in, so nobody has to pick their own name afterwards.
 function StaffCodeGate({ onSignedIn }) {
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
@@ -127,10 +90,10 @@ function StaffCodeGate({ onSignedIn }) {
   async function handleSubmit() {
     if (!code.trim() || busy) return;
     setBusy(true);
-    const { error: err } = await staffLogin(code.trim());
+    const { error: err, member } = await staffLogin(code.trim());
     setBusy(false);
     if (err) { setError(err); return; }
-    onSignedIn();
+    onSignedIn(member);
   }
 
   return (
@@ -148,17 +111,24 @@ function StaffCodeGate({ onSignedIn }) {
             Archbishop Chapelle
           </div>
           <label htmlFor="staff-code" style={{ display: 'block', fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)', marginBottom: 7 }}>
-            Staff Code
+            Your Code
           </label>
+          {/* Shown, not masked. It's a personal code rather than a password,
+              and a hidden field on a phone means a typo you can't see — which
+              costs more here than shoulder-surfing does. Autocorrect off so
+              iOS doesn't quietly rewrite it on the way in. */}
           <input
             id="staff-code"
-            type="password"
+            type="text"
             value={code}
             onChange={e => { setCode(e.target.value); setError(''); }}
             onKeyDown={e => e.key === 'Enter' && handleSubmit()}
             autoFocus
             autoComplete="off"
-            placeholder="Enter your staff code"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            placeholder="e.g. Connie-88"
             style={{ width: '100%', boxSizing: 'border-box', padding: '14px 16px', border: `1.5px solid ${error ? '#E46E88' : 'var(--border)'}`, borderRadius: 10, fontSize: 16, fontFamily: 'Montserrat, sans-serif', outline: 'none', marginBottom: error ? 10 : 18, background: 'var(--bg)' }}
           />
           {error && (
@@ -370,13 +340,15 @@ export default function App() {
     adminLogout();
     setIsAdmin(false);
   }
-  function handleSelectUser(name) {
-    setCurrentUser(name);
-    localStorage.setItem('ctd_current_user', name);
-  }
-  function handleSwitchUser() {
+  // Who you are now comes from your code, so "switch user" means sign out and
+  // sign back in as yourself. Clearing the name on its own would leave the
+  // session open with nobody attached to it.
+  async function handleSwitchUser() {
     setCurrentUser('');
     localStorage.removeItem('ctd_current_user');
+    await staffLogout();
+    setIsAdmin(false);
+    setSignedIn(false);
   }
 
   function maybeDiscardDraft() {
@@ -430,13 +402,38 @@ export default function App() {
 
   // Roster changes are admin-only and go through the Netlify function, because
   // the database revokes them from staff outright.
-  async function handleAddMember(data) {
-    const res = await runWrite(() => api.saveMember(data));
-    if (res) await refresh();
+  // The sign-in code rides along with the member form but lives in its own
+  // table, so it's a second call. `code` is only present when the form actually
+  // had the field — never send it otherwise, or an edit made before the codes
+  // loaded would wipe someone's access.
+  // Anyone on staff can add someone. Admins go the long way round because only
+  // they can attach a sign-in code or mark a new person as an approver; for
+  // everyone else it is a single insert the database allows outright.
+  async function handleAddMember({ code, isAdmin: makeAdmin, ...member }) {
+    if (!isAdmin) {
+      const res = await runWrite(() => api.addMember(member));
+      if (res) await refresh();
+      return;
+    }
+    const res = await runWrite(() => api.saveMember({ ...member, isAdmin: makeAdmin }));
+    if (!res) return;
+    const newId = res?.data?.member?.id;
+    if (newId && code !== undefined) await runWrite(() => api.setMemberCode(newId, code));
+    await refresh();
   }
-  async function handleUpdateMember(id, data) {
-    const res = await runWrite(() => api.saveMember({ id, ...data }));
-    if (res) await refresh();
+  // A non-admin opening this form can only have changed how someone looks, so
+  // that is all that gets sent. Routing it through saveMember would hit the
+  // admin function and 401 — and the database would refuse the write anyway.
+  async function handleUpdateMember(id, { code, ...member }) {
+    if (!isAdmin) {
+      const res = await runWrite(() => api.updateMemberLook(id, member));
+      if (res) await refresh();
+      return;
+    }
+    const res = await runWrite(() => api.saveMember({ id, ...member }));
+    if (!res) return;
+    if (code !== undefined) await runWrite(() => api.setMemberCode(id, code));
+    await refresh();
   }
   async function handleDeleteMember(id) {
     const res = await runWrite(
@@ -478,15 +475,21 @@ export default function App() {
     );
   }
 
+  // A new board starts with empty boxes on purpose. It used to open with every
+  // staff member already dealt a dot, which quietly decided two things for the
+  // person creating the event: that everyone is involved, and that the team is
+  // exactly as big as the roster. "A team of 8" is the starting point to adjust
+  // — the names go in when whoever is planning it is ready to put them there.
+  const NEW_PROJECT_DOTS = 8;
+
   function handleNewProject() {
-    const memberDots = [...team].sort((a, b) => a.name.localeCompare(b.name)).slice(0, 12).map(m => ({ member: m.name, responsibilities: [] }));
     const draft = {
       id: crypto.randomUUID(),
       name: '',
       date: '',
       leads: [],
-      dots: memberDots,
-      dotCount: memberDots.length > 0 ? Math.min(memberDots.length, 12) : 8,
+      dots: Array.from({ length: NEW_PROJECT_DOTS }, () => ({ member: '', responsibilities: [] })),
+      dotCount: NEW_PROJECT_DOTS,
       notes: [],
       submitted: false,
       blessed: false,
@@ -561,7 +564,19 @@ export default function App() {
   const pendingCount = projects.filter(p => p.submitted && !p.blessed).length;
 
   if (signedIn === false) {
-    return <StaffCodeGate onSignedIn={async () => {
+    return <StaffCodeGate onSignedIn={async (member) => {
+      // staffLogin has already stashed an admin token if the roster says this
+      // person approves, so this reads back what the server decided rather
+      // than trusting anything the sign-in screen passed along.
+      setIsAdmin(!!adminToken());
+      if (member?.name) {
+        setCurrentUser(member.name);
+        // Cached so a reload doesn't have to ask again — the Supabase session
+        // survives, but it's the shared staff identity and can't say which
+        // person it is. The value here came from the server's answer to the
+        // code, not from anything the browser picked.
+        localStorage.setItem('ctd_current_user', member.name);
+      }
       setSignedIn(true);
       setBooting(true);
       const err = await refresh();
@@ -668,8 +683,8 @@ export default function App() {
           <div className="sidebar-user-display" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', color: 'rgba(255,255,255,0.5)', fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
             <UserCircle size={13} strokeWidth={2} />
             <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{currentUser}</span>
-            <button onClick={handleSwitchUser} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: 0, flexShrink: 0 }}>
-              Switch
+            <button onClick={handleSwitchUser} title="Sign out" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: 0, flexShrink: 0 }}>
+              Sign Out
             </button>
           </div>
         )}
@@ -701,9 +716,9 @@ export default function App() {
             you're signed in as decides which tasks you can check off. */}
         <div className="mobile-utility">
           {currentUser && (
-            <button onClick={handleSwitchUser} title="Sign in as someone else">
+            <button onClick={handleSwitchUser} title="Sign out">
               <UserCircle size={14} strokeWidth={2} />
-              {currentUser} · Switch
+              {currentUser} · Sign Out
             </button>
           )}
           {isAdmin ? (
@@ -850,9 +865,6 @@ export default function App() {
         />
       )}
 
-      {!isAdmin && !currentUser && team.length > 0 && (
-        <UserPickerModal team={team} onSelect={handleSelectUser} />
-      )}
     </div>
   );
 }

@@ -1,8 +1,18 @@
-import { useState, useRef } from 'react';
-import { Plus, Pencil, Trash2, Camera, X, Check, LayoutList, BookOpen, ClipboardList, Trophy, LoaderCircle } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Plus, Pencil, Trash2, Camera, X, Check, LayoutList, BookOpen, ClipboardList, Trophy, LoaderCircle,
+         Star, Heart, Sparkles, Crown, Music, Palette, Sun, Leaf, Coffee, Gift, Globe, Award } from 'lucide-react';
 import LogoMark from './LogoMark';
 import { downscale } from '../lib/downscale';
-import { uploadImage } from '../lib/api';
+import { uploadImage, listCodes } from '../lib/api';
+
+// A person's own mark. Stored by name so the choice survives an icon-set swap
+// and means something when read straight out of the database.
+const MEMBER_ICONS = { Star, Heart, Sparkles, Crown, Music, Palette, Sun, Leaf, Coffee, Gift, Globe, Award };
+
+// Drawn from the binder palette below so a restyled card still belongs to the
+// same app. Deep Blush is the brand accent and earns its place; nothing else
+// pink is offered.
+const MEMBER_COLORS = ['#175933', '#457D58', '#1A7A50', '#2E6E45', '#C04A18', '#B89400', '#E46E88', '#3A7355'];
 
 const BINDER_COLORS = [
   '#175933', // navy (theme blue)
@@ -16,12 +26,17 @@ const BINDER_COLORS = [
   '#2E6E45', // medium navy
 ];
 
+// Photo first, then a chosen icon, then initials. Each is a stronger signal of
+// "this is me" than the one after it, so the most personal thing available wins.
 function Avatar({ member, size = 48 }) {
   const initials = member.name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+  const Icon = member.iconName ? MEMBER_ICONS[member.iconName] : null;
   return (
-    <div style={{ width: size, height: size, borderRadius: '50%', background: 'var(--green)', flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+    <div style={{ width: size, height: size, borderRadius: '50%', background: member.color || 'var(--green)', flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       {member.photoUrl
         ? <img src={member.photoUrl} alt={member.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+        : Icon
+        ? <Icon size={size * 0.46} color="#fff" strokeWidth={1.9} />
         : <span style={{ fontSize: size * 0.35, fontWeight: 700, color: '#fff', fontFamily: 'Montserrat, sans-serif' }}>{initials}</span>
       }
     </div>
@@ -408,7 +423,22 @@ function MemberRow({ member, projects, onEdit, onDelete, onSelect, canManage = f
         <Avatar member={member} size={44} />
       </div>
       <div style={{ flex: 1, minWidth: 0, cursor: 'pointer' }} onClick={() => onSelect(member.name)}>
-        <div style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)' }}>{member.name}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' }}>
+          <span style={{ fontWeight: 700, fontSize: 14, color: 'var(--text)' }}>{member.name}</span>
+          {/* Shown to everyone, not just admins: the whole point of naming an
+              approver is that the rest of the staff know who to send a plan to. */}
+          {member.isAdmin && (
+            <span style={{
+              display: 'inline-flex', alignItems: 'center', gap: 4,
+              background: 'var(--cream)', color: 'var(--blue)',
+              border: '1px solid var(--border)', borderRadius: 99,
+              padding: '2px 9px', fontSize: 9, fontFamily: 'Montserrat, sans-serif',
+              fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em',
+            }}>
+              <Check size={9} strokeWidth={3} /> Approves
+            </span>
+          )}
+        </div>
         {member.title && <div style={{ fontSize: 11, color: 'var(--muted)' }}>{member.title}</div>}
         <div style={{ fontSize: 10, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', textTransform: 'uppercase', letterSpacing: '0.06em', marginTop: 2 }}>
           {total} {total === 1 ? 'task' : 'tasks'} assigned
@@ -429,24 +459,35 @@ function MemberRow({ member, projects, onEdit, onDelete, onSelect, canManage = f
           </div>
         )}
       </div>
-      {canManage && (
-        <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
-          <button onClick={() => onEdit(member)} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 6, padding: '5px 8px', cursor: 'pointer', color: 'var(--muted)', display: 'flex', alignItems: 'center' }}>
-            <Pencil size={12} />
-          </button>
-          <button onClick={() => onDelete(member.id)} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 6, padding: '5px 8px', cursor: 'pointer', color: 'var(--muted)', display: 'flex', alignItems: 'center' }}>
+      {/* The pencil is for everyone — it is how a person reaches their own icon
+          and colour. What the form lets them change once it opens depends on
+          whether they approve; the bin stays with approvers either way. */}
+      <div style={{ display: 'flex', gap: 6, flexShrink: 0 }}>
+        <button onClick={() => onEdit(member)} title={canManage ? 'Edit' : 'Change icon and colour'} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 6, padding: '5px 8px', cursor: 'pointer', color: 'var(--muted)', display: 'flex', alignItems: 'center' }}>
+          <Pencil size={12} />
+        </button>
+        {canManage && (
+          <button onClick={() => onDelete(member.id)} title="Remove from the team" style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 6, padding: '5px 8px', cursor: 'pointer', color: 'var(--muted)', display: 'flex', alignItems: 'center' }}>
             <Trash2 size={12} />
           </button>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }
 
-function MemberForm({ initial, onSave, onCancel }) {
+// `canSetCode` is false until the codes have actually loaded. Without it, the
+// field would render empty for someone who has a perfectly good code, and
+// saving the form would read that blank as "remove their code" and lock them
+// out — a data-loss bug disguised as an ordinary edit.
+function MemberForm({ initial, initialCode = '', canSetCode = false, canEditIdentity = true, onSave, onCancel }) {
   const [name, setName] = useState(initial?.name || '');
   const [title, setTitle] = useState(initial?.title || '');
+  const [code, setCode] = useState(initialCode);
+  const [isAdmin, setIsAdmin] = useState(!!initial?.isAdmin);
   const [photoUrl, setPhotoUrl] = useState(initial?.photoUrl || null);
+  const [iconName, setIconName] = useState(initial?.iconName || '');
+  const [color, setColor] = useState(initial?.color || '');
   const [uploading, setUploading] = useState(false);
   const [photoError, setPhotoError] = useState('');
   const fileRef = useRef();
@@ -478,11 +519,13 @@ function MemberForm({ initial, onSave, onCancel }) {
     <div style={{ background: 'var(--cream)', border: '1px solid var(--border)', borderRadius: 12, padding: '18px 20px', marginBottom: 12 }}>
       <div style={{ display: 'flex', gap: 16, alignItems: 'flex-start' }}>
         <div style={{ position: 'relative', flexShrink: 0 }}>
-          <div style={{ width: 60, height: 60, borderRadius: '50%', background: 'var(--green)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ width: 60, height: 60, borderRadius: '50%', background: color || 'var(--green)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'background 0.15s' }}>
             {uploading
               ? <LoaderCircle size={20} color="#fff" strokeWidth={2} style={{ animation: 'ctd-spin 0.9s linear infinite' }} />
               : photoUrl
               ? <img src={photoUrl} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              : iconName && MEMBER_ICONS[iconName]
+              ? (() => { const I = MEMBER_ICONS[iconName]; return <I size={27} color="#fff" strokeWidth={1.9} />; })()
               : <span style={{ fontSize: 20, fontWeight: 700, color: '#fff', fontFamily: 'Montserrat, sans-serif' }}>{initials}</span>}
           </div>
           <button
@@ -495,14 +538,110 @@ function MemberForm({ initial, onSave, onCancel }) {
           <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handlePhoto} />
         </div>
         <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <input className="form-input" placeholder="Full name" value={name} onChange={e => setName(e.target.value)} autoFocus style={{ marginBottom: 0 }} />
-          <input className="form-input" placeholder="Title or role (optional)" value={title} onChange={e => setTitle(e.target.value)} style={{ marginBottom: 0 }} />
+          <input className="form-input" placeholder="Full name" value={name} onChange={e => setName(e.target.value)} autoFocus={canEditIdentity} disabled={!canEditIdentity} style={{ marginBottom: 0, ...(canEditIdentity ? {} : { background: 'var(--cream)', color: 'var(--muted)', cursor: 'not-allowed' }) }} />
+          <input className="form-input" placeholder="Title or role (optional)" value={title} onChange={e => setTitle(e.target.value)} disabled={!canEditIdentity} style={{ marginBottom: 0, ...(canEditIdentity ? {} : { background: 'var(--cream)', color: 'var(--muted)', cursor: 'not-allowed' }) }} />
+          {!canEditIdentity && (
+            <div style={{ fontSize: 11, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', lineHeight: 1.5 }}>
+              Names and roles are changed by an approver — renaming has to follow the person through every project they're on. Your icon and colour are yours.
+            </div>
+          )}
+
+          {/* Colour */}
+          <div style={{ fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)', marginTop: 4 }}>Colour</div>
+          <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
+            {MEMBER_COLORS.map(c => (
+              <button
+                key={c}
+                type="button"
+                onClick={() => setColor(color === c ? '' : c)}
+                title={c}
+                aria-label={`Colour ${c}`}
+                style={{
+                  width: 26, height: 26, borderRadius: '50%', background: c, cursor: 'pointer',
+                  border: color === c ? '2.5px solid var(--text)' : '2px solid transparent',
+                  boxShadow: color === c ? '0 0 0 2px #fff inset' : 'none',
+                  transition: 'transform 0.12s',
+                }}
+                onMouseOver={e => e.currentTarget.style.transform = 'scale(1.12)'}
+                onMouseOut={e => e.currentTarget.style.transform = 'none'}
+              />
+            ))}
+          </div>
+
+          {/* Icon */}
+          <div style={{ fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)', marginTop: 4 }}>Icon</div>
+          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+            {Object.entries(MEMBER_ICONS).map(([key, Icon]) => (
+              <button
+                key={key}
+                type="button"
+                onClick={() => setIconName(iconName === key ? '' : key)}
+                title={key}
+                aria-label={key}
+                aria-pressed={iconName === key}
+                style={{
+                  width: 30, height: 30, borderRadius: 8, cursor: 'pointer',
+                  background: iconName === key ? (color || 'var(--green)') : '#fff',
+                  border: `1.5px solid ${iconName === key ? (color || 'var(--green)') : 'var(--border)'}`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  transition: 'background 0.12s, border-color 0.12s',
+                }}
+              >
+                <Icon size={15} color={iconName === key ? '#fff' : 'var(--muted)'} strokeWidth={1.9} />
+              </button>
+            ))}
+          </div>
+          <div style={{ fontSize: 11, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', lineHeight: 1.5 }}>
+            A photo wins over an icon, and an icon over initials. Click a chosen one again to clear it.
+          </div>
+          {canSetCode && (
+            <>
+              <input
+                className="form-input"
+                placeholder="Sign-in code, e.g. Connie-88"
+                value={code}
+                onChange={e => setCode(e.target.value)}
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
+                style={{ marginBottom: 0 }}
+              />
+              <div style={{ fontSize: 11, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', lineHeight: 1.5 }}>
+                This is what they type to sign in. Leave it empty to take away their access without removing them from the team.
+              </div>
+
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: 9, cursor: 'pointer', marginTop: 4 }}>
+                <input
+                  type="checkbox"
+                  checked={isAdmin}
+                  onChange={e => setIsAdmin(e.target.checked)}
+                  style={{ width: 17, height: 17, marginTop: 1, accentColor: 'var(--blue)', cursor: 'pointer', flexShrink: 0 }}
+                />
+                <span style={{ fontSize: 12.5, fontFamily: 'Montserrat, sans-serif', color: 'var(--text)', lineHeight: 1.5 }}>
+                  <strong>Can approve projects</strong>
+                  <span style={{ display: 'block', fontSize: 11, color: 'var(--muted)', marginTop: 2 }}>
+                    Approve and unapprove projects, delete them, and edit this team. Signing in with their own code is all they need.
+                  </span>
+                </span>
+              </label>
+            </>
+          )}
           {photoError && (
             <div style={{ fontSize: 11, color: '#b45309', fontFamily: 'Montserrat, sans-serif', lineHeight: 1.5 }}>{photoError}</div>
           )}
           <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
             <button className="btn-primary" disabled={uploading || !name.trim()} style={{ fontSize: 11, padding: '6px 14px', display: 'flex', alignItems: 'center', gap: 4, opacity: uploading || !name.trim() ? 0.5 : 1, cursor: uploading || !name.trim() ? 'not-allowed' : 'pointer' }}
-              onClick={() => { if (name.trim() && !uploading) onSave({ name: name.trim(), title: title.trim(), photoUrl }); }}>
+              onClick={() => {
+                if (!name.trim() || uploading) return;
+                // Look is always sent — everyone may change it. Identity only
+                // when the form actually offered those fields, and the code and
+                // approver flag only when it showed those too: a save must never
+                // write back a value the person was never shown.
+                const data = { photoUrl, iconName: iconName || null, color: color || null };
+                if (canEditIdentity) { data.name = name.trim(); data.title = title.trim(); }
+                if (canSetCode) { data.code = code.trim(); data.isAdmin = isAdmin; }
+                onSave(data);
+              }}>
               <Check size={12} /> Save
             </button>
             <button onClick={onCancel} style={{ background: 'none', border: '1px solid var(--border)', borderRadius: 6, padding: '6px 12px', fontSize: 11, cursor: 'pointer', color: 'var(--muted)' }}>
@@ -525,9 +664,31 @@ export default function PeopleView({ team, projects, onAddMember, onUpdateMember
   const [editingId, setEditingId] = useState(null);
   const [viewMode, setViewMode] = useState('list');
   const [binderOpen, setBinderOpen] = useState(null);
+  // null until loaded, so the form can tell "no code set" apart from "haven't
+  // asked yet" — see the note on MemberForm's canSetCode.
+  const [codes, setCodes] = useState(null);
 
-  // The roster is admin-only. The database revokes these writes from staff
-  // outright, so an ungated button here would just 401 confusingly.
+  // Codes are readable to an admin and to nobody else: the table is revoked
+  // from the Data API entirely, so this has to go through the admin function.
+  // Keyed on the form opening and closing rather than on `team`: the poll hands
+  // back a fresh array every 30 seconds, so depending on it would re-fetch the
+  // codes all afternoon. Opening or closing an editor is exactly when a code
+  // could have gone stale, and nothing else changes them.
+  useEffect(() => {
+    if (!isAdmin) return;
+    let cancelled = false;
+    (async () => {
+      const { data } = await listCodes();
+      if (cancelled) return;
+      const map = {};
+      for (const row of data?.codes || []) map[row.member_id] = row.code || '';
+      setCodes(map);
+    })();
+    return () => { cancelled = true; };
+  }, [isAdmin, editingId, adding]);
+
+  // Adding is open to everyone; editing and removing are not. That split is
+  // enforced in Postgres, not just here — see ctd-open-roster.sql.
   function handleAdd(data) {
     onAddMember(data);
     setAdding(false);
@@ -549,15 +710,13 @@ export default function PeopleView({ team, projects, onAddMember, onUpdateMember
       <div className="page-header">
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <h1 className="page-title">Team</h1>
-          {isAdmin && (
-            <button
-              onClick={() => { setAdding(true); setEditingId(null); }}
-              title="Add a team member"
-              style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--yellow)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 4 }}
-            >
-              <Plus size={16} color="#fff" strokeWidth={2.5} />
-            </button>
-          )}
+          <button
+            onClick={() => { setAdding(true); setEditingId(null); }}
+            title="Add a team member"
+            style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--yellow)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: 4 }}
+          >
+            <Plus size={16} color="#fff" strokeWidth={2.5} />
+          </button>
         </div>
         <LogoMark size={36} onClick={onOpenStickyNote} />
       </div>
@@ -580,7 +739,7 @@ export default function PeopleView({ team, projects, onAddMember, onUpdateMember
         </div>
       </div>
 
-      {adding && <MemberForm onSave={handleAdd} onCancel={() => setAdding(false)} />}
+      {adding && <MemberForm canSetCode={isAdmin && codes !== null} onSave={handleAdd} onCancel={() => setAdding(false)} />}
 
       {viewMode === 'binder' ? (
         <>
@@ -617,7 +776,14 @@ export default function PeopleView({ team, projects, onAddMember, onUpdateMember
               sortedTeam.map(member => (
                 editingId === member.id ? (
                   <div key={member.id} style={{ padding: '12px 16px', borderBottom: '1px solid var(--border)' }}>
-                    <MemberForm initial={member} onSave={handleEdit} onCancel={() => setEditingId(null)} />
+                    <MemberForm
+                      initial={member}
+                      initialCode={codes?.[member.id] || ''}
+                      canSetCode={isAdmin && codes !== null}
+                      canEditIdentity={isAdmin}
+                      onSave={handleEdit}
+                      onCancel={() => setEditingId(null)}
+                    />
                   </div>
                 ) : (
                   <MemberRow key={member.id} member={member} projects={projects} onEdit={m => setEditingId(m.id)} onDelete={handleDelete} onSelect={onSelectPerson} canManage={isAdmin} />

@@ -38,6 +38,13 @@ async function post(fn, payload) {
 
 // ── Staff ──────────────────────────────────────────────────────────────────
 
+// Returns the signed-in person along with the session. The name comes from the
+// server's answer to the code, never from anything the browser chose, which is
+// what makes "these are Shannon's tasks" mean something.
+//
+// If the roster says this person approves, the server also hands back an admin
+// token and it goes straight into sessionStorage — so an admin is simply an
+// admin from the moment they sign in, with no second password to remember.
 export async function staffLogin(code) {
   const { data, error } = await post('staff-login', { code });
   if (error) return { error };
@@ -47,7 +54,11 @@ export async function staffLogin(code) {
     refresh_token: data.refresh_token,
   });
   if (sessErr) return { error: 'Couldn’t start your session. Try again.' };
-  return { ok: true };
+
+  if (data.admin_token && data.admin_exp) {
+    sessionStorage.setItem(ADMIN_KEY, JSON.stringify({ token: data.admin_token, exp: data.admin_exp }));
+  }
+  return { ok: true, member: data.member || null };
 }
 
 export async function hasStaffSession() {

@@ -50,7 +50,7 @@ function IconPicker({ currentIcon, hasLogo, onSelectIcon, onUpload, onClear, onC
         width: 380, boxShadow: '0 8px 40px rgba(0,0,0,0.18)',
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-          <div style={{ fontFamily: 'var(--font-heading)', fontSize: 20, fontWeight: 700, color: 'var(--blue)' }}>Event Icon</div>
+          <div style={{ fontFamily: 'var(--font-heading)', fontSize: 20, fontWeight: 700, color: 'var(--blue)' }}>Project Icon</div>
           <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', display: 'flex', alignItems: 'center' }}><X size={18} /></button>
         </div>
         <p style={{ fontSize: 12, color: 'var(--muted)', marginBottom: 16, fontFamily: 'Montserrat, sans-serif', letterSpacing: '0.03em' }}>
@@ -85,7 +85,7 @@ function IconPicker({ currentIcon, hasLogo, onSelectIcon, onUpload, onClear, onC
         <div style={{ display: 'flex', gap: 8, paddingTop: 14, borderTop: '1px solid var(--border)' }}>
           <button
             onClick={() => { onUpload(); onClose(); }}
-            style={{ flex: 1, background: 'var(--yellow)', border: 'none', borderRadius: 8, padding: '9px 0', fontSize: 12, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#175933', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
+            style={{ flex: 1, background: 'var(--yellow)', border: 'none', borderRadius: 8, padding: '9px 0', fontSize: 12, cursor: 'pointer', fontFamily: 'Montserrat, sans-serif', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.06em', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}
           >
             <Camera size={13} /> Upload Logo
           </button>
@@ -148,6 +148,14 @@ const DOT_PRIORITY = [
   [2, 2], // bot-center
 ];
 
+// Boxes show first names. Eight full names across a grid is a wall of text to
+// scan, and everyone in this office knows who Shannon is — the surname earns
+// its place on the roster and in the assignment dialog, not in the grid. The
+// full name is still what's stored and what the export prints.
+function firstNameOf(name) {
+  return String(name || '').trim().split(/\s+/)[0] || '';
+}
+
 function DotCell({ dot, onEdit, onToggleDone, blessed = false, isAdmin = false, currentUser = '', animClass = '', animDelay = '0ms', accentColor = null }) {
   const tasks = normalizeTasks(dot.responsibilities);
   const isEmpty = !dot.member?.trim();
@@ -169,7 +177,7 @@ function DotCell({ dot, onEdit, onToggleDone, blessed = false, isAdmin = false, 
       ) : (
         <>
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-            <div className="hub-dot-name">{dot.member}</div>
+            <div className="hub-dot-name" title={dot.member}>{firstNameOf(dot.member)}</div>
             <button onClick={e => { e.stopPropagation(); onEdit(); }} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--muted)', padding: 2, display: 'flex', alignItems: 'center', flexShrink: 0 }}>
               <Pencil size={10} />
             </button>
@@ -322,7 +330,7 @@ function DotEditPanel({ dot, team, projects = [], usedMembers = new Set(), onSav
             {suggestions.length > 0 && (
               <div style={{ marginTop: 16 }}>
                 <div style={{ fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--green)', marginBottom: 8 }}>
-                  Suggested from past events
+                  Suggested from past projects
                 </div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6 }}>
                   {suggestions.map((s, i) => (
@@ -358,17 +366,17 @@ function DotEditPanel({ dot, team, projects = [], usedMembers = new Set(), onSav
               onClick={() => setConfirmingDelete(true)}
               style={{ background: 'none', border: '1px solid var(--red)', borderRadius: 8, padding: '8px 0', fontSize: 12, cursor: 'pointer', color: 'var(--red)', fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 5 }}
             >
-              <Trash2 size={13} /> Remove from this event
+              <Trash2 size={13} /> Remove from this project
             </button>
           )}
 
           {confirmingDelete && (
             <div style={{ background: '#fff5f5', border: '1px solid var(--red)', borderRadius: 8, padding: '12px 16px' }}>
               <div style={{ fontSize: 13, color: 'var(--text)', marginBottom: 10, fontWeight: 600 }}>
-                Remove {dot.member} from this event?
+                Remove {dot.member} from this project?
               </div>
               <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 12 }}>
-                This clears their assignment and all tasks for this event only. Their profile and other events are not affected.
+                This clears their assignment and all tasks for this project only. Their profile and other projects are not affected.
               </div>
               <div style={{ display: 'flex', gap: 8 }}>
                 <button
@@ -653,7 +661,7 @@ export default function ProjectDetail({ project, projects = [], team = [], onSav
               disabled={isConnecting}
               style={{
                 display: 'flex', alignItems: 'center', gap: 6,
-                background: 'var(--yellow)', color: '#175933',
+                background: 'var(--yellow)', color: '#fff',
                 border: 'none', borderRadius: 8, padding: '7px 16px', fontSize: 12, cursor: 'pointer',
                 fontFamily: 'Montserrat, sans-serif', fontWeight: 800,
                 textTransform: 'uppercase', letterSpacing: '0.08em', transition: 'filter 0.15s',
@@ -758,27 +766,6 @@ export default function ProjectDetail({ project, projects = [], team = [], onSav
           with every line still the live control. */}
       <div className="playbill" style={{ marginBottom: 24 }}>
         <div className="pb-topbar">
-          {/* Date — reads as printed type, becomes a picker on click */}
-          {editingDate ? (
-            <input
-              type="date"
-              className="pb-date-input"
-              value={project.date || ''}
-              autoFocus
-              onChange={e => onUpdateProject({ ...project, date: e.target.value })}
-              onBlur={() => setEditingDate(false)}
-              onKeyDown={e => { if (e.key === 'Enter' || e.key === 'Escape') e.currentTarget.blur(); }}
-              aria-label="Event date"
-            />
-          ) : (
-            <button
-              className={`pb-date${project.date ? '' : ' empty'}`}
-              onClick={() => setEditingDate(true)}
-            >
-              {project.date ? fmt(project.date) : 'Add a date'}
-            </button>
-          )}
-
           {(() => {
             const textC = project.completed ? '#8F7700' : project.blessed ? 'var(--green)' : project.submitted ? '#b45309' : 'var(--muted)';
             return (
@@ -812,7 +799,7 @@ export default function ProjectDetail({ project, projects = [], team = [], onSav
           {uploadingLogo ? (
             <LoaderCircle size={21} color="var(--blue)" strokeWidth={1.6} style={{ animation: 'ctd-spin 0.9s linear infinite' }} />
           ) : project.logoUrl ? (
-            <img src={project.logoUrl} alt="Event logo" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 6, boxSizing: 'border-box' }} />
+            <img src={project.logoUrl} alt="Project logo" style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 6, boxSizing: 'border-box' }} />
           ) : project.iconName && ICON_MAP[project.iconName] ? (
             (() => { const Icon = ICON_MAP[project.iconName]; return <Icon size={25} color="var(--blue)" strokeWidth={1.5} />; })()
           ) : (
@@ -828,15 +815,42 @@ export default function ProjectDetail({ project, projects = [], team = [], onSav
           onChange={e => setNameDraft(e.target.value)}
           onBlur={saveNameOnBlur}
           onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur(); }}
-          placeholder="Event name..."
+          placeholder="Project name..."
           autoFocus={!project.name}
-          aria-label="Event name"
+          aria-label="Project name"
         />
 
         <div className="pb-rule" />
 
-        {/* Credits */}
-        <div className="pb-credit" style={{ position: 'relative' }}>
+        {/* Credits, set as one line. The date sits here rather than up in the
+            topbar: it belongs with the project's own details, next to who is
+            leading it, not off in a corner reading like page furniture. */}
+        <div className="pb-meta">
+          <div className="pb-meta-item">
+          {editingDate ? (
+            <input
+              type="date"
+              className="pb-date-input"
+              value={project.date || ''}
+              autoFocus
+              onChange={e => onUpdateProject({ ...project, date: e.target.value })}
+              onBlur={() => setEditingDate(false)}
+              onKeyDown={e => { if (e.key === 'Enter' || e.key === 'Escape') e.currentTarget.blur(); }}
+              aria-label="Project date"
+            />
+          ) : (
+            <button
+              className={`pb-date${project.date ? '' : ' empty'}`}
+              onClick={() => setEditingDate(true)}
+            >
+              {project.date ? fmt(project.date) : 'Add a date'}
+            </button>
+          )}
+          </div>
+
+          <span className="pb-meta-sep" aria-hidden="true" />
+
+          <div className="pb-meta-item" style={{ position: 'relative' }}>
           <button
             className={`pb-leads${leadsArr.length ? '' : ' empty'}`}
             onClick={() => setShowLeadsPicker(v => !v)}
@@ -882,12 +896,16 @@ export default function ProjectDetail({ project, projects = [], team = [], onSav
           )}
         </div>
 
-        <div className="pb-credit">
-          <span>with a company of <span className="num">{dotCount}</span></span>
-          <span style={{ display: 'inline-flex', gap: 4 }}>
-            <button className="pb-step" onClick={() => changeDotCount(dotCount - 1)} disabled={dotCount <= 1} aria-label="Fewer team members">−</button>
-            <button className="pb-step" onClick={() => changeDotCount(dotCount + 1)} disabled={dotCount >= 12} aria-label="More team members">+</button>
-          </span>
+          <span className="pb-meta-sep" aria-hidden="true" />
+
+          <div className="pb-meta-item">
+            <span className="pb-meta-label">Team of</span>
+            <span className="pb-stepper">
+              <button className="pb-step" onClick={() => changeDotCount(dotCount - 1)} disabled={dotCount <= 1} aria-label="Fewer team members">−</button>
+              <span className="num" aria-live="polite">{dotCount}</span>
+              <button className="pb-step" onClick={() => changeDotCount(dotCount + 1)} disabled={dotCount >= 12} aria-label="More team members">+</button>
+            </span>
+          </div>
         </div>
 
         {countWarning && (
