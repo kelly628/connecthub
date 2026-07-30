@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { CheckCircle2, Clock, ArrowRight, TrendingUp, GraduationCap, BookOpen, Apple, Pencil, Heart, HandHeart, Users, Globe, Music, Palette, Baby, Camera, Trophy, Award, Ribbon, Star, Sparkles, PartyPopper, Gift, Martini, Leaf, Sun, Handshake, Crown, Calendar, ChevronDown } from 'lucide-react';
 import LogoMark from './LogoMark';
 
@@ -24,6 +24,54 @@ function daysUntil(dateStr) {
 }
 
 const PINK = '#c2336b';
+
+// The greeting. This is eight women who work together every day, so it talks
+// like they do rather than like a bank. {name} is the first name only.
+const GREETINGS = {
+  morning: [
+    'Morning, {name}!',
+    'Hey girl, good morning!',
+    'Rise and shine, {name}!',
+    'Well hey, {name}!',
+    'Good morning, sunshine!',
+    'There she is! Morning, {name}.',
+    'Look at you, up and at it!',
+  ],
+  afternoon: [
+    'Hey girl!',
+    'Afternoon, {name}!',
+    'Look who it is!',
+    'Hey there, {name}!',
+    'Hey girl, how’s the day treating you?',
+    'Good afternoon, {name}!',
+    'Back at it, {name}!',
+  ],
+  evening: [
+    'Evening, {name}!',
+    'Still at it, {name}?',
+    'Hey girl, burning the candle?',
+    'Good evening, {name}!',
+    'You’ve done plenty today, {name}.',
+    'Late one, {name}?',
+  ],
+};
+
+// Picked from the date and the name, never at random. The dashboard re-renders
+// on a 30-second poll, so a random pick would hand someone a different greeting
+// every half minute, which reads as a glitch rather than as personality. This
+// way it is one greeting for the day, and a new one tomorrow.
+function pickGreeting(fullName, date) {
+  const hour = date.getHours();
+  const slot = hour < 12 ? 'morning' : hour < 17 ? 'afternoon' : 'evening';
+  const list = GREETINGS[slot];
+  const first = String(fullName || '').trim().split(/\s+/)[0] || '';
+
+  const key = `${date.toDateString()}|${slot}|${first}`;
+  let h = 0;
+  for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) >>> 0;
+
+  return list[h % list.length].replace('{name}', first);
+}
 
 function StatCard({ label, value, sub, accent, highlight = false, onClick }) {
   return (
@@ -159,26 +207,11 @@ export default function DashboardView({ projects, team, onSelectProject, onSelec
   }, [upcoming.length]);
   const safeIdx = Math.min(slideIdx, upcoming.length - 1);
 
-  // Paper airplane idle animation
-  const [isFlying, setIsFlying] = useState(false);
-  const idleRef = useRef(null);
-  const flyingRef = useRef(false);
+  // The idle drift that used to send the paper aeroplane looping around the
+  // header went with the aeroplane. It read as flight; on a chipmunk's head it
+  // read as a bug. Chippy holds still and winks when you hover her.
 
-  useEffect(() => {
-    function resetIdle() {
-      clearTimeout(idleRef.current);
-      if (flyingRef.current) { flyingRef.current = false; setIsFlying(false); }
-      idleRef.current = setTimeout(() => { flyingRef.current = true; setIsFlying(true); }, 30000);
-    }
-    const evts = ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart', 'click'];
-    evts.forEach(e => window.addEventListener(e, resetIdle, { passive: true }));
-    resetIdle();
-    return () => { evts.forEach(e => window.removeEventListener(e, resetIdle)); clearTimeout(idleRef.current); };
-  }, []);
-
-  // Greeting
-  const hour = now.getHours();
-  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+  const greeting = pickGreeting(currentUser, now);
 
   // Completed projects (lead has confirmed via Mark Complete)
   const featuredWins = projects.filter(p => p.completed);
@@ -260,37 +293,10 @@ export default function DashboardView({ projects, team, onSelectProject, onSelec
       <div className="page-header">
         <div>
           <h1 className="page-title">
-            {currentUser ? `${greeting}, ${currentUser.split(' ')[0]}!` : 'Welcome to ConnectHub'}
+            {currentUser ? greeting : 'Welcome to ConnectHub'}
           </h1>
         </div>
-        {isFlying && (
-          <style>{`
-            @keyframes airplane-drift {
-              0%   { transform: translate(0px,   0px)  rotate(0deg);  }
-              10%  { transform: translate(5px,  -13px) rotate(14deg); }
-              22%  { transform: translate(18px, -20px) rotate(24deg); }
-              34%  { transform: translate(30px, -10px) rotate(18deg); }
-              45%  { transform: translate(26px,  8px)  rotate(4deg);  }
-              57%  { transform: translate(8px,   18px) rotate(-11deg);}
-              68%  { transform: translate(-10px, 15px) rotate(-22deg);}
-              80%  { transform: translate(-16px,  1px) rotate(-16deg);}
-              91%  { transform: translate(-6px, -11px) rotate(-4deg); }
-              100% { transform: translate(0px,   0px)  rotate(0deg);  }
-            }
-          `}</style>
-        )}
-        <div style={{ position: 'relative', flexShrink: 0 }}>
-          <div style={{
-            animation: isFlying ? 'airplane-drift 6.5s cubic-bezier(0.45,0,0.55,1) infinite' : 'none',
-            transformOrigin: 'center',
-          }}>
-            <LogoMark
-              size={isFlying ? 34 : 56}
-              onClick={() => { onOpenStickyNote(); flyingRef.current = false; setIsFlying(false); }}
-              style={{ transition: 'width 0.4s, height 0.4s' }}
-            />
-          </div>
-        </div>
+        <LogoMark size={56} onClick={onOpenStickyNote} />
       </div>
 
       {/* Stat cards */}
