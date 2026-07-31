@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ConnectHub — The Robust Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+:root{
+  --cream:#F6F1E9; --paper:#FFFFFF; --paper-warm:#FBF8F2;
+  --forest:#1E3D31; --forest-soft:#EAF1EA; --muted:#5E6F64;
+  --terra:#B85C3C; --terra-tint:#FBEBE2; --terra-tint2:#F2E2D8;
+  --cream-on-dark:#F4EEE4;
+  --line:rgba(30,61,49,0.12); --line-soft:rgba(30,61,49,0.07);
+  --shadow:0 1px 2px rgba(30,61,49,0.04), 0 12px 30px -18px rgba(30,61,49,0.22);
+  --shadow-lift:0 2px 4px rgba(30,61,49,0.05), 0 22px 48px -22px rgba(30,61,49,0.30);
+  --r-lg:18px; --r-md:14px;
+
+  --ch-green:#175933; --ch-green-dk:#0D3D21; --ch-cream:#F4FAF6; --ch-panache:#E0F1E6;
+  --ch-lime:#BEE5C3; --ch-blush:#E46E88; --ch-text:#0D2B1A; --ch-muted:#5E7A68;
+  --ch-line:rgba(23,89,51,0.13); --ch-leaf:#457D58; --ch-gold:#B89400;
+}
+*{box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--cream);color:var(--forest);
+  font-family:"DM Sans",system-ui,sans-serif;line-height:1.62;font-size:16px;
+  background-image:radial-gradient(rgba(30,61,49,0.022) 1px, transparent 1px);background-size:4px 4px;overflow-x:hidden;}
+.wrap{max-width:1240px;margin:0 auto;padding:58px 24px 72px;}
+
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--terra);font-weight:600;}
+header h1{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:clamp(28px,4vw,44px);line-height:1.1;margin:14px 0 0;}
+.lede{font-size:18px;color:#34503f;max-width:66ch;margin:18px 0 0;}
+.lede b{font-weight:600;color:var(--forest);}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:500;background:var(--paper);
+  border:1px solid var(--line);border-radius:99px;padding:6px 13px;box-shadow:var(--shadow);}
+.chip i{font-size:15px;color:var(--terra);}
+
+section{margin-top:52px;}
+.label{font-family:"Fraunces",Georgia,serif;font-size:13px;font-weight:600;letter-spacing:.02em;
+  color:var(--terra);text-transform:uppercase;margin-bottom:5px;}
+.label-sub{font-size:14px;color:var(--muted);margin:0 0 18px;max-width:66ch;}
+.cap{display:flex;gap:11px;align-items:flex-start;margin-top:14px;padding:13px 16px;background:var(--paper-warm);
+  border:1px solid var(--line-soft);border-radius:var(--r-md);}
+.cap i{font-size:18px;color:var(--terra);margin-top:1px;flex:none;}
+.cap span{font-size:13.5px;color:#3c5648;line-height:1.55;}
+.cap b{color:var(--forest);font-weight:600;}
+
+.screen{border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow-lift);background:#fff;}
+.bar{background:#E9E4DA;padding:9px 14px;display:flex;align-items:center;gap:7px;border-bottom:1px solid var(--line);}
+.bar .d{width:9px;height:9px;border-radius:50%;background:#CFC7B8;}
+.bar .u{margin-left:10px;font-size:10.5px;color:#8B8577;background:#fff;border-radius:99px;padding:3px 11px;}
+.app{display:flex;font-family:"Montserrat",sans-serif;}
+
+.side{width:158px;flex:none;background:var(--ch-green);padding:16px 11px;display:flex;flex-direction:column;gap:3px;}
+.side .logo{font-family:"Fraunces",serif;font-size:17px;color:#fff;line-height:1;padding:0 6px 11px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:9px;}
+.side .logo span{color:var(--ch-lime);}
+.side .logo .sch{display:block;font-family:"Montserrat";font-size:6px;letter-spacing:.14em;color:rgba(255,255,255,.42);margin-top:5px;font-weight:700;}
+.nv{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:6px;font-size:8.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:rgba(242,234,207,.55);}
+.nv i{font-size:11px;} .nv.on{background:var(--ch-lime);color:var(--ch-green-dk);}
+.nv .bdg{margin-left:auto;background:var(--ch-blush);color:#fff;border-radius:99px;font-size:7px;padding:1px 5px;}
+.side .foot{margin-top:auto;padding-top:10px;border-top:1px solid rgba(255,255,255,.12);font-size:8px;color:rgba(255,255,255,.78);font-weight:700;}
+.side .foot .so{display:block;color:rgba(255,255,255,.4);font-size:7px;margin-top:3px;}
+
+.main{flex:1;background:var(--ch-cream);padding:16px 18px 20px;min-width:0;}
+
+/* top line */
+.topline{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:13px;flex-wrap:wrap;}
+.greet{font-family:"Fraunces",serif;font-size:27px;font-weight:500;color:var(--ch-green);line-height:1.02;}
+.today{font-size:7.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ch-muted);font-weight:800;margin-top:3px;}
+.acts{display:flex;gap:6px;}
+.btn{font-size:7.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;border-radius:99px;padding:6px 11px;
+  display:inline-flex;align-items:center;gap:5px;}
+.btn.p{background:var(--ch-blush);color:#fff;} .btn.s{background:#fff;border:1px solid var(--ch-line);color:var(--ch-green);}
+
+/* week strip */
+.week{display:flex;gap:4px;margin-bottom:13px;}
+.wd{flex:1;background:#fff;border:1px solid var(--ch-line);border-radius:7px;padding:6px 2px;text-align:center;min-width:0;}
+.wd .dw{font-size:6px;letter-spacing:.1em;text-transform:uppercase;color:var(--ch-muted);font-weight:800;}
+.wd .dn{font-family:"Fraunces",serif;font-size:13px;font-weight:600;color:var(--ch-text);line-height:1.3;}
+.wd.today{background:var(--ch-green);border-color:var(--ch-green);}
+.wd.today .dw,.wd.today .dn{color:#fff;}
+.wd.wknd{opacity:.5;}
+.pips{display:flex;gap:2px;justify-content:center;margin-top:2px;height:4px;}
+.pips i{width:4px;height:4px;border-radius:50%;background:var(--ch-blush);display:block;}
+.pips i.g{background:var(--ch-leaf);} .pips i.o{background:var(--ch-gold);}
+
+/* main split */
+.split{display:grid;grid-template-columns:1.55fr 1fr;gap:13px;align-items:start;}
+.col{display:flex;flex-direction:column;gap:13px;min-width:0;}
+
+.pnl{background:#fff;border:1px solid var(--ch-line);border-radius:11px;overflow:hidden;}
+.ph{display:flex;align-items:center;gap:7px;padding:9px 12px;border-bottom:1px solid var(--ch-line);}
+.ph .t{font-family:"Fraunces",serif;font-size:13px;font-weight:600;color:var(--ch-green);}
+.ph .c{font-size:6.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ch-muted);font-weight:800;margin-left:auto;}
+.ph i{font-size:13px;color:var(--ch-leaf);}
+
+/* the next few projects, as cards in a row. One wide bar showed a single
+   project and a lot of nothing; four rectangles show the whole season and
+   still give the nearest one its weight. */
+.heroes{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:13px;}
+.hcard{position:relative;overflow:hidden;background:#fff;border:1px solid var(--ch-line);
+  border-radius:11px;padding:13px 13px 12px;min-width:0;}
+.hcard.on{background:var(--ch-green);border-color:var(--ch-green);}
+.hstar{position:absolute;right:-8px;bottom:-10px;font-size:56px;color:var(--ch-green);opacity:.07;}
+.hcard.on .hstar{color:#fff;opacity:.11;}
+.hk{font-size:6px;letter-spacing:.15em;text-transform:uppercase;font-weight:800;color:var(--ch-muted);}
+.hcard.on .hk{color:rgba(255,255,255,.66);}
+.hn{font-family:"Fraunces",serif;font-size:16px;font-weight:600;color:var(--ch-green);line-height:1.12;margin:4px 0 2px;
+  overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;min-height:36px;}
+.hcard.on .hn{color:#fff;}
+.hd{font-size:7.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;color:var(--ch-muted);}
+.hcard.on .hd{color:rgba(255,255,255,.8);}
+.hbig{font-family:"Fraunces",serif;font-size:28px;font-weight:600;color:var(--ch-green);line-height:1;margin-top:9px;}
+.hcard.on .hbig{color:var(--ch-blush);}
+.hbig span{font-family:"Montserrat";font-size:6.5px;letter-spacing:.13em;text-transform:uppercase;font-weight:800;
+  color:var(--ch-muted);margin-left:4px;}
+.hcard.on .hbig span{color:rgba(255,255,255,.6);}
+.hwho{display:flex;gap:3px;margin-top:8px;min-height:15px;}
+.htrack{height:3px;background:var(--ch-panache);border-radius:99px;overflow:hidden;margin-top:9px;}
+.hcard.on .htrack{background:rgba(255,255,255,.2);}
+.hfill{height:100%;background:var(--ch-leaf);border-radius:99px;}
+.hcard.on .hfill{background:var(--ch-lime);}
+.mini-av{width:15px;height:15px;border-radius:50%;font-size:6px;font-weight:800;display:flex;align-items:center;
+  justify-content:center;color:#fff;border:1.5px solid rgba(255,255,255,.5);}
+.hcard:not(.on) .mini-av{border-color:#fff;}
+
+/* task rows */
+.tsk{display:flex;gap:8px;align-items:flex-start;padding:8px 12px;border-top:1px solid var(--ch-line);}
+.tsk:first-child{border-top:none;}
+.box{width:12px;height:12px;border-radius:3px;border:1.5px solid var(--ch-leaf);flex:none;margin-top:1px;}
+.box.dn{background:var(--ch-leaf);}
+.tsk .t{font-size:10.5px;color:var(--ch-text);line-height:1.35;}
+.tsk .t.done{color:var(--ch-muted);text-decoration:line-through;}
+.tsk .m{font-size:7px;letter-spacing:.07em;text-transform:uppercase;color:var(--ch-leaf);font-weight:800;margin-top:2px;}
+.tag{font-size:6px;letter-spacing:.07em;text-transform:uppercase;font-weight:800;border-radius:99px;padding:2px 6px;margin-left:5px;}
+.tag.w{background:var(--ch-panache);color:var(--ch-green);} .tag.p{background:#FDEEF2;color:#b3405c;}
+
+/* meeting */
+.meet{display:flex;align-items:center;gap:9px;padding:9px 12px;border-top:1px solid var(--ch-line);}
+.meet:first-child{border-top:none;}
+.meet .ic{width:27px;height:27px;border-radius:8px;background:#FDEEF2;color:var(--ch-blush);display:flex;align-items:center;justify-content:center;font-size:14px;flex:none;}
+.meet .w{font-family:"Fraunces",serif;font-size:13px;font-weight:600;color:var(--ch-text);line-height:1.15;}
+.meet .s{font-size:8px;color:var(--ch-muted);}
+.meet .add{margin-left:auto;font-size:12px;color:var(--ch-leaf);}
+
+/* feed */
+.fl{display:flex;align-items:center;gap:7px;padding:7px 12px;border-top:1px solid var(--ch-line);font-size:9.5px;color:var(--ch-text);}
+.fl:first-child{border-top:none;}
+.av{width:17px;height:17px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:6.5px;font-weight:800;color:#fff;background:var(--ch-leaf);}
+.av.p{background:var(--ch-blush);} .av.g{background:var(--ch-green);} .av.a{background:#5E3A82;} .av.s{background:#2A4A85;}
+.fl .ago{margin-left:auto;font-size:6.5px;color:var(--ch-muted);letter-spacing:.05em;text-transform:uppercase;font-weight:800;}
+
+/* room */
+.room{display:flex;gap:9px;flex-wrap:wrap;padding:12px;}
+.fc{text-align:center;width:40px;}
+.fc .ring{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto;
+  font-size:9.5px;font-weight:800;color:#fff;background:var(--ch-green);border:2.5px solid var(--ch-lime);}
+.fc .ring.mid{border-color:var(--ch-blush);} .fc .ring.none{border-color:var(--ch-line);}
+.fc .nm{font-size:6.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--ch-muted);margin-top:3px;}
+
+/* milanote button — a destination, so it is sized and weighted like one */
+.mila{display:flex;align-items:center;gap:11px;background:var(--ch-green);border-radius:11px;
+  padding:15px 15px;color:#fff;text-decoration:none;box-shadow:0 10px 24px -14px rgba(13,43,26,.6);}
+.mila .mi{width:38px;height:38px;border-radius:10px;flex:none;display:flex;align-items:center;justify-content:center;
+  font-size:20px;background:rgba(255,255,255,.14);color:var(--ch-lime);}
+.mila .mt{font-family:"Fraunces",serif;font-size:15px;font-weight:600;line-height:1.15;}
+.mila .ms{font-size:7.5px;letter-spacing:.09em;text-transform:uppercase;font-weight:700;color:rgba(255,255,255,.6);margin-top:3px;}
+.mila .mgo{margin-left:auto;font-size:17px;color:var(--ch-blush);flex:none;}
+
+/* board thumbs */
+.thumbs{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:11px 12px;}
+.bt{aspect-ratio:1;border-radius:6px;background:var(--ch-cream);border:1px solid var(--ch-line);display:flex;align-items:center;justify-content:center;color:var(--ch-muted);font-size:12px;}
+.bt.a{background:var(--ch-panache);border-color:var(--ch-lime);color:var(--ch-green);}
+.bt.b{background:#FDEEF2;border-color:#F6C9D4;color:var(--ch-blush);}
+
+/* project rows */
+.pr{display:flex;align-items:center;gap:10px;padding:9px 12px;border-top:1px solid var(--ch-line);}
+.pr:first-child{border-top:none;}
+.pr .days{width:34px;flex:none;text-align:center;background:var(--ch-panache);border-radius:6px;padding:3px 0;}
+.pr .days .n{font-family:"Fraunces",serif;font-size:13px;font-weight:600;color:var(--ch-green);line-height:1;}
+.pr .days .l{font-size:5.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--ch-leaf);font-weight:800;}
+.pr .nm{font-family:"Fraunces",serif;font-size:13px;font-weight:600;color:var(--ch-green);line-height:1.2;}
+.pr .dt{font-size:7.5px;color:var(--ch-muted);}
+.pr .bar2{margin-left:auto;width:66px;flex:none;}
+.pr .track{height:4px;background:var(--ch-panache);border-radius:99px;overflow:hidden;}
+.pr .fill{height:100%;background:var(--ch-leaf);border-radius:99px;}
+.pr .pct{font-size:6.5px;font-weight:800;color:var(--ch-muted);text-align:right;letter-spacing:.06em;margin-bottom:2px;}
+
+/* stat strip */
+.stats{display:flex;gap:8px;margin-top:13px;}
+.stat{flex:1;background:#fff;border:1px solid var(--ch-line);border-radius:9px;padding:8px 10px;min-width:0;}
+.stat .l{font-size:6px;letter-spacing:.11em;text-transform:uppercase;color:var(--ch-muted);font-weight:800;}
+.stat .v{font-family:"Montserrat";font-size:16px;font-weight:700;color:var(--ch-green);line-height:1.2;}
+.stat .s{font-size:6.5px;color:var(--ch-muted);}
+
+/* approvals */
+.apr{display:flex;align-items:center;gap:9px;padding:9px 12px;border-top:1px solid var(--ch-line);}
+.apr:first-child{border-top:none;}
+.apr .nm{font-family:"Fraunces",serif;font-size:12.5px;font-weight:600;color:var(--ch-green);}
+.apr .by{font-size:7.5px;color:var(--ch-muted);}
+.apr .go{margin-left:auto;font-size:6.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;background:var(--ch-green);color:#fff;border-radius:99px;padding:4px 9px;}
+
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:16px;}
+.lg{display:flex;align-items:center;gap:7px;font-size:12.5px;color:#3c5648;}
+.lg .sw{width:11px;height:11px;border-radius:3px;flex:none;}
+
+.takeaway{margin-top:44px;background:var(--forest);color:var(--cream-on-dark);border-radius:var(--r-lg);
+  padding:26px 28px;display:flex;gap:15px;align-items:flex-start;box-shadow:var(--shadow-lift);}
+.takeaway i{font-size:24px;color:#E8A079;flex:none;margin-top:2px;}
+.takeaway p{margin:0;font-size:15.5px;line-height:1.6;color:#EDE6D8;}
+.takeaway b{color:#fff;font-weight:600;} .takeaway .lead{color:#E8A079;font-weight:600;}
+footer{margin-top:28px;text-align:center;font-size:12.5px;color:var(--muted);}
+footer .dot{color:var(--terra);margin:0 6px;}
+
+@media(max-width:820px){
+  .wrap{padding:40px 14px 54px;}
+  .split{grid-template-columns:1fr;}
+  .heroes{grid-template-columns:repeat(2,1fr);}
+  .side{width:92px;padding:12px 6px;}
+  .side .logo{font-size:12px;}
+  .nv{font-size:6.5px;padding:5px;} .nv i{font-size:9px;}
+  .main{padding:12px 11px 15px;}
+  .greet{font-size:19px;}
+  .hn{font-size:13px;min-height:30px;} .hbig{font-size:22px;}
+  .thumbs{grid-template-columns:repeat(4,1fr);}
+  .stats{flex-wrap:wrap;} .stat{min-width:calc(50% - 4px);}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">ConnectHub &middot; Archbishop Chapelle</div>
+    <h1>Everything on one page —<br>the dashboard as a command centre.</h1>
+    <p class="lede">Not six thin alternatives. This is <b>all of it at once</b>: the week ahead, the next project, your own list, meetings, approvals waiting, what everyone's been doing, the whole team's progress, every board, and the counts. Arranged so a busy person finds their thing in about two seconds.</p>
+    <div class="chips">
+      <span class="chip"><i class="ti ti-star"></i>Project hero</span>
+      <span class="chip"><i class="ti ti-checklist"></i>Your list</span>
+      <span class="chip"><i class="ti ti-clock-hour-4"></i>Meetings</span>
+      <span class="chip"><i class="ti ti-circle-check"></i>Approvals</span>
+      <span class="chip"><i class="ti ti-activity"></i>Momentum</span>
+      <span class="chip"><i class="ti ti-layout-board"></i>Milanote</span>
+    </div>
+  </header>
+
+  <section>
+    <div class="label">The full page</div>
+    <p class="label-sub">Ten live modules. Scroll it as one screen, the way staff would.</p>
+
+    <div class="screen">
+      <div class="bar"><span class="d"></span><span class="d"></span><span class="d"></span><span class="u">chapelle-connecthub.netlify.app</span></div>
+      <div class="app">
+
+        <div class="side">
+          <div class="logo">Connect<span>Hub</span><span class="sch">Archbishop Chapelle</span></div>
+          <div class="nv on"><i class="ti ti-layout-dashboard"></i>Home</div>
+          <div class="nv"><i class="ti ti-sitemap"></i>Projects</div>
+          <div class="nv"><i class="ti ti-users"></i>Team</div>
+          <div class="nv"><i class="ti ti-checklist"></i>Tasks</div>
+          <div class="nv"><i class="ti ti-circle-check"></i>Approvals<span class="bdg">2</span></div>
+          <div class="foot">Kelly Claverie<span class="so">Sign out</span></div>
+        </div>
+
+        <div class="main">
+
+          <!-- 1. greeting + quick actions -->
+          <div class="topline">
+            <div>
+              <div class="greet">Hey girl!</div>
+              <div class="today">Wednesday, September 10, 2026</div>
+            </div>
+            <div class="acts">
+              <span class="btn p"><i class="ti ti-plus"></i>New project</span>
+              <span class="btn s"><i class="ti ti-note"></i>Sticky note</span>
+            </div>
+          </div>
+
+          <!-- 2. the next few projects, side by side -->
+          <div class="heroes">
+
+            <div class="hcard on">
+              <i class="ti ti-star hstar"></i>
+              <div class="hk">Next up</div>
+              <div class="hn">Gala</div>
+              <div class="hd">Fri, September 11</div>
+              <div class="hbig">1<span>day</span></div>
+              <div class="hwho">
+                <span class="mini-av" style="background:#8E2A4C">TD</span>
+                <span class="mini-av" style="background:#2A4A85">ME</span>
+              </div>
+              <div class="htrack"><div class="hfill" style="width:72%"></div></div>
+            </div>
+
+            <div class="hcard">
+              <i class="ti ti-cup hstar"></i>
+              <div class="hk">Then</div>
+              <div class="hn">Alumnae Tea</div>
+              <div class="hd">Thu, October 8</div>
+              <div class="hbig">28<span>days</span></div>
+              <div class="hwho">
+                <span class="mini-av" style="background:#0E6B4A">SI</span>
+              </div>
+              <div class="htrack"><div class="hfill" style="width:40%"></div></div>
+            </div>
+
+            <div class="hcard">
+              <i class="ti ti-gift hstar"></i>
+              <div class="hk">Then</div>
+              <div class="hn">Breakfast with Santa</div>
+              <div class="hd">Sat, December 5</div>
+              <div class="hbig">86<span>days</span></div>
+              <div class="hwho">
+                <span class="mini-av" style="background:#5E3A82">RM</span>
+                <span class="mini-av" style="background:#B89400">KP</span>
+              </div>
+              <div class="htrack"><div class="hfill" style="width:18%"></div></div>
+            </div>
+
+            <div class="hcard">
+              <i class="ti ti-door-enter hstar"></i>
+              <div class="hk">Then</div>
+              <div class="hn">Open House</div>
+              <div class="hd">Sat, January 30</div>
+              <div class="hbig">142<span>days</span></div>
+              <div class="hwho">
+                <span class="mini-av" style="background:#12586B">JL</span>
+              </div>
+              <div class="htrack"><div class="hfill" style="width:5%"></div></div>
+            </div>
+
+          </div>
+
+          <div class="split">
+
+            <!-- LEFT -->
+            <div class="col">
+
+              <!-- 4. your list -->
+              <div class="pnl">
+                <div class="ph"><i class="ti ti-checklist"></i><span class="t">Your list</span><span class="c">3 to go &middot; 1 done</span></div>
+                <div class="tsk"><span class="box"></span><div><div class="t">Final headcount to the caterer<span class="tag p">Today</span></div><div class="m">Gala</div></div></div>
+                <div class="tsk"><span class="box"></span><div><div class="t">Website banner swapped over</div><div class="m">Gala</div></div></div>
+                <div class="tsk"><span class="box"></span><div><div class="t">Draft the thank-you note to sponsors<span class="tag w">Waiting on approval</span></div><div class="m">Breakfast with Santa</div></div></div>
+                <div class="tsk"><span class="box dn"></span><div><div class="t done">Table linens confirmed</div><div class="m">Gala</div></div></div>
+              </div>
+
+              <!-- 5. approvals -->
+              <div class="pnl">
+                <div class="ph"><i class="ti ti-circle-check"></i><span class="t">Waiting on Connie</span><span class="c">2 projects</span></div>
+                <div class="apr"><div><div class="nm">Breakfast with Santa</div><div class="by">Sent by Rayne &middot; 2 days ago</div></div><span class="go">Review</span></div>
+                <div class="apr"><div><div class="nm">Alumnae Tea</div><div class="by">Sent by Shannon &middot; today</div></div><span class="go">Review</span></div>
+              </div>
+
+              <!-- 6. all projects -->
+              <div class="pnl">
+                <div class="ph"><i class="ti ti-sitemap"></i><span class="t">All projects</span><span class="c">4</span></div>
+                <div class="pr">
+                  <div class="days"><div class="n">1</div><div class="l">day</div></div>
+                  <div><div class="nm">Gala</div><div class="dt">September 11, 2026</div></div>
+                  <div class="bar2"><div class="pct">72%</div><div class="track"><div class="fill" style="width:72%"></div></div></div>
+                </div>
+                <div class="pr">
+                  <div class="days"><div class="n">28</div><div class="l">days</div></div>
+                  <div><div class="nm">Alumnae Tea</div><div class="dt">October 8, 2026</div></div>
+                  <div class="bar2"><div class="pct">40%</div><div class="track"><div class="fill" style="width:40%"></div></div></div>
+                </div>
+                <div class="pr">
+                  <div class="days"><div class="n">86</div><div class="l">days</div></div>
+                  <div><div class="nm">Breakfast with Santa</div><div class="dt">December 5, 2026</div></div>
+                  <div class="bar2"><div class="pct">18%</div><div class="track"><div class="fill" style="width:18%"></div></div></div>
+                </div>
+                <div class="pr">
+                  <div class="days"><div class="n">142</div><div class="l">days</div></div>
+                  <div><div class="nm">Open House</div><div class="dt">January 30, 2027</div></div>
+                  <div class="bar2"><div class="pct">5%</div><div class="track"><div class="fill" style="width:5%"></div></div></div>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- RIGHT RAIL -->
+            <div class="col">
+
+              <!-- 7. meetings -->
+              <div class="pnl">
+                <div class="ph"><i class="ti ti-clock-hour-4"></i><span class="t">Next meetings</span></div>
+                <div class="meet">
+                  <div class="ic"><i class="ti ti-users"></i></div>
+                  <div><div class="w">Today 2:00PM</div><div class="s">Gala walk-through &middot; Library</div></div>
+                  <i class="ti ti-calendar-plus add"></i>
+                </div>
+                <div class="meet">
+                  <div class="ic"><i class="ti ti-users"></i></div>
+                  <div><div class="w">Tue 10:00AM</div><div class="s">Santa planning &middot; Front office</div></div>
+                  <i class="ti ti-calendar-plus add"></i>
+                </div>
+              </div>
+
+              <!-- 8. momentum -->
+              <div class="pnl">
+                <div class="ph"><i class="ti ti-activity"></i><span class="t">Momentum</span><span class="c">Since yesterday</span></div>
+                <div class="fl"><span class="av g">CD</span><span><b>Connie</b> approved Gala</span><span class="ago">1h</span></div>
+                <div class="fl"><span class="av">TD</span><span><b>Tanya</b> ticked 3 off</span><span class="ago">3h</span></div>
+                <div class="fl"><span class="av p">SI</span><span><b>Shannon</b> left a note</span><span class="ago">5h</span></div>
+                <div class="fl"><span class="av a">KP</span><span><b>Kacey</b> joined the Tea</span><span class="ago">Yest</span></div>
+                <div class="fl"><span class="av s">RM</span><span><b>Rayne</b> sent Santa up</span><span class="ago">Yest</span></div>
+              </div>
+
+              <!-- 9. milanote -->
+              <a class="mila">
+                <div class="mi"><i class="ti ti-layout-board"></i></div>
+                <div class="mtxt">
+                  <div class="mt">Open Milanote</div>
+                </div>
+                <i class="ti ti-arrow-up-right mgo"></i>
+              </a>
+
+            </div>
+          </div>
+
+          <!-- 10. counts, demoted -->
+          <div class="stats">
+            <div class="stat"><div class="l">Projects</div><div class="v">4</div><div class="s">1 past</div></div>
+            <div class="stat"><div class="l">Waiting</div><div class="v">2</div><div class="s">for Connie</div></div>
+            <div class="stat"><div class="l">Tasks done</div><div class="v">41%</div><div class="s">17 of 41</div></div>
+            <div class="stat"><div class="l">Team</div><div class="v">8</div><div class="s">6 with tasks</div></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <span class="lg"><span class="sw" style="background:var(--ch-blush)"></span> Yours, due that day</span>
+      <span class="lg"><span class="sw" style="background:var(--ch-leaf)"></span> Someone else's</span>
+      <span class="lg"><span class="sw" style="background:var(--ch-gold)"></span> A meeting</span>
+    </div>
+
+    <div class="cap"><i class="ti ti-info-circle"></i><span>The counts are still here — they've just moved to <b>the bottom, small</b>. They're worth a glance, and they were never worth the top of the page.</span></div>
+  </section>
+
+  <section>
+    <div class="label">Why it's arranged this way</div>
+    <p class="label-sub">Density only works if the eye knows where to go.</p>
+    <div class="cap"><i class="ti ti-eye"></i><span><b>Left column is what you owe.</b> Your list, then what's waiting on Connie, then every project. It reads as "my work, our work, the whole slate."</span></div>
+    <div class="cap"><i class="ti ti-clock"></i><span><b>Right rail is what's happening.</b> Meetings, momentum, the room, the board — glanceable, none of it demanding action. A rail is the right home for things you check rather than do.</span></div>
+    <div class="cap"><i class="ti ti-arrow-up"></i><span><b>The top three inches decide everything.</b> Greeting, two-week strip, the nearest project. If someone reads nothing else, they still know what day it is and what's closest.</span></div>
+  </section>
+
+  <div class="takeaway">
+    <i class="ti ti-arrow-right-circle"></i>
+    <p><span class="lead">The move:</span> build this as <b>one page</b>, in the order shown. The strip, hero, your list and the counts I can do from data that already exists — that's most of the page and roughly <b>a day and a half</b>. Meetings and the Milanote board each need one small field on the project. Momentum reads timestamps we're already storing. Nothing here needs a new system, only assembly.</p>
+  </div>
+
+  <footer>ConnectHub <span class="dot">&middot;</span> the robust dashboard <span class="dot">&middot;</span> prepared July 30, 2026 <span class="dot">&middot;</span> ten modules, one page</footer>
+
+</div>
+</body>
+</html>

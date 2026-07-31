@@ -1019,18 +1019,8 @@ a { color: inherit; text-decoration: none; }
 .pb-date:focus-visible { outline: none; background: var(--cream); box-shadow: 0 0 0 3px rgba(69,125,88,0.16); }
 .pb-date.empty { font-style: italic; text-transform: none; letter-spacing: 0.03em; font-weight: 600; }
 
-.pb-date-input {
-  font-family: var(--font-body);
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text);
-  background: var(--cream);
-  border: none;
-  border-radius: 7px;
-  padding: 6px 9px;
-  outline: none;
-  box-shadow: 0 0 0 3px rgba(69,125,88,0.16);
-}
+/* .pb-date-input is gone with <input type="date">. Its popup was drawn by the
+   browser, so it could not be styled at all — see components/DatePicker.jsx. */
 
 .pb-status {
   font-family: var(--font-body);
@@ -1250,13 +1240,17 @@ a { color: inherit; text-decoration: none; }
   justify-content: center;
 }
 
+/* Bigger boxes, bigger type. These cards are the app — a whole staff reads
+   their week off them — and the checklist inside was set at 12px, which is
+   note-in-the-margin size, not read-across-a-desk size. The box grows with the
+   text so the same number of tasks still fits. */
 .hub-dot {
-  width: clamp(160px, 18vw, 210px);
-  height: clamp(160px, 18vw, 210px);
+  width: clamp(190px, 21vw, 250px);
+  height: clamp(190px, 21vw, 250px);
   flex-shrink: 0;
   border: 1.5px solid var(--green);
   border-radius: 10px;
-  padding: 14px;
+  padding: 16px;
   background: #f4faf7;
   cursor: pointer;
   position: relative;
@@ -1285,7 +1279,7 @@ a { color: inherit; text-decoration: none; }
 
 .hub-dot-name {
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -1294,9 +1288,9 @@ a { color: inherit; text-decoration: none; }
 }
 
 .hub-dot-text {
-  font-size: 12px;
+  font-size: 15px;
   color: var(--text);
-  line-height: 1.5;
+  line-height: 1.55;
   flex: 1;
 }
 
@@ -1305,11 +1299,13 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 13px;
+  font-weight: 600;
   color: var(--muted);
   font-family: var(--font-body);
   text-transform: uppercase;
   letter-spacing: 0.08em;
+  text-align: center;
 }
 
 .hub-dot-edit-icon {
@@ -1329,7 +1325,7 @@ a { color: inherit; text-decoration: none; }
   border-bottom: 1.5px solid var(--green);
   background: transparent;
   font-family: var(--font-body);
-  font-size: 13px;
+  font-size: 16px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -1345,7 +1341,7 @@ a { color: inherit; text-decoration: none; }
   border-radius: 6px;
   background: #fff;
   font-family: var(--font-body);
-  font-size: 12px;
+  font-size: 15px;
   color: var(--text);
   outline: none;
   resize: none;

@@ -18,6 +18,17 @@ function fmt(dateStr) {
   return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
+// The hero date, written out in full: weekday first, whole month name, year.
+// Someone planning around an event wants to know it lands on a Friday without
+// counting, and an abbreviated month saves three characters at the cost of a
+// glance. Never the day alone — a date without a year is a question.
+function fmtLong(dateStr) {
+  if (!dateStr) return 'Date to be set';
+  return new Date(dateStr + 'T00:00:00').toLocaleDateString('en-US', {
+    weekday: 'long', month: 'long', day: 'numeric', year: 'numeric',
+  });
+}
+
 function daysUntil(dateStr) {
   if (!dateStr) return null;
   return Math.ceil((new Date(dateStr) - new Date()) / 86400000);
@@ -178,7 +189,42 @@ function EventRow({ project, onSelect }) {
   );
 }
 
-export default function DashboardView({ projects, team, onSelectProject, onSelectPerson, onOpenStickyNote, isAdmin = false, onNavigate, currentUser = '' }) {
+// Everything assigned to one person, across every project, flattened into a
+// list they can tick straight off. This did not exist: the dashboard knew who
+// you were only well enough to say hello, and finding your own work meant
+// opening the Tasks page — which shows everyone's — or hunting for your box
+// inside each project.
+function myTasks(projects, currentUser) {
+  const me = String(currentUser || '').trim().toLowerCase();
+  if (!me) return [];
+  const out = [];
+  projects.forEach(p => {
+    (p.dots || []).forEach((d, dotIndex) => {
+      if (String(d.member || '').trim().toLowerCase() !== me) return;
+      (Array.isArray(d.responsibilities) ? d.responsibilities : []).forEach((task, taskIndex) => {
+        out.push({
+          text: task.text || '',
+          done: !!task.done,
+          projectId: p.id,
+          projectName: p.name || 'Untitled',
+          date: p.date || '',
+          blessed: !!p.blessed,
+          dotIndex,
+          taskIndex,
+        });
+      });
+    });
+  });
+  // Soonest first, and anything undated last rather than pretending it is urgent.
+  return out.sort((a, b) => {
+    if (a.done !== b.done) return a.done ? 1 : -1;
+    if (!a.date) return 1;
+    if (!b.date) return -1;
+    return a.date.localeCompare(b.date);
+  });
+}
+
+export default function DashboardView({ projects, team, onSelectProject, onSelectPerson, onOpenStickyNote, isAdmin = false, onNavigate, currentUser = '', onToggleTask }) {
   const now = new Date();
 
   // Sort projects by date
@@ -320,6 +366,104 @@ export default function DashboardView({ projects, team, onSelectProject, onSelec
         <StatCard label="Team Members" value={team.length} sub={`${memberStats.length} with tasks`} onClick={() => onNavigate?.('people')} />
       </div>
 
+      {/* Your list */}
+      {currentUser && (() => {
+        const mine = myTasks(projects, currentUser);
+        const open = mine.filter(t => !t.done);
+        const doneCount = mine.length - open.length;
+        const firstName = currentUser.trim().split(/\s+/)[0];
+
+        return (
+          <div style={{ marginBottom: 34 }}>
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 10, marginBottom: 14, flexWrap: 'wrap' }}>
+              <h2 style={{ fontFamily: 'var(--font-heading)', fontSize: 26, fontWeight: 700, color: 'var(--blue)', letterSpacing: '-0.01em' }}>
+                Your list
+              </h2>
+              {mine.length > 0 && (
+                <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 800, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'var(--muted)' }}>
+                  {open.length === 0 ? 'All done' : `${open.length} to go`}
+                  {doneCount > 0 && ` · ${doneCount} done`}
+                </span>
+              )}
+            </div>
+
+            <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 14, overflow: 'hidden' }}>
+              {mine.length === 0 ? (
+                <div style={{ padding: '30px 24px', textAlign: 'center' }}>
+                  <div style={{ fontSize: 15, color: 'var(--text)', marginBottom: 4 }}>
+                    Nothing on your list yet, {firstName}.
+                  </div>
+                  <div style={{ fontSize: 13, color: 'var(--muted)' }}>
+                    Anything assigned to your dot on a project turns up here.
+                  </div>
+                </div>
+              ) : open.length === 0 ? (
+                <div style={{ padding: '30px 24px', textAlign: 'center' }}>
+                  <Trophy size={26} color="var(--green)" strokeWidth={1.6} style={{ marginBottom: 8 }} />
+                  <div style={{ fontSize: 15, color: 'var(--text)', fontWeight: 600 }}>
+                    Every one of your {mine.length} {mine.length === 1 ? 'task is' : 'tasks are'} done, {firstName}.
+                  </div>
+                </div>
+              ) : (
+                open.slice(0, 8).map((t, i) => {
+                  // Ticking is only live once the office has approved the plan.
+                  const canToggle = t.blessed;
+                  return (
+                    <div
+                      key={`${t.projectId}-${t.dotIndex}-${t.taskIndex}`}
+                      style={{
+                        display: 'flex', alignItems: 'flex-start', gap: 12, padding: '14px 18px',
+                        borderTop: i === 0 ? 'none' : '1px solid var(--border)',
+                        transition: 'background 0.12s',
+                      }}
+                      onMouseOver={e => e.currentTarget.style.background = 'var(--cream)'}
+                      onMouseOut={e => e.currentTarget.style.background = 'transparent'}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={t.done}
+                        disabled={!canToggle}
+                        onChange={() => canToggle && onToggleTask?.(t.projectId, t.dotIndex, t.taskIndex)}
+                        title={canToggle ? 'Mark done' : 'You can tick this once the office approves the project'}
+                        style={{ marginTop: 2, width: 18, height: 18, accentColor: 'var(--green)', flexShrink: 0, cursor: canToggle ? 'pointer' : 'not-allowed' }}
+                      />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ fontSize: 15, color: 'var(--text)', lineHeight: 1.45, marginBottom: 3 }}>{t.text}</div>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+                          <button
+                            onClick={() => onSelectProject(t.projectId)}
+                            style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', fontSize: 11, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.07em', color: 'var(--green)' }}
+                          >
+                            {t.projectName}
+                          </button>
+                          {t.date && (
+                            <span style={{ fontSize: 11, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif' }}>{fmt(t.date)}</span>
+                          )}
+                          {!t.blessed && (
+                            <span style={{ fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase', color: 'var(--muted)', background: 'var(--cream)', borderRadius: 99, padding: '2px 8px' }}>
+                              Awaiting approval
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+
+              {open.length > 8 && (
+                <button
+                  onClick={() => onNavigate?.('tasks')}
+                  style={{ width: '100%', padding: '12px 0', background: 'var(--cream)', border: 'none', borderTop: '1px solid var(--border)', cursor: 'pointer', fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 800, letterSpacing: '0.09em', textTransform: 'uppercase', color: 'var(--blue)' }}
+                >
+                  {open.length - 8} more on your list
+                </button>
+              )}
+            </div>
+          </div>
+        );
+      })()}
+
       <div className="dashboard-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: 28, alignItems: 'start' }}>
 
         {/* Left: Events list */}
@@ -350,7 +494,7 @@ export default function DashboardView({ projects, team, onSelectProject, onSelec
                       {labels[Math.min(safeIdx, labels.length - 1)]}
                     </div>
                     <div style={{ fontFamily: 'var(--font-heading)', fontSize: 28, fontWeight: 700, color: '#fff', lineHeight: 1.1, marginBottom: 6 }}>{event.name}</div>
-                    <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', fontFamily: 'Montserrat, sans-serif' }}>{fmt(event.date)}</div>
+                    <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.82)', fontFamily: 'Montserrat, sans-serif' }}>{fmtLong(event.date)}</div>
                   </div>
                   <div style={{ textAlign: 'center', flexShrink: 0 }}>
                     <div style={{ fontFamily: 'var(--font-body)', fontSize: 52, fontWeight: 700, color: 'var(--yellow)', lineHeight: 1, paddingTop: 3 }}>{days}</div>

@@ -1,0 +1,399 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ConnectHub — Six Dashboards, Full Page</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+:root{
+  /* Kelly's review palette — the page this is presented on */
+  --cream:#F6F1E9; --paper:#FFFFFF; --paper-warm:#FBF8F2;
+  --forest:#1E3D31; --forest-soft:#EAF1EA; --muted:#5E6F64;
+  --terra:#B85C3C; --terra-tint:#FBEBE2; --terra-tint2:#F2E2D8;
+  --cream-on-dark:#F4EEE4;
+  --line:rgba(30,61,49,0.12); --line-soft:rgba(30,61,49,0.07);
+  --shadow:0 1px 2px rgba(30,61,49,0.04), 0 12px 30px -18px rgba(30,61,49,0.22);
+  --shadow-lift:0 2px 4px rgba(30,61,49,0.05), 0 22px 48px -22px rgba(30,61,49,0.30);
+  --r-lg:18px; --r-md:14px;
+
+  /* ConnectHub's real palette — everything inside a mockup screen */
+  --ch-green:#175933; --ch-green-dk:#0D3D21; --ch-cream:#F4FAF6; --ch-panache:#E0F1E6;
+  --ch-lime:#BEE5C3; --ch-blush:#E46E88; --ch-text:#0D2B1A; --ch-muted:#5E7A68;
+  --ch-line:rgba(23,89,51,0.12); --ch-leaf:#457D58;
+}
+*{box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased}
+body{margin:0;background:var(--cream);color:var(--forest);
+  font-family:"DM Sans",system-ui,sans-serif;line-height:1.62;font-size:16px;
+  background-image:radial-gradient(rgba(30,61,49,0.022) 1px, transparent 1px);background-size:4px 4px;overflow-x:hidden;}
+.wrap{max-width:1120px;margin:0 auto;padding:60px 26px 72px;}
+
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--terra);font-weight:600;}
+header h1{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:clamp(29px,4.2vw,44px);
+  line-height:1.1;margin:14px 0 0;}
+.lede{font-size:18px;color:#34503f;max-width:64ch;margin:18px 0 0;}
+.lede b{font-weight:600;color:var(--forest);}
+
+section{margin-top:56px;}
+.label{font-family:"Fraunces",Georgia,serif;font-size:13px;font-weight:600;letter-spacing:.02em;
+  color:var(--terra);text-transform:uppercase;margin-bottom:5px;}
+.label-sub{font-size:14px;color:var(--muted);margin:0 0 18px;max-width:64ch;}
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  color:#7a3a22;background:var(--terra-tint);border:1px solid var(--terra-tint2);border-radius:99px;padding:4px 10px;margin-left:8px;vertical-align:middle;}
+.cap{display:flex;gap:11px;align-items:flex-start;margin-top:14px;padding:13px 16px;background:var(--paper-warm);
+  border:1px solid var(--line-soft);border-radius:var(--r-md);}
+.cap i{font-size:18px;color:var(--terra);margin-top:1px;flex:none;}
+.cap span{font-size:13.5px;color:#3c5648;line-height:1.55;}
+.cap b{color:var(--forest);font-weight:600;}
+
+/* ── The mockup screen ─────────────────────────────────────────── */
+.screen{border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--line);box-shadow:var(--shadow-lift);background:#fff;}
+.bar{background:#E9E4DA;padding:9px 14px;display:flex;align-items:center;gap:7px;border-bottom:1px solid var(--line);}
+.bar .d{width:9px;height:9px;border-radius:50%;background:#CFC7B8;}
+.bar .u{margin-left:10px;font-size:10.5px;color:#8B8577;background:#fff;border-radius:99px;padding:3px 11px;}
+.app{display:flex;min-height:420px;font-family:"Montserrat",sans-serif;}
+
+.side{width:150px;flex:none;background:var(--ch-green);padding:16px 11px;display:flex;flex-direction:column;gap:3px;}
+.side .logo{font-family:"Fraunces",serif;font-size:16px;color:#fff;line-height:1;padding:0 6px 11px;border-bottom:1px solid rgba(255,255,255,.15);margin-bottom:9px;}
+.side .logo span{color:var(--ch-lime);}
+.side .logo .sch{display:block;font-family:"Montserrat";font-size:6px;letter-spacing:.14em;color:rgba(255,255,255,.42);margin-top:5px;font-weight:700;}
+.nv{display:flex;align-items:center;gap:7px;padding:6px 8px;border-radius:6px;font-size:8.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:rgba(242,234,207,.55);}
+.nv i{font-size:11px;}
+.nv.on{background:var(--ch-lime);color:var(--ch-green-dk);}
+.side .foot{margin-top:auto;padding-top:10px;border-top:1px solid rgba(255,255,255,.12);font-size:8px;color:rgba(255,255,255,.75);font-weight:700;}
+
+.main{flex:1;background:var(--ch-cream);padding:18px 20px;min-width:0;}
+.greet{font-family:"Fraunces",serif;font-size:26px;font-weight:500;color:var(--ch-green);line-height:1.05;margin-bottom:14px;}
+.chip-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.stat{flex:1;min-width:78px;background:#fff;border:1px solid var(--ch-line);border-radius:9px;padding:9px 11px;}
+.stat .l{font-size:6.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ch-muted);font-weight:700;}
+.stat .v{font-family:"Montserrat";font-size:19px;font-weight:700;color:var(--ch-green);line-height:1.15;}
+.sect{font-family:"Fraunces",serif;font-size:15px;font-weight:600;color:var(--ch-green);margin:0 0 8px;display:flex;align-items:baseline;gap:8px;}
+.sect .c{font-family:"Montserrat";font-size:7.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ch-muted);font-weight:800;}
+.panel{background:#fff;border:1px solid var(--ch-line);border-radius:11px;overflow:hidden;}
+.tsk{display:flex;gap:8px;align-items:flex-start;padding:9px 11px;border-top:1px solid var(--ch-line);}
+.tsk:first-child{border-top:none;}
+.box{width:12px;height:12px;border-radius:3px;border:1.5px solid var(--ch-leaf);flex:none;margin-top:1px;}
+.tsk .t{font-size:10.5px;color:var(--ch-text);line-height:1.35;}
+.tsk .m{font-size:7.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--ch-leaf);font-weight:700;margin-top:2px;}
+
+/* concept-specific bits */
+.week{display:flex;gap:5px;margin-bottom:15px;}
+.wd{flex:1;background:#fff;border:1px solid var(--ch-line);border-radius:8px;padding:7px 2px;text-align:center;}
+.wd .dw{font-size:6.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ch-muted);font-weight:800;}
+.wd .dn{font-family:"Fraunces",serif;font-size:15px;font-weight:600;color:var(--ch-text);line-height:1.25;}
+.wd.today{background:var(--ch-green);border-color:var(--ch-green);}
+.wd.today .dw,.wd.today .dn{color:#fff;}
+.wd .pip{width:5px;height:5px;border-radius:50%;background:var(--ch-blush);margin:3px auto 0;}
+.wd .pip.g{background:var(--ch-leaf);}
+
+.board{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;}
+.bt{aspect-ratio:1;border-radius:7px;background:#fff;border:1px solid var(--ch-line);display:flex;align-items:center;justify-content:center;color:var(--ch-muted);font-size:15px;}
+.bt.a{background:var(--ch-panache);border-color:var(--ch-lime);color:var(--ch-green);}
+.bt.b{background:#FDEEF2;border-color:#F6C9D4;color:var(--ch-blush);}
+
+.hero{background:var(--ch-green);border-radius:11px;padding:17px 19px;color:#fff;display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;}
+.hero .k{font-size:7px;letter-spacing:.13em;text-transform:uppercase;opacity:.7;font-weight:700;}
+.hero .n{font-family:"Fraunces",serif;font-size:27px;font-weight:600;line-height:1.05;margin:2px 0 3px;}
+.hero .d{font-size:8.5px;letter-spacing:.1em;text-transform:uppercase;opacity:.85;font-weight:700;}
+.hero .big{font-family:"Fraunces",serif;font-size:34px;font-weight:600;color:var(--ch-blush);line-height:1;text-align:right;}
+
+.feed{display:flex;flex-direction:column;}
+.fl{display:flex;align-items:center;gap:8px;padding:8px 11px;border-top:1px solid var(--ch-line);font-size:10px;color:var(--ch-text);}
+.fl:first-child{border-top:none;}
+.av{width:19px;height:19px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:7.5px;font-weight:700;color:#fff;background:var(--ch-leaf);}
+.av.p{background:var(--ch-blush);} .av.g{background:var(--ch-green);}
+.fl .ago{margin-left:auto;font-size:7.5px;color:var(--ch-muted);letter-spacing:.05em;text-transform:uppercase;font-weight:700;}
+
+.meet{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--ch-line);border-radius:10px;padding:11px 13px;margin-bottom:13px;}
+.meet .ic{width:32px;height:32px;border-radius:9px;background:#FDEEF2;color:var(--ch-blush);display:flex;align-items:center;justify-content:center;font-size:16px;flex:none;}
+.meet .w{font-family:"Fraunces",serif;font-size:16px;font-weight:600;color:var(--ch-text);line-height:1.15;}
+.meet .s{font-size:9px;color:var(--ch-muted);}
+.meet .btn{margin-left:auto;font-size:7.5px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--ch-green);background:var(--ch-panache);border-radius:99px;padding:5px 10px;}
+
+.room{display:flex;gap:11px;flex-wrap:wrap;}
+.fc{text-align:center;}
+.fc .ring{width:46px;height:46px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:#fff;background:var(--ch-green);border:3px solid var(--ch-lime);}
+.fc .ring.mid{border-color:var(--ch-blush);}
+.fc .ring.none{border-color:var(--ch-line);}
+.fc .nm{font-size:7.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ch-muted);margin-top:4px;}
+
+.takeaway{margin-top:44px;background:var(--forest);color:var(--cream-on-dark);border-radius:var(--r-lg);
+  padding:26px 28px;display:flex;gap:15px;align-items:flex-start;box-shadow:var(--shadow-lift);}
+.takeaway i{font-size:24px;color:#E8A079;flex:none;margin-top:2px;}
+.takeaway p{margin:0;font-size:15.5px;line-height:1.6;color:#EDE6D8;}
+.takeaway b{color:#fff;font-weight:600;} .takeaway .lead{color:#E8A079;font-weight:600;}
+footer{margin-top:28px;text-align:center;font-size:12.5px;color:var(--muted);}
+footer .dot{color:var(--terra);margin:0 6px;}
+
+@media(max-width:760px){
+  .wrap{padding:42px 16px 56px;}
+  .app{min-height:0;}
+  .side{width:96px;padding:12px 7px;}
+  .side .logo{font-size:12px;}
+  .nv{font-size:7px;padding:5px 6px;}
+  .nv i{font-size:9px;}
+  .main{padding:13px 13px;}
+  .greet{font-size:19px;}
+  .board{grid-template-columns:repeat(3,1fr);}
+  .hero .n{font-size:20px;} .hero .big{font-size:24px;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">ConnectHub &middot; Six dashboards</div>
+    <h1>The same page, six ways —<br>drawn full size, not described.</h1>
+    <p class="lede">Each screen below is the whole dashboard as it would actually appear, in ConnectHub's own green and blush with Chippy in the corner. <b>Point at the one you want</b> and I'll build it. They also combine.</p>
+  </header>
+
+  <!-- 1 — WEEK STRIP -->
+  <section>
+    <div class="label">One &middot; The Week Strip <span class="pill"><i class="ti ti-star"></i>Build first</span></div>
+    <p class="label-sub">Ten days across the top. A dot where something of yours lands. Today is filled in.</p>
+    <div class="screen">
+      <div class="bar"><span class="d"></span><span class="d"></span><span class="d"></span><span class="u">chapelle-connecthub.netlify.app</span></div>
+      <div class="app">
+        <div class="side">
+          <div class="logo">Connect<span>Hub</span><span class="sch">Archbishop Chapelle</span></div>
+          <div class="nv on"><i class="ti ti-layout-dashboard"></i>Home</div>
+          <div class="nv"><i class="ti ti-sitemap"></i>Projects</div>
+          <div class="nv"><i class="ti ti-users"></i>Team</div>
+          <div class="nv"><i class="ti ti-checklist"></i>Tasks</div>
+          <div class="nv"><i class="ti ti-circle-check"></i>Approvals</div>
+          <div class="foot">Kelly Claverie</div>
+        </div>
+        <div class="main">
+          <div class="greet">Hey girl!</div>
+          <div class="week">
+            <div class="wd"><div class="dw">Mon</div><div class="dn">8</div></div>
+            <div class="wd"><div class="dw">Tue</div><div class="dn">9</div><div class="pip g"></div></div>
+            <div class="wd today"><div class="dw">Wed</div><div class="dn">10</div></div>
+            <div class="wd"><div class="dw">Thu</div><div class="dn">11</div><div class="pip"></div></div>
+            <div class="wd"><div class="dw">Fri</div><div class="dn">12</div></div>
+            <div class="wd"><div class="dw">Mon</div><div class="dn">15</div><div class="pip"></div></div>
+            <div class="wd"><div class="dw">Tue</div><div class="dn">16</div></div>
+          </div>
+          <div class="sect">Thursday <span class="c">2 things</span></div>
+          <div class="panel">
+            <div class="tsk"><span class="box"></span><div><div class="t">Confirm the caterer's final headcount</div><div class="m">Gala</div></div></div>
+            <div class="tsk"><span class="box"></span><div><div class="t">Send the save-the-date to alumnae</div><div class="m">Gala</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cap"><i class="ti ti-info-circle"></i><span>The counts drop to a <b>quiet line</b> further down. What replaces them is the only question anyone actually opens this page with.</span></div>
+  </section>
+
+  <!-- 2 — MILANOTE -->
+  <section>
+    <div class="label">Two &middot; Milanote in the page <span class="pill"><i class="ti ti-star"></i>Build first</span></div>
+    <p class="label-sub">The board lives inside the project, not behind a link in another tab.</p>
+    <div class="screen">
+      <div class="bar"><span class="d"></span><span class="d"></span><span class="d"></span><span class="u">chapelle-connecthub.netlify.app &rsaquo; Gala</span></div>
+      <div class="app">
+        <div class="side">
+          <div class="logo">Connect<span>Hub</span><span class="sch">Archbishop Chapelle</span></div>
+          <div class="nv"><i class="ti ti-layout-dashboard"></i>Home</div>
+          <div class="nv on"><i class="ti ti-sitemap"></i>Projects</div>
+          <div class="nv"><i class="ti ti-users"></i>Team</div>
+          <div class="nv"><i class="ti ti-checklist"></i>Tasks</div>
+          <div class="nv"><i class="ti ti-circle-check"></i>Approvals</div>
+          <div class="foot">Kelly Claverie</div>
+        </div>
+        <div class="main">
+          <div class="sect" style="font-size:20px">Gala <span class="c">Friday, September 11, 2026</span></div>
+          <div class="sect" style="margin-top:12px">The board <span class="c">Milanote &middot; read only</span></div>
+          <div class="panel" style="padding:11px">
+            <div class="board">
+              <div class="bt a"><i class="ti ti-photo"></i></div>
+              <div class="bt"><i class="ti ti-note"></i></div>
+              <div class="bt b"><i class="ti ti-palette"></i></div>
+              <div class="bt"><i class="ti ti-link"></i></div>
+              <div class="bt"><i class="ti ti-checkbox"></i></div>
+              <div class="bt a"><i class="ti ti-file-text"></i></div>
+              <div class="bt b"><i class="ti ti-typography"></i></div>
+              <div class="bt"><i class="ti ti-photo"></i></div>
+            </div>
+          </div>
+          <div style="margin-top:9px;font-size:8px;letter-spacing:.09em;text-transform:uppercase;color:var(--ch-muted);font-weight:700">
+            <i class="ti ti-external-link"></i> Open in Milanote to edit
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cap"><i class="ti ti-alert-triangle"></i><span>Milanote's read-only link is <b>public to anyone who has it</b>. Right for a moodboard, wrong for anything with family detail on it — so that warning sits next to the field, not in a manual.</span></div>
+  </section>
+
+  <!-- 3 — NEXT MEETING -->
+  <section>
+    <div class="label">Three &middot; Next Meeting</div>
+    <p class="label-sub">A time, a place, and a button that drops it into your own calendar.</p>
+    <div class="screen">
+      <div class="bar"><span class="d"></span><span class="d"></span><span class="d"></span><span class="u">chapelle-connecthub.netlify.app</span></div>
+      <div class="app">
+        <div class="side">
+          <div class="logo">Connect<span>Hub</span><span class="sch">Archbishop Chapelle</span></div>
+          <div class="nv on"><i class="ti ti-layout-dashboard"></i>Home</div>
+          <div class="nv"><i class="ti ti-sitemap"></i>Projects</div>
+          <div class="nv"><i class="ti ti-users"></i>Team</div>
+          <div class="nv"><i class="ti ti-checklist"></i>Tasks</div>
+          <div class="nv"><i class="ti ti-circle-check"></i>Approvals</div>
+          <div class="foot">Kelly Claverie</div>
+        </div>
+        <div class="main">
+          <div class="greet">Look who it is!</div>
+          <div class="sect">Coming up <span class="c">2 meetings</span></div>
+          <div class="meet">
+            <div class="ic"><i class="ti ti-users"></i></div>
+            <div><div class="w">Tuesday 2:00PM</div><div class="s">Gala planning &middot; Library</div></div>
+            <div class="btn">+ Calendar</div>
+          </div>
+          <div class="meet">
+            <div class="ic"><i class="ti ti-users"></i></div>
+            <div><div class="w">Thursday 10:00AM</div><div class="s">Breakfast with Santa &middot; Front office</div></div>
+            <div class="btn">+ Calendar</div>
+          </div>
+          <div class="sect" style="margin-top:13px">Your list <span class="c">1 to go</span></div>
+          <div class="panel">
+            <div class="tsk"><span class="box"></span><div><div class="t">Website</div><div class="m">Gala &middot; Sep 11</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cap"><i class="ti ti-clock"></i><span>Deliberately <b>one field, not a scheduler</b>. The moment it sends invites it is competing with the calendar everyone already lives in, and losing.</span></div>
+  </section>
+
+  <!-- 4 — MOMENTUM -->
+  <section>
+    <div class="label">Four &middot; Momentum</div>
+    <p class="label-sub">A short pulse of what everyone has been doing. Built from timestamps already in the database.</p>
+    <div class="screen">
+      <div class="bar"><span class="d"></span><span class="d"></span><span class="d"></span><span class="u">chapelle-connecthub.netlify.app</span></div>
+      <div class="app">
+        <div class="side">
+          <div class="logo">Connect<span>Hub</span><span class="sch">Archbishop Chapelle</span></div>
+          <div class="nv on"><i class="ti ti-layout-dashboard"></i>Home</div>
+          <div class="nv"><i class="ti ti-sitemap"></i>Projects</div>
+          <div class="nv"><i class="ti ti-users"></i>Team</div>
+          <div class="nv"><i class="ti ti-checklist"></i>Tasks</div>
+          <div class="nv"><i class="ti ti-circle-check"></i>Approvals</div>
+          <div class="foot">Kelly Claverie</div>
+        </div>
+        <div class="main">
+          <div class="greet">Rise and shine, Kelly!</div>
+          <div class="sect">Since yesterday</div>
+          <div class="panel feed">
+            <div class="fl"><span class="av g">CD</span><span><b>Connie</b> approved Gala</span><span class="ago">1h</span></div>
+            <div class="fl"><span class="av">TD</span><span><b>Tanya</b> ticked 3 things off</span><span class="ago">3h</span></div>
+            <div class="fl"><span class="av p">SI</span><span><b>Shannon</b> added a note to Gala</span><span class="ago">Yest</span></div>
+            <div class="fl"><span class="av">ME</span><span><b>Maria</b> joined Breakfast with Santa</span><span class="ago">Yest</span></div>
+          </div>
+          <div class="sect" style="margin-top:13px">Your list <span class="c">1 to go</span></div>
+          <div class="panel">
+            <div class="tsk"><span class="box"></span><div><div class="t">Website</div><div class="m">Gala &middot; Sep 11</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cap"><i class="ti ti-activity"></i><span>Nothing new to store — <b>done_at, blessed_at and note timestamps already exist</b>. This is a read of history the app is quietly keeping anyway.</span></div>
+  </section>
+
+  <!-- 5 — EDITORIAL HERO -->
+  <section>
+    <div class="label">Five &middot; Editorial Hero</div>
+    <p class="label-sub">Fewer things, bigger. One project owns the top of the page.</p>
+    <div class="screen">
+      <div class="bar"><span class="d"></span><span class="d"></span><span class="d"></span><span class="u">chapelle-connecthub.netlify.app</span></div>
+      <div class="app">
+        <div class="side">
+          <div class="logo">Connect<span>Hub</span><span class="sch">Archbishop Chapelle</span></div>
+          <div class="nv on"><i class="ti ti-layout-dashboard"></i>Home</div>
+          <div class="nv"><i class="ti ti-sitemap"></i>Projects</div>
+          <div class="nv"><i class="ti ti-users"></i>Team</div>
+          <div class="nv"><i class="ti ti-checklist"></i>Tasks</div>
+          <div class="nv"><i class="ti ti-circle-check"></i>Approvals</div>
+          <div class="foot">Kelly Claverie</div>
+        </div>
+        <div class="main">
+          <div class="hero">
+            <div>
+              <div class="k">Next project</div>
+              <div class="n">Gala</div>
+              <div class="d">Friday, September 11, 2026</div>
+            </div>
+            <div><div class="big">43</div><div class="k" style="text-align:right">Days away</div></div>
+          </div>
+          <div class="sect">Your list <span class="c">1 to go</span></div>
+          <div class="panel">
+            <div class="tsk"><span class="box"></span><div><div class="t">Website</div><div class="m">Gala &middot; Sep 11</div></div></div>
+          </div>
+          <div class="chip-row" style="margin-top:13px">
+            <div class="stat"><div class="l">Projects</div><div class="v">2</div></div>
+            <div class="stat"><div class="l">Waiting</div><div class="v">0</div></div>
+            <div class="stat"><div class="l">Done</div><div class="v">0%</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cap"><i class="ti ti-layout-cards"></i><span>The counts don't vanish, they <b>shrink to their real importance</b> and move under the fold.</span></div>
+  </section>
+
+  <!-- 6 — THE ROOM -->
+  <section>
+    <div class="label">Six &middot; The Room</div>
+    <p class="label-sub">The eight of you as faces, each ringed by how far along she is. Uses the colours everyone just picked.</p>
+    <div class="screen">
+      <div class="bar"><span class="d"></span><span class="d"></span><span class="d"></span><span class="u">chapelle-connecthub.netlify.app</span></div>
+      <div class="app">
+        <div class="side">
+          <div class="logo">Connect<span>Hub</span><span class="sch">Archbishop Chapelle</span></div>
+          <div class="nv on"><i class="ti ti-layout-dashboard"></i>Home</div>
+          <div class="nv"><i class="ti ti-sitemap"></i>Projects</div>
+          <div class="nv"><i class="ti ti-users"></i>Team</div>
+          <div class="nv"><i class="ti ti-checklist"></i>Tasks</div>
+          <div class="nv"><i class="ti ti-circle-check"></i>Approvals</div>
+          <div class="foot">Kelly Claverie</div>
+        </div>
+        <div class="main">
+          <div class="greet">There she is!</div>
+          <div class="sect">The room <span class="c">who needs a nudge</span></div>
+          <div class="panel" style="padding:14px 13px">
+            <div class="room">
+              <div class="fc"><div class="ring">CD</div><div class="nm">Connie</div></div>
+              <div class="fc"><div class="ring mid">ME</div><div class="nm">Maria</div></div>
+              <div class="fc"><div class="ring">SI</div><div class="nm">Shannon</div></div>
+              <div class="fc"><div class="ring none">KP</div><div class="nm">Kacey</div></div>
+              <div class="fc"><div class="ring mid">TD</div><div class="nm">Tanya</div></div>
+              <div class="fc"><div class="ring none">RM</div><div class="nm">Rayne</div></div>
+              <div class="fc"><div class="ring">JL</div><div class="nm">Jamie</div></div>
+              <div class="fc"><div class="ring mid">KC</div><div class="nm">Kelly</div></div>
+            </div>
+          </div>
+          <div class="sect" style="margin-top:13px">Your list <span class="c">1 to go</span></div>
+          <div class="panel">
+            <div class="tsk"><span class="box"></span><div><div class="t">Website</div><div class="m">Gala &middot; Sep 11</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cap"><i class="ti ti-users-group"></i><span>Ring full means everything of hers is done, part means underway, hairline means nothing assigned. <b>Click a face and you're in her binder.</b></span></div>
+  </section>
+
+  <div class="takeaway">
+    <i class="ti ti-arrow-right-circle"></i>
+    <p><span class="lead">The move:</span> <b>one and five together</b> are the whole redesign, and about a day. Week strip on top, editorial hero under it, counts shrunk to a quiet row at the bottom. Then <b>two</b> puts the Milanote board inside every project. <b>Three</b> is the one you already sensed was missing, and it's small. Four and six are the delightful ones — worth doing, but after the page earns its keep.</p>
+  </div>
+
+  <footer>ConnectHub <span class="dot">&middot;</span> six dashboards, full page <span class="dot">&middot;</span> prepared July 30, 2026 <span class="dot">&middot;</span> point at one and I'll build it</footer>
+
+</div>
+</body>
+</html>

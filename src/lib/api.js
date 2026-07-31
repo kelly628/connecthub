@@ -307,5 +307,24 @@ export async function updateMemberLook(id, look) {
 
 export async function saveMember(member)      { return adminFetch('save_member',   { member }); }
 export async function deleteMember(id)        { return adminFetch('delete_member', { id }); }
+// Tell the office a project is waiting. Deliberately best-effort: the project
+// is already submitted by the time this runs, so a mail problem must never be
+// reported to the staffer as though their submission failed.
+export async function notifySubmitted(projectId) {
+  try {
+    const { data } = await supabase.auth.getSession();
+    const token = data?.session?.access_token;
+    if (!token) return { ok: false };
+    const res = await fetch('/.netlify/functions/notify-submitted', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ projectId }),
+    });
+    return await res.json().catch(() => ({ ok: false }));
+  } catch {
+    return { ok: false };
+  }
+}
+
 export async function listCodes()             { return adminFetch('list_codes',    {}); }
 export async function setMemberCode(id, code) { return adminFetch('set_member_code', { id, code }); }

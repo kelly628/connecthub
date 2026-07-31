@@ -9,10 +9,19 @@ import { uploadImage, listCodes } from '../lib/api';
 // and means something when read straight out of the database.
 const MEMBER_ICONS = { Star, Heart, Sparkles, Crown, Music, Palette, Sun, Leaf, Coffee, Gift, Globe, Award };
 
-// Drawn from the binder palette below so a restyled card still belongs to the
-// same app. Deep Blush is the brand accent and earns its place; nothing else
-// pink is offered.
-const MEMBER_COLORS = ['#175933', '#457D58', '#1A7A50', '#2E6E45', '#C04A18', '#B89400', '#E46E88', '#3A7355'];
+// Five jewel tones, and they run green → teal → blue → violet → wine so the
+// roster reads as one set rather than a bag of colours. Each is deep and a
+// little greyed rather than fully saturated: at full chroma they would shout
+// past Chapelle's green and blush instead of sitting with them. Garnet is the
+// jewel-tone cousin of Deep Blush, which is what ties the far end back to the
+// brand. Anything beyond these five is a keystroke away in the picker.
+const MEMBER_COLORS = [
+  { hex: '#0E6B4A', name: 'Emerald' },
+  { hex: '#12586B', name: 'Peacock' },
+  { hex: '#2A4A85', name: 'Sapphire' },
+  { hex: '#5E3A82', name: 'Amethyst' },
+  { hex: '#8E2A4C', name: 'Garnet' },
+];
 
 const BINDER_COLORS = [
   '#175933', // navy (theme blue)
@@ -488,6 +497,8 @@ function MemberForm({ initial, initialCode = '', canSetCode = false, canEditIden
   const [photoUrl, setPhotoUrl] = useState(initial?.photoUrl || null);
   const [iconName, setIconName] = useState(initial?.iconName || '');
   const [color, setColor] = useState(initial?.color || '');
+  // A colour they picked themselves rather than one of the five.
+  const isCustomColor = !!color && !MEMBER_COLORS.some(c => c.hex.toLowerCase() === color.toLowerCase());
   const [uploading, setUploading] = useState(false);
   const [photoError, setPhotoError] = useState('');
   const fileRef = useRef();
@@ -548,24 +559,68 @@ function MemberForm({ initial, initialCode = '', canSetCode = false, canEditIden
 
           {/* Colour */}
           <div style={{ fontSize: 9, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--muted)', marginTop: 4 }}>Colour</div>
-          <div style={{ display: 'flex', gap: 7, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 9, flexWrap: 'wrap', alignItems: 'center' }}>
             {MEMBER_COLORS.map(c => (
               <button
-                key={c}
+                key={c.hex}
                 type="button"
-                onClick={() => setColor(color === c ? '' : c)}
-                title={c}
-                aria-label={`Colour ${c}`}
+                onClick={() => setColor(color === c.hex ? '' : c.hex)}
+                title={c.name}
+                aria-label={c.name}
+                aria-pressed={color === c.hex}
                 style={{
-                  width: 26, height: 26, borderRadius: '50%', background: c, cursor: 'pointer',
-                  border: color === c ? '2.5px solid var(--text)' : '2px solid transparent',
-                  boxShadow: color === c ? '0 0 0 2px #fff inset' : 'none',
+                  width: 30, height: 30, borderRadius: '50%', background: c.hex, cursor: 'pointer',
+                  border: color === c.hex ? '2.5px solid var(--text)' : '2px solid transparent',
+                  boxShadow: color === c.hex ? '0 0 0 2px #fff inset' : 'none',
                   transition: 'transform 0.12s',
                 }}
                 onMouseOver={e => e.currentTarget.style.transform = 'scale(1.12)'}
                 onMouseOut={e => e.currentTarget.style.transform = 'none'}
               />
             ))}
+
+            {/* Anything else. The five above are the house set; this is the rest
+                of the spectrum for anyone who wants it. The ring is a real
+                colour wheel so it reads as "any colour" without a label. */}
+            <label
+              title="Any colour"
+              style={{
+                width: 30, height: 30, borderRadius: '50%', cursor: 'pointer', position: 'relative',
+                display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                background: 'conic-gradient(#8E2A4C, #B07A16, #0E6B4A, #12586B, #2A4A85, #5E3A82, #8E2A4C)',
+                border: isCustomColor ? '2.5px solid var(--text)' : '2px solid transparent',
+                transition: 'transform 0.12s',
+              }}
+              onMouseOver={e => e.currentTarget.style.transform = 'scale(1.12)'}
+              onMouseOut={e => e.currentTarget.style.transform = 'none'}
+            >
+              <span style={{
+                width: 14, height: 14, borderRadius: '50%',
+                background: isCustomColor ? color : 'var(--surface)',
+                boxShadow: '0 0 0 1.5px rgba(255,255,255,0.9)',
+              }} />
+              <input
+                type="color"
+                value={color || '#0E6B4A'}
+                onChange={e => setColor(e.target.value)}
+                aria-label="Pick any colour"
+                style={{ position: 'absolute', inset: 0, opacity: 0, cursor: 'pointer', border: 'none', padding: 0 }}
+              />
+            </label>
+
+            {color && (
+              <button
+                type="button"
+                onClick={() => setColor('')}
+                style={{
+                  background: 'none', border: 'none', cursor: 'pointer', padding: '4px 2px',
+                  fontFamily: 'Montserrat, sans-serif', fontSize: 10, fontWeight: 800,
+                  letterSpacing: '0.09em', textTransform: 'uppercase', color: 'var(--muted)',
+                }}
+              >
+                Reset
+              </button>
+            )}
           </div>
 
           {/* Icon */}

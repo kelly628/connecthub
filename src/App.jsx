@@ -255,6 +255,9 @@ export default function App() {
   const [isAdmin, setIsAdmin] = useState(() => !!adminToken());
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [currentUser, setCurrentUser] = useState(() => localStorage.getItem('ctd_current_user') || '');
+  // 'idle' | 'saving' | 'saved' | 'error' — drives the line in the project
+  // header that tells someone their work is written down somewhere.
+  const [saveState, setSaveState] = useState('idle');
   const [signedIn, setSignedIn] = useState(null);   // null = still checking
   const [booting, setBooting] = useState(true);
   const [bootError, setBootError] = useState('');
@@ -262,6 +265,9 @@ export default function App() {
   // A background refresh must never yank the screen out from under someone
   // mid-edit, so it skips while a write is in flight or a modal is open.
   const writesInFlight = useRef(0);
+  // Holds the pending auto-save so a burst of typing collapses into one write.
+  const draftSaveTimer = useRef(null);
+  useEffect(() => () => clearTimeout(draftSaveTimer.current), []);
   const uiBusy = useRef(false);
   const uiIsBusy = showStickyModal || showAdminModal || !!draftProject;
   useEffect(() => { uiBusy.current = uiIsBusy; }, [uiIsBusy]);
@@ -316,6 +322,7 @@ export default function App() {
   // says what happened, rather than leaving a lie on screen.
   const runWrite = useCallback(async (fn, optimistic) => {
     writesInFlight.current += 1;
+    setSaveState('saving');
     if (optimistic) optimistic();
     let res;
     try {
@@ -325,10 +332,14 @@ export default function App() {
     }
     writesInFlight.current -= 1;
     if (res?.error) {
+      if (writesInFlight.current === 0) setSaveState('error');
       showToast(res.error);
       await refresh();
       return null;
     }
+    // Only the last write in a burst settles the indicator, or a quick edit
+    // during a slow save would flip it to "saved" while one is still going.
+    if (writesInFlight.current === 0) setSaveState('saved');
     return res;
   }, [refresh]);
 
@@ -351,11 +362,15 @@ export default function App() {
     setSignedIn(false);
   }
 
+  // Leaving a draft used to throw it away, name, dots, tasks and all, with a
+  // toast explaining what it had needed. Now anything with a name is saved on
+  // the way out instead of being lost.
   function maybeDiscardDraft() {
-    if (draftProject) {
-      setDraftProject(null);
-      showToast('Almost! A project needs a name, a date and a lead before it saves.');
-    }
+    if (!draftProject) return;
+    clearTimeout(draftSaveTimer.current);
+    if (draftProject.name?.trim()) { saveDraftNow(draftProject); return; }
+    setDraftProject(null);
+    showToast('That project had no name yet, so there was nothing to save.');
   }
 
   // Replace one project in local state, keeping the rest untouched.
@@ -367,17 +382,31 @@ export default function App() {
 
   // A draft lives only in local state until it has enough to be a real event.
   // Once it does, this is the insert.
-  async function handleUpdateDraft(project) {
-    const leadsArr = Array.isArray(project.leads) ? project.leads : project.leads ? [project.leads] : [];
-    if (!(project.name?.trim() && project.date && leadsArr.length > 0)) {
-      setDraftProject(project);
-      return;
+  // Write the draft out for real. A name is the whole requirement — it used to
+  // also demand a date and a lead, which meant someone could fill in eight
+  // boxes of tasks and still have nothing saved anywhere.
+  async function saveDraftNow(project) {
+    clearTimeout(draftSaveTimer.current);
+    if (!project?.name?.trim()) {
+      showToast('Give the project a name and it saves itself from there.');
+      return null;
     }
     const res = await runWrite(() => api.createProject(project));
-    if (!res?.project) return;
+    if (!res?.project) return null;
     applyProject(res.project);
     setSelectedId(res.project.id);
     setDraftProject(null);
+    return res.project;
+  }
+
+  // Every keystroke lands here, so the write waits for a pause rather than
+  // creating a project called "S" the moment someone starts typing "Spring".
+  // Once it exists, edits go through handleUpdateProject and patch as they go.
+  function handleUpdateDraft(project) {
+    setDraftProject(project);
+    clearTimeout(draftSaveTimer.current);
+    if (!project.name?.trim()) return;
+    draftSaveTimer.current = setTimeout(() => saveDraftNow(project), 1200);
   }
 
   function handleDiscardDraft() {
@@ -469,10 +498,20 @@ export default function App() {
       await handleToggleBlessed(project.id);
       return;
     }
-    await runWrite(
+    const res = await runWrite(
       () => api.updateProjectFields(project.id, prev, project),
       () => applyProject(project)
     );
+
+    // Connect the Dots just happened. Fired after the write, so the office is
+    // never told about a submission that did not land — and not awaited, since
+    // the staffer's screen should not sit on a mail server's timing.
+    if (res && !prev.submitted && project.submitted) {
+      api.notifySubmitted(project.id).then(r => {
+        if (r?.sent) showToast('Sent to the office for approval. They’ve been emailed.');
+        else showToast('Sent to the office for approval.');
+      });
+    }
   }
 
   // A new board starts with empty boxes on purpose. It used to open with every
@@ -656,40 +695,33 @@ export default function App() {
           )}
         </button>
 
-        <button
-          className="sidebar-new-btn"
-          title="New Project"
-          style={{
-            marginTop: 12,
-            width: 42, height: 42,
-            borderRadius: '50%',
-            background: 'var(--yellow)', color: '#fff',
-            border: 'none',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            cursor: 'pointer', alignSelf: 'center',
-            boxShadow: '0 2px 10px rgba(0,0,0,0.25)',
-            transition: 'filter 0.15s, transform 0.15s',
-            flexShrink: 0,
-          }}
-          onMouseOver={e => { e.currentTarget.style.filter = 'brightness(0.92)'; e.currentTarget.style.transform = 'scale(1.08)'; }}
-          onMouseOut={e => { e.currentTarget.style.filter = 'none'; e.currentTarget.style.transform = 'none'; }}
-          onClick={handleNewProject}
-        >
-          <Plus size={20} />
-        </button>
+        {/* The floating pink + is gone. Every screen that can start a project
+            already has its own add button, so this was a second door to the
+            same room, sitting in the middle of the nav where it broke the run
+            of items. */}
 
-
-        {!isAdmin && currentUser && (
-          <div className="sidebar-user-display" style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '8px 12px', color: 'rgba(255,255,255,0.5)', fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' }}>
-            <UserCircle size={13} strokeWidth={2} />
-            <span style={{ flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{currentUser}</span>
-            <button onClick={handleSwitchUser} title="Sign out" style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'rgba(255,255,255,0.3)', fontSize: 10, fontFamily: 'Montserrat, sans-serif', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em', padding: 0, flexShrink: 0 }}>
-              Sign Out
-            </button>
-          </div>
-        )}
-
-        <div className="sidebar-admin" style={{ marginTop: 'auto', paddingTop: 12 }}>
+        {/* Who you are, down at the foot with the other account controls rather
+            than wedged into the navigation. Name on its own line above the
+            sign-out so neither has to be truncated to "KELLY CLA…". */}
+        <div className="sidebar-foot" style={{ marginTop: 'auto', paddingTop: 14 }}>
+          {currentUser && (
+            <div style={{ padding: '0 12px 12px', borderBottom: '1px solid rgba(255,255,255,0.1)', marginBottom: 12 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'rgba(255,255,255,0.92)', marginBottom: 7 }}>
+                <UserCircle size={15} strokeWidth={2} style={{ flexShrink: 0, opacity: 0.65 }} />
+                <span style={{ fontFamily: 'Montserrat, sans-serif', fontSize: 13, fontWeight: 700, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {currentUser}
+                </span>
+              </div>
+              <button
+                onClick={handleSwitchUser}
+                style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0, marginLeft: 23, color: 'rgba(255,255,255,0.45)', fontFamily: 'Montserrat, sans-serif', fontSize: 10, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.09em', transition: 'color 0.15s' }}
+                onMouseOver={e => e.currentTarget.style.color = 'rgba(255,255,255,0.85)'}
+                onMouseOut={e => e.currentTarget.style.color = 'rgba(255,255,255,0.45)'}
+              >
+                Sign out
+              </button>
+            </div>
+          )}
           {isAdmin ? (
             <button
               onClick={handleLock}
@@ -736,6 +768,8 @@ export default function App() {
           <ProjectDetail
             project={draftProject}
             isNew={true}
+            saveState={saveState}
+            onSaveNow={() => saveDraftNow(draftProject)}
             projects={projects}
             team={team}
             isAdmin={isAdmin}
@@ -753,6 +787,7 @@ export default function App() {
         ) : selected ? (
           <ProjectDetail
             project={selected}
+            saveState={saveState}
             projects={projects}
             team={team}
             isAdmin={isAdmin}
@@ -815,6 +850,7 @@ export default function App() {
             onOpenStickyNote={() => setShowStickyModal(true)}
             onNavigate={view => { maybeDiscardDraft(); setNavView(view); setSelectedId(null); setSelectedPerson(null); }}
             currentUser={currentUser}
+            onToggleTask={handleToggleTask}
           />
         ) : (
           <ProjectsView

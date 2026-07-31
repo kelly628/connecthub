@@ -1,0 +1,358 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ConnectHub — Dashboard Concepts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+:root{
+  --cream:#F6F1E9; --paper:#FFFFFF; --paper-warm:#FBF8F2;
+  --forest:#1E3D31; --forest-soft:#EAF1EA; --muted:#5E6F64;
+  --terra:#B85C3C; --terra-tint:#FBEBE2; --terra-tint2:#F2E2D8; --terra-deep:#5A3422;
+  --cream-on-dark:#F4EEE4;
+  --line:rgba(30,61,49,0.12); --line-soft:rgba(30,61,49,0.07);
+  --shadow:0 1px 2px rgba(30,61,49,0.04), 0 12px 30px -18px rgba(30,61,49,0.22);
+  --shadow-lift:0 2px 4px rgba(30,61,49,0.05), 0 22px 48px -22px rgba(30,61,49,0.30);
+  --r-lg:18px; --r-md:14px; --r-sm:10px;
+}
+*{box-sizing:border-box}
+html{-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+body{margin:0;background:var(--cream);color:var(--forest);
+  font-family:"DM Sans",system-ui,sans-serif;line-height:1.62;font-size:16px;
+  background-image:radial-gradient(rgba(30,61,49,0.022) 1px, transparent 1px);background-size:4px 4px;
+  overflow-x:hidden;}
+.wrap{max-width:1000px;margin:0 auto;padding:64px 28px 72px;}
+
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--terra);font-weight:600;}
+header h1{font-family:"Fraunces",Georgia,serif;font-weight:500;font-size:clamp(30px,4.4vw,46px);
+  line-height:1.1;letter-spacing:-0.01em;margin:14px 0 0;color:var(--forest);}
+.lede{font-size:18px;color:#34503f;max-width:64ch;margin:20px 0 0;line-height:1.6;}
+.lede b{font-weight:600;color:var(--forest);}
+
+.chips{display:flex;flex-wrap:wrap;gap:9px;margin-top:26px;}
+.chip{display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:var(--forest);
+  background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:7px 14px;box-shadow:var(--shadow);}
+.chip i{font-size:16px;color:var(--terra);}
+
+section{margin-top:58px;}
+.label{font-family:"Fraunces",Georgia,serif;font-size:13px;font-weight:600;letter-spacing:.02em;
+  color:var(--terra);text-transform:uppercase;margin-bottom:6px;}
+.label-sub{font-size:14px;color:var(--muted);margin:0 0 20px;max-width:62ch;}
+
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);padding:22px 24px;}
+.card.rec{border:1.5px solid var(--terra);box-shadow:var(--shadow-lift);}
+.card-h{display:flex;align-items:center;gap:12px;margin-bottom:4px;}
+.ic{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+  background:var(--forest-soft);color:var(--forest);font-size:22px;flex:none;}
+.ic.t{background:var(--terra-tint);color:var(--terra);}
+.card-h .nm{font-family:"Fraunces",serif;font-weight:600;font-size:20px;line-height:1.15;}
+.card-h .pr{font-size:12.5px;color:var(--muted);margin-top:1px;}
+.rectag{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;
+  color:#7a3a22;background:var(--terra-tint);border:1px solid var(--terra-tint2);border-radius:99px;padding:4px 11px;margin:12px 0 2px;}
+.desc{font-size:14px;color:#3c5648;margin:12px 0 14px;line-height:1.55;}
+.row{display:flex;justify-content:space-between;gap:14px;font-size:13.5px;padding:8px 0;border-top:1px solid var(--line-soft);}
+.row .k{color:var(--muted);white-space:nowrap;}
+.row .v{color:var(--forest);text-align:right;font-weight:500;}
+.foot{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:14px;border-top:1px solid var(--line);gap:10px;flex-wrap:wrap;}
+.cost{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:15px;}
+.cost .amt{font-family:"Fraunces",serif;}
+.cost i{font-size:15px;color:var(--terra);}
+.best{font-size:12px;color:var(--muted);font-style:italic;}
+.note{font-size:12.5px;color:var(--muted);margin:14px 0 0;line-height:1.5;}
+.note b{color:var(--forest);font-weight:600;}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px;}
+.mini .ic{width:38px;height:38px;font-size:20px;border-radius:11px;}
+.mini .nm{font-size:17px;}
+
+.cap{display:flex;gap:11px;align-items:flex-start;margin-top:18px;padding:14px 16px;background:var(--paper-warm);
+  border:1px solid var(--line-soft);border-radius:var(--r-md);}
+.cap i{font-size:18px;color:var(--terra);margin-top:1px;flex:none;}
+.cap span{font-size:13.5px;color:#3c5648;line-height:1.55;}
+.cap b{color:var(--forest);font-weight:600;}
+
+.chartcard{background:var(--paper);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--shadow);padding:22px 24px;}
+.chartcard h3{font-family:"Fraunces",serif;font-size:17px;font-weight:600;margin:0 0 2px;}
+.chartcard .s{font-size:13px;color:var(--muted);margin:0 0 16px;}
+
+.steps{display:flex;flex-direction:column;gap:12px;}
+.step{display:flex;gap:16px;background:var(--paper);border:1px solid var(--line);border-radius:var(--r-md);
+  box-shadow:var(--shadow);padding:18px 20px;}
+.step .n{width:34px;height:34px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
+  font-family:"Fraunces",serif;font-weight:600;font-size:16px;background:var(--forest);color:var(--cream-on-dark);}
+.step.you .n{background:var(--terra);}
+.step h4{font-family:"Fraunces",serif;font-weight:600;font-size:16px;margin:2px 0 5px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.step p{font-size:13.5px;color:#3c5648;margin:0;line-height:1.55;}
+.who{font-size:11px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;border-radius:99px;padding:3px 9px;}
+.who.k{color:#7a3a22;background:var(--terra-tint);}
+.who.c{color:var(--forest);background:var(--forest-soft);}
+
+/* A small rendered impression of each concept, so it is seen and not just described. */
+.demo{background:var(--paper-warm);border:1px solid var(--line-soft);border-radius:var(--r-md);padding:13px;margin:12px 0 2px;overflow:hidden;}
+.d-strip{display:flex;gap:5px;}
+.d-day{flex:1;min-width:0;text-align:center;background:#fff;border:1px solid var(--line-soft);border-radius:8px;padding:7px 3px;}
+.d-day .dow{font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);font-weight:700;}
+.d-day .num{font-family:"Fraunces",serif;font-size:15px;font-weight:600;line-height:1.25;}
+.d-day.on{background:var(--terra);border-color:var(--terra);}
+.d-day.on .dow,.d-day.on .num{color:#fff;}
+.d-day .pip{width:5px;height:5px;border-radius:50%;background:var(--terra);margin:3px auto 0;}
+.d-board{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.d-tile{height:38px;border-radius:7px;background:#fff;border:1px solid var(--line-soft);display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:15px;}
+.d-tile.t{background:var(--terra-tint);border-color:var(--terra-tint2);color:var(--terra);}
+.d-feed{display:flex;flex-direction:column;gap:6px;}
+.d-line{display:flex;align-items:center;gap:8px;font-size:12px;color:#3c5648;background:#fff;border:1px solid var(--line-soft);border-radius:8px;padding:6px 9px;}
+.d-av{width:19px;height:19px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;color:#fff;background:var(--forest);}
+.d-av.t{background:var(--terra);}
+.d-meet{display:flex;align-items:center;gap:9px;background:#fff;border:1px solid var(--line-soft);border-radius:9px;padding:9px 11px;}
+.d-meet .when{font-family:"Fraunces",serif;font-size:15px;font-weight:600;}
+.d-meet .sub{font-size:11px;color:var(--muted);}
+.d-hero{background:var(--forest);border-radius:10px;padding:13px 15px;color:var(--cream-on-dark);display:flex;justify-content:space-between;align-items:center;gap:10px;}
+.d-hero .t1{font-size:9px;letter-spacing:.12em;text-transform:uppercase;opacity:.72;}
+.d-hero .t2{font-family:"Fraunces",serif;font-size:19px;font-weight:600;line-height:1.1;}
+.d-hero .t3{font-size:10px;letter-spacing:.08em;text-transform:uppercase;opacity:.8;margin-top:2px;}
+.d-hero .big{font-family:"Fraunces",serif;font-size:26px;font-weight:600;color:#E8A079;line-height:1;}
+.d-room{display:flex;gap:8px;flex-wrap:wrap;}
+.d-face{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:#fff;background:var(--forest);border:2.5px solid var(--terra);}
+.d-face.part{border-color:var(--terra-tint2);}
+.d-face.none{border-color:var(--line);}
+
+.takeaway{margin-top:40px;background:var(--forest);color:var(--cream-on-dark);border-radius:var(--r-lg);
+  padding:26px 28px;display:flex;gap:15px;align-items:flex-start;box-shadow:var(--shadow-lift);}
+.takeaway i{font-size:24px;color:#E8A079;flex:none;margin-top:2px;}
+.takeaway p{margin:0;font-size:15.5px;line-height:1.6;color:#EDE6D8;}
+.takeaway b{color:#fff;font-weight:600;}
+.takeaway .lead{color:#E8A079;font-weight:600;}
+
+footer{margin-top:30px;text-align:center;font-size:12.5px;color:var(--muted);}
+footer .dot{color:var(--terra);margin:0 6px;}
+@media(max-width:680px){
+  .wrap{padding:44px 18px 56px;}
+  .d-board{grid-template-columns:repeat(3,1fr);}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">ConnectHub &middot; Archbishop Chapelle</div>
+    <h1>Six ways the dashboard could earn<br>the first minute of someone's day.</h1>
+    <p class="lede">Right now the home screen opens with <b>four stat cards</b> — counts that are true but that nobody acts on. These six concepts each answer a sharper question: <b>what do I need to do, and when.</b> Terracotta marks what I'd build first.</p>
+    <div class="chips">
+      <span class="chip"><i class="ti ti-layout-board"></i>Milanote boards, embedded</span>
+      <span class="chip"><i class="ti ti-clock"></i>Meeting times</span>
+      <span class="chip"><i class="ti ti-device-mobile"></i>Mobile pass next</span>
+    </div>
+  </header>
+
+  <section>
+    <div class="label">Where it stands today</div>
+    <p class="label-sub">An honest read before the ideas, because two of the six are really fixes.</p>
+    <div class="cap"><i class="ti ti-eye"></i><span>The dashboard leads with <b>Upcoming Projects, Pending Approvals, Tasks Complete, Team Members</b>. Three of those four are the same number most weeks, and none of them changes what anyone does next. <b>Your list</b> — added today — is the first thing on the page someone can act on, and it is sitting below the counts rather than above them.</span></div>
+  </section>
+
+  <section>
+    <div class="label">The six concepts</div>
+    <p class="label-sub">Each card shows a small rendered impression, what it answers, and roughly what it takes to build.</p>
+    <div class="grid">
+
+      <!-- 1 -->
+      <div class="card mini rec">
+        <div class="card-h"><div class="ic t"><i class="ti ti-calendar-week"></i></div><div><div class="nm">The Week Strip</div><div class="pr">concept one</div></div></div>
+        <div class="rectag"><i class="ti ti-star"></i>Build first</div>
+        <div class="demo">
+          <div class="d-strip">
+            <div class="d-day"><div class="dow">Mon</div><div class="num">8</div></div>
+            <div class="d-day"><div class="dow">Tue</div><div class="num">9</div><div class="pip"></div></div>
+            <div class="d-day on"><div class="dow">Wed</div><div class="num">10</div></div>
+            <div class="d-day"><div class="dow">Thu</div><div class="num">11</div><div class="pip"></div></div>
+            <div class="d-day"><div class="dow">Fri</div><div class="num">12</div></div>
+          </div>
+        </div>
+        <p class="desc">Ten days across the top. A dot on any day something of yours is due, today filled in. Tap a day to see what lands.</p>
+        <div class="row"><span class="k">Answers</span><span class="v">"What's this week?"</span></div>
+        <div class="row"><span class="k">Replaces</span><span class="v">Two stat cards</span></div>
+        <div class="foot"><span class="cost"><i class="ti ti-tool"></i><span class="amt">~1 day</span></span><span class="best">highest use per pixel</span></div>
+      </div>
+
+      <!-- 2 -->
+      <div class="card mini rec">
+        <div class="card-h"><div class="ic t"><i class="ti ti-layout-board"></i></div><div><div class="nm">Milanote, in the page</div><div class="pr">concept two</div></div></div>
+        <div class="rectag"><i class="ti ti-star"></i>Build first</div>
+        <div class="demo">
+          <div class="d-board">
+            <div class="d-tile"><i class="ti ti-photo"></i></div>
+            <div class="d-tile t"><i class="ti ti-note"></i></div>
+            <div class="d-tile"><i class="ti ti-link"></i></div>
+            <div class="d-tile t"><i class="ti ti-checkbox"></i></div>
+            <div class="d-tile"><i class="ti ti-palette"></i></div>
+            <div class="d-tile"><i class="ti ti-file"></i></div>
+          </div>
+        </div>
+        <p class="desc">Each project holds its Milanote board and shows it right there. Not a link that throws you into another tab.</p>
+        <div class="row"><span class="k">Answers</span><span class="v">"Where's the stuff?"</span></div>
+        <div class="row"><span class="k">Needs</span><span class="v">A read-only link</span></div>
+        <div class="foot"><span class="cost"><i class="ti ti-tool"></i><span class="amt">~half day</span></span><span class="best">least work, most felt</span></div>
+      </div>
+
+      <!-- 3 -->
+      <div class="card mini">
+        <div class="card-h"><div class="ic"><i class="ti ti-clock-hour-4"></i></div><div><div class="nm">Next Meeting</div><div class="pr">concept three</div></div></div>
+        <div class="demo">
+          <div class="d-meet">
+            <div class="ic t" style="width:32px;height:32px;font-size:16px;border-radius:9px"><i class="ti ti-users"></i></div>
+            <div><div class="when">Tuesday 2:00PM</div><div class="sub">Gala planning &middot; Library</div></div>
+          </div>
+        </div>
+        <p class="desc">A time and a place on every project, surfaced on the dashboard, with a one-tap add to your calendar.</p>
+        <div class="row"><span class="k">Answers</span><span class="v">"When do we meet?"</span></div>
+        <div class="row"><span class="k">Needs</span><span class="v">Two new fields</span></div>
+        <div class="foot"><span class="cost"><i class="ti ti-tool"></i><span class="amt">~1 day</span></span><span class="best">answers your question</span></div>
+      </div>
+
+      <!-- 4 -->
+      <div class="card mini">
+        <div class="card-h"><div class="ic"><i class="ti ti-activity"></i></div><div><div class="nm">Momentum</div><div class="pr">concept four</div></div></div>
+        <div class="demo">
+          <div class="d-feed">
+            <div class="d-line"><span class="d-av t">CD</span> Connie approved <b>Gala</b></div>
+            <div class="d-line"><span class="d-av">TD</span> Tanya ticked 3 things</div>
+            <div class="d-line"><span class="d-av">SI</span> Shannon added a note</div>
+          </div>
+        </div>
+        <p class="desc">A short pulse of what everyone has been doing. Turns a filing cabinet into a room with people in it.</p>
+        <div class="row"><span class="k">Answers</span><span class="v">"Is this thing alive?"</span></div>
+        <div class="row"><span class="k">Needs</span><span class="v">Read of existing stamps</span></div>
+        <div class="foot"><span class="cost"><i class="ti ti-tool"></i><span class="amt">~1.5 days</span></span><span class="best">the engagement one</span></div>
+      </div>
+
+      <!-- 5 -->
+      <div class="card mini">
+        <div class="card-h"><div class="ic"><i class="ti ti-layout-cards"></i></div><div><div class="nm">Editorial Hero</div><div class="pr">concept five</div></div></div>
+        <div class="demo">
+          <div class="d-hero">
+            <div><div class="t1">Next project</div><div class="t2">Gala</div><div class="t3">Friday, September 11</div></div>
+            <div style="text-align:right"><div class="big">43</div><div class="t1">days</div></div>
+          </div>
+        </div>
+        <p class="desc">Fewer things, bigger. One project owns the top of the page with its own icon and colour, the rest step back.</p>
+        <div class="row"><span class="k">Answers</span><span class="v">"What matters most?"</span></div>
+        <div class="row"><span class="k">Replaces</span><span class="v">The stat card row</span></div>
+        <div class="foot"><span class="cost"><i class="ti ti-tool"></i><span class="amt">~half day</span></span><span class="best">biggest visual jump</span></div>
+      </div>
+
+      <!-- 6 -->
+      <div class="card mini">
+        <div class="card-h"><div class="ic"><i class="ti ti-users-group"></i></div><div><div class="nm">The Room</div><div class="pr">concept six</div></div></div>
+        <div class="demo">
+          <div class="d-room">
+            <div class="d-face">CD</div>
+            <div class="d-face part">ME</div>
+            <div class="d-face">SI</div>
+            <div class="d-face none">KP</div>
+            <div class="d-face part">TD</div>
+            <div class="d-face none">RM</div>
+          </div>
+        </div>
+        <p class="desc">The eight of you as faces, each ringed by how far along they are. Click a face, see their board. Uses the icons and colours people just picked.</p>
+        <div class="row"><span class="k">Answers</span><span class="v">"Who needs a nudge?"</span></div>
+        <div class="row"><span class="k">Builds on</span><span class="v">Today's colour picker</span></div>
+        <div class="foot"><span class="cost"><i class="ti ti-tool"></i><span class="amt">~1 day</span></span><span class="best">most personal</span></div>
+      </div>
+
+    </div>
+    <div class="cap"><i class="ti ti-bulb"></i><span>They are not exclusive. <b>One, two and five together</b> would rebuild the whole page in about two days: a week strip on top, an editorial hero for the nearest project, and every board one scroll away.</span></div>
+  </section>
+
+  <section>
+    <div class="label">What it takes to build</div>
+    <p class="label-sub">Rough working days. Shorter is cheaper to try and cheaper to undo.</p>
+    <div class="chartcard">
+      <h3>Build effort by concept</h3>
+      <p class="s">Terracotta bars are the two I would start with.</p>
+      <div style="position:relative;width:100%;height:290px;">
+        <canvas id="effortChart" role="img" aria-label="Build effort per concept in working days: Milanote embed half a day, Editorial hero half a day, Week strip one day, Next meeting one day, The Room one day, Momentum one and a half days."></canvas>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">Milanote, specifically</div>
+    <p class="label-sub">You asked whether it can live inside this. It can, and more fully than I expected.</p>
+    <div class="card">
+      <div class="card-h"><div class="ic t"><i class="ti ti-layout-board"></i></div><div><div class="nm">A real embed, not a link</div><div class="pr">confirmed against Milanote's own documentation</div></div></div>
+      <p class="desc">Milanote lets you turn on a <b>read-only link</b> for any board, and once that is on it will generate an <b>HTML embed code</b>. That means the board can render inside a ConnectHub project page rather than throwing someone into another tab.</p>
+      <div class="row"><span class="k">Who sets it up</span><span class="v">Whoever owns the board</span></div>
+      <div class="row"><span class="k">What they paste in</span><span class="v">One link, once, per project</span></div>
+      <div class="row"><span class="k">Comments &amp; reactions</span><span class="v">Optional, on by default</span></div>
+      <div class="row"><span class="k">Editing</span><span class="v">Still happens in Milanote</span></div>
+      <p class="note"><b>The honest limit:</b> a read-only embed is read-only. Staff would look at the board here and edit it there. There is no Milanote API that would let ConnectHub write to a board, so a true two-way sync is not on the table.</p>
+    </div>
+    <div class="cap"><i class="ti ti-alert-triangle"></i><span>One thing to decide before we build it: a read-only link is <b>public to anyone who has it</b>. That is fine for a Gala moodboard and wrong for anything with student or family detail in it. I would put that warning next to the field rather than in a manual nobody reads.</span></div>
+  </section>
+
+  <section>
+    <div class="label">Meeting times &mdash; my answer</div>
+    <p class="label-sub">You asked whether they belong here. Yes, but as one field, not a calendar.</p>
+    <div class="card">
+      <div class="card-h"><div class="ic t"><i class="ti ti-clock-hour-4"></i></div><div><div class="nm">One next meeting per project</div><div class="pr">not a scheduling system</div></div></div>
+      <p class="desc">A date, a time and a place on the project, shown in the meta line next to the date it already has, and pulled onto the dashboard as <b>"Next: Tuesday 2:00PM"</b>. A small button downloads it to Outlook or Google Calendar.</p>
+      <div class="row"><span class="k">Where it shows</span><span class="v">Project header + dashboard</span></div>
+      <div class="row"><span class="k">Calendar</span><span class="v">One-tap .ics download</span></div>
+      <div class="row"><span class="k">What it is not</span><span class="v">Invites, RSVPs, recurrence</span></div>
+      <p class="note"><b>Why stop there:</b> the moment it sends invites it is competing with the calendar everyone already lives in, and losing. One field that says when to turn up is the whole job.</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="label">How we'd do it</div>
+    <p class="label-sub">Terracotta steps are yours; green steps are mine to build.</p>
+    <div class="steps">
+      <div class="step you"><div class="n">1</div><div><h4>Pick your two or three <span class="who k">Kelly</span></h4><p>Point at the concepts you want. They combine freely, so you are not choosing one.</p></div></div>
+      <div class="step"><div class="n">2</div><div><h4>Rebuild the top of the dashboard <span class="who c">I build</span></h4><p>Week strip and editorial hero, with the stat cards demoted to a single quiet line.</p></div></div>
+      <div class="step"><div class="n">3</div><div><h4>Add the Milanote field <span class="who c">I build</span></h4><p>One link per project, embedded below the board, with the public-link warning beside it.</p></div></div>
+      <div class="step you"><div class="n">4</div><div><h4>Turn on a read-only link for one board <span class="who k">Kelly</span></h4><p>So we can test a real Chapelle board rather than a made-up one.</p></div></div>
+      <div class="step"><div class="n">5</div><div><h4>Meeting time and place <span class="who c">I build</span></h4><p>Two fields, the meta line, the dashboard line, and the calendar download.</p></div></div>
+      <div class="step"><div class="n">6</div><div><h4>Then the mobile pass <span class="who c">I build</span></h4><p>Your next request, and the right order: no point tuning a phone layout for a page we are about to rebuild.</p></div></div>
+    </div>
+  </section>
+
+  <div class="takeaway">
+    <i class="ti ti-arrow-right-circle"></i>
+    <p><span class="lead">The move:</span> take <b>the Week Strip</b> and <b>the Milanote embed</b> first. Together they are a day and a half and they change what the page is for: from a set of counts nobody acts on, to <b>what is happening this week and where the work lives</b>. Add <b>Next Meeting</b> straight after, since you already suspected it was missing. Then I do the mobile pass on the new layout rather than the old one.</p>
+  </div>
+
+  <footer>ConnectHub <span class="dot">&middot;</span> dashboard concepts <span class="dot">&middot;</span> prepared July 30, 2026 <span class="dot">&middot;</span> start with the week strip and Milanote</footer>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>
+var labels=['Milanote embed','Editorial hero','Week strip','Next meeting','The Room','Momentum'];
+var days=[0.5,0.5,1,1,1,1.5];
+var first=[true,false,true,false,false,false];
+new Chart(document.getElementById('effortChart'),{
+  type:'bar',
+  data:{labels:labels,datasets:[{
+    label:'days',data:days,
+    backgroundColor:first.map(function(f){return f?'#B85C3C':'#EAF1EA';}),
+    borderColor:first.map(function(f){return f?'#9c4a2e':'rgba(30,61,49,0.18)';}),
+    borderWidth:1,borderRadius:6,barThickness:24}]},
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,layout:{padding:{right:10}},
+    plugins:{legend:{display:false},tooltip:{
+      backgroundColor:'#1E3D31',padding:10,cornerRadius:8,
+      titleFont:{family:'DM Sans',weight:'600'},bodyFont:{family:'DM Sans'},
+      callbacks:{label:function(c){return c.parsed.x+(c.parsed.x===1?' working day':' working days');}}}},
+    scales:{
+      x:{min:0,max:2,ticks:{stepSize:0.5,callback:function(v){return v+'d';},color:'#5E6F64',font:{family:'DM Sans',size:11}},
+        grid:{color:'rgba(30,61,49,0.07)'},border:{display:false}},
+      y:{ticks:{color:'#1E3D31',font:{family:'DM Sans',size:12.5}},grid:{display:false},border:{display:false}}}}
+});
+</script>
+</body>
+</html>

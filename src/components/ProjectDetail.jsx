@@ -1,9 +1,10 @@
 import { useState, useRef } from 'react';
 import { downscale } from '../lib/downscale';
 import { uploadImage } from '../lib/api';
-import { ArrowLeft, Pencil, Trash2, CheckCircle2, Clock, Plus, X, Copy, Download, LoaderCircle, GraduationCap, BookOpen, Heart, Users, Globe, HandHeart, Music, Palette, Baby, Camera, Trophy, Award, Star, Sparkles, Martini, Sun, PartyPopper, Gift, Leaf, Ribbon, Handshake, Crown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Pencil, Trash2, CheckCircle2, Clock, Plus, X, Copy, Download, LoaderCircle, GraduationCap, BookOpen, Heart, Users, Globe, HandHeart, Music, Palette, Baby, Camera, Trophy, Award, Star, Sparkles, Martini, Sun, PartyPopper, Gift, Leaf, Ribbon, Handshake, Crown, ChevronLeft, ChevronRight, Calendar, TriangleAlert } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import LogoMark from './LogoMark';
+import DatePicker from './DatePicker';
 
 const LatinCross = ({ size = 22, strokeWidth = 2, color = 'currentColor', ...props }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -156,19 +157,52 @@ function firstNameOf(name) {
   return String(name || '').trim().split(/\s+/)[0] || '';
 }
 
-function DotCell({ dot, onEdit, onToggleDone, blessed = false, isAdmin = false, currentUser = '', animClass = '', animDelay = '0ms', accentColor = null }) {
+function DotCell({ dot, onEdit, onToggleDone, blessed = false, isAdmin = false, currentUser = '', animClass = '', animDelay = '0ms', accentColor = null,
+                   index = 0, onDropDot, draggingIndex, setDraggingIndex, dragOverIndex, setDragOverIndex }) {
   const tasks = normalizeTasks(dot.responsibilities);
   const isEmpty = !dot.member?.trim();
   const noTasks = !isEmpty && tasks.length === 0;
   const canToggle = blessed && (isAdmin || dot.member?.trim().toLowerCase() === currentUser.trim().toLowerCase());
 
+  const isDragging = draggingIndex === index;
+  const isDropTarget = dragOverIndex === index && draggingIndex !== null && draggingIndex !== index;
+
   return (
     <div
       className={`hub-dot ${isEmpty ? 'empty' : ''} ${animClass}`}
+      // Only a filled box is worth picking up; dragging an empty one would be
+      // dragging nothing. Empty boxes remain valid places to drop.
+      draggable={!isEmpty}
+      onDragStart={e => {
+        if (isEmpty) return;
+        setDraggingIndex(index);
+        e.dataTransfer.effectAllowed = 'move';
+        // Firefox refuses to start a drag unless something is set here.
+        e.dataTransfer.setData('text/plain', String(index));
+      }}
+      onDragEnd={() => { setDraggingIndex(null); setDragOverIndex(null); }}
+      onDragOver={e => {
+        if (draggingIndex === null || draggingIndex === index) return;
+        e.preventDefault();               // without this the drop never fires
+        e.dataTransfer.dropEffect = 'move';
+        if (dragOverIndex !== index) setDragOverIndex(index);
+      }}
+      onDragLeave={() => { if (dragOverIndex === index) setDragOverIndex(null); }}
+      onDrop={e => {
+        e.preventDefault();
+        const from = draggingIndex ?? Number(e.dataTransfer.getData('text/plain'));
+        onDropDot?.(from, index);
+        setDraggingIndex(null);
+        setDragOverIndex(null);
+      }}
       style={{
         ...(animClass ? { animationDelay: animDelay } : {}),
         ...(noTasks ? { opacity: 0.45 } : {}),
         ...(accentColor ? { borderColor: accentColor, background: accentColor === 'var(--yellow)' ? 'rgba(228,110,136,0.04)' : undefined } : {}),
+        ...(isDragging ? { opacity: 0.4, transform: 'scale(0.97)' } : {}),
+        ...(isDropTarget ? { borderColor: 'var(--yellow)', boxShadow: '0 0 0 3px rgba(228,110,136,0.22)', transform: 'scale(1.02)' } : {}),
+        cursor: isEmpty ? 'pointer' : 'grab',
+        transition: 'border-color 0.15s, box-shadow 0.15s, transform 0.12s, opacity 0.12s',
       }}
       onClick={isEmpty ? onEdit : undefined}
     >
@@ -184,17 +218,22 @@ function DotCell({ dot, onEdit, onToggleDone, blessed = false, isAdmin = false, 
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 4, overflowY: 'auto', flex: 1, minHeight: 0 }}>
             {tasks.length === 0 ? (
-              <span style={{ fontSize: 11, color: 'var(--muted)', fontStyle: 'italic' }}>No tasks yet</span>
+              <span style={{ fontSize: 14, color: 'var(--muted)', fontStyle: 'italic' }}>No tasks yet</span>
             ) : tasks.map((task, i) => (
-              <label key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, cursor: canToggle ? 'pointer' : 'default', opacity: blessed ? 1 : 0.5 }} onClick={e => e.stopPropagation()}>
+              /* Before approval the whole row used to sit at 50% opacity to say
+                 "you can't tick this yet". It said it by making the words hard
+                 to read, which is a steep price for a hint — the task list is
+                 the thing people came to read. The disabled checkbox carries
+                 that message on its own now. */
+              <label key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, cursor: canToggle ? 'pointer' : 'default' }} onClick={e => e.stopPropagation()}>
                 <input
                   type="checkbox"
                   checked={task.done}
                   disabled={!canToggle}
                   onChange={() => canToggle && onToggleDone(i)}
-                  style={{ marginTop: 2, accentColor: 'var(--green)', flexShrink: 0, cursor: canToggle ? 'pointer' : 'default' }}
+                  style={{ marginTop: 2, width: 17, height: 17, accentColor: 'var(--green)', flexShrink: 0, cursor: canToggle ? 'pointer' : 'default' }}
                 />
-                <span style={{ fontSize: 11, color: task.done ? 'var(--muted)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none', lineHeight: 1.4 }}>
+                <span style={{ fontSize: 14, color: task.done ? 'var(--muted)' : 'var(--text)', textDecoration: task.done ? 'line-through' : 'none', lineHeight: 1.45 }}>
                   {task.text}
                 </span>
               </label>
@@ -453,9 +492,12 @@ function DoneNotesStack({ notes }) {
   );
 }
 
-export default function ProjectDetail({ project, projects = [], team = [], onSaveDot, onUpdateProject, onDelete, onDuplicate, onBack, isNew = false, isAdmin = false, currentUser = '' }) {
+export default function ProjectDetail({ project, projects = [], team = [], onSaveDot, onUpdateProject, onDelete, onDuplicate, onBack, isNew = false, isAdmin = false, currentUser = '', saveState = 'idle', onSaveNow }) {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [editingDotIndex, setEditingDotIndex] = useState(null);
+  // Which box is in the air, and which one it is hovering over.
+  const [draggingIndex, setDraggingIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
   const [showIconPicker, setShowIconPicker] = useState(false);
   const [countWarning, setCountWarning] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
@@ -610,6 +652,19 @@ export default function ProjectDetail({ project, projects = [], team = [], onSav
     onSaveDot(index, dot);
   }
 
+  // Swap two boxes. A dot is stored against its slot, so moving one is really
+  // exchanging the contents of two slots — two writes, not a reorder of a list.
+  // Dropping a box on an empty one leaves an empty box behind rather than
+  // closing the gap, which is what the grid means: the slots are the layout.
+  function handleDotDrop(fromIndex, toIndex) {
+    if (fromIndex === toIndex || fromIndex == null || toIndex == null) return;
+    const blank = { member: '', responsibilities: [] };
+    const from = project.dots[fromIndex] || blank;
+    const to   = project.dots[toIndex]   || blank;
+    onSaveDot(toIndex, { member: from.member || '', responsibilities: from.responsibilities || [] });
+    onSaveDot(fromIndex, { member: to.member || '', responsibilities: to.responsibilities || [] });
+  }
+
   function handleToggleDone(index, taskIdx) {
     const dot = project.dots[index] || { member: '', responsibilities: [] };
     const tasks = normalizeTasks(dot.responsibilities);
@@ -620,14 +675,41 @@ export default function ProjectDetail({ project, projects = [], team = [], onSav
 
   function changeDotCount(n) {
     const clamped = Math.max(1, Math.min(12, n));
-    if (clamped < dotCount) {
-      const wouldRemove = (project.dots || []).slice(clamped).some(d => d?.member?.trim());
-      if (wouldRemove) {
-        setCountWarning(true);
-        setTimeout(() => setCountWarning(false), 3000);
-        return;
+    if (clamped >= dotCount) {
+      onUpdateProject({ ...project, dotCount: clamped });
+      return;
+    }
+
+    // Shrinking. People are stored against a slot, and the slot someone lands
+    // in is wherever the person assigning them happened to click — so two
+    // people on a board of six can easily be sitting in slots 1 and 5. Simply
+    // lopping off the end therefore refused to remove four empty boxes because
+    // the last of them had somebody in it.
+    //
+    // So close the gaps first: move everyone down into the lowest slots, in the
+    // order they already appear, and the boxes that fall off the end are the
+    // empty ones. Only a genuine shortage of room is refused.
+    const dots = project.dots || [];
+    const blank = { member: '', responsibilities: [] };
+    const assigned = dots.filter(d => d?.member?.trim());
+
+    if (assigned.length > clamped) {
+      setCountWarning(true);
+      setTimeout(() => setCountWarning(false), 3000);
+      return;
+    }
+
+    for (let i = 0; i < dotCount; i++) {
+      const next = assigned[i] || blank;
+      const cur = dots[i] || blank;
+      const unchanged =
+        (cur.member || '') === (next.member || '') &&
+        JSON.stringify(cur.responsibilities || []) === JSON.stringify(next.responsibilities || []);
+      if (!unchanged) {
+        onSaveDot(i, { member: next.member || '', responsibilities: next.responsibilities || [] });
       }
     }
+
     onUpdateProject({ ...project, dotCount: clamped });
   }
 
@@ -652,6 +734,34 @@ export default function ProjectDetail({ project, projects = [], team = [], onSav
         >
           <ArrowLeft size={13} /> All Projects
         </button>
+
+        {/* Whether the work is written down. An unnamed draft is the one state
+            where nothing is saved yet, so that gets a real button; everything
+            else saves as you go and only needs to say so. */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginRight: 'auto', marginLeft: 14, fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 700, letterSpacing: '0.06em' }}>
+          {isNew && !project.name?.trim() ? (
+            <button
+              onClick={onSaveNow}
+              style={{ display: 'flex', alignItems: 'center', gap: 6, background: 'none', border: '1px solid var(--border)', borderRadius: 8, padding: '6px 14px', cursor: 'pointer', fontFamily: 'Montserrat, sans-serif', fontSize: 11, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}
+              title="Give the project a name first"
+            >
+              Save draft
+            </button>
+          ) : saveState === 'saving' ? (
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--muted)' }}>
+              <LoaderCircle size={12} strokeWidth={2.2} style={{ animation: 'ctd-spin 0.9s linear infinite' }} />
+              Saving…
+            </span>
+          ) : saveState === 'error' ? (
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#b45309' }}>
+              <TriangleAlert size={12} strokeWidth={2.2} /> Not saved
+            </span>
+          ) : (
+            <span style={{ display: 'flex', alignItems: 'center', gap: 6, color: 'var(--green)' }}>
+              <CheckCircle2 size={12} strokeWidth={2.2} /> All changes saved
+            </span>
+          )}
+        </div>
 
         <div style={{ display: 'flex', gap: 8, flexShrink: 0 }}>
           {/* Connect the Dots — staff submits for review */}
@@ -826,26 +936,22 @@ export default function ProjectDetail({ project, projects = [], team = [], onSav
             topbar: it belongs with the project's own details, next to who is
             leading it, not off in a corner reading like page furniture. */}
         <div className="pb-meta">
-          <div className="pb-meta-item">
-          {editingDate ? (
-            <input
-              type="date"
-              className="pb-date-input"
-              value={project.date || ''}
-              autoFocus
-              onChange={e => onUpdateProject({ ...project, date: e.target.value })}
-              onBlur={() => setEditingDate(false)}
-              onKeyDown={e => { if (e.key === 'Enter' || e.key === 'Escape') e.currentTarget.blur(); }}
-              aria-label="Project date"
-            />
-          ) : (
+          <div className="pb-meta-item" style={{ position: 'relative' }}>
             <button
               className={`pb-date${project.date ? '' : ' empty'}`}
-              onClick={() => setEditingDate(true)}
+              onClick={() => setEditingDate(v => !v)}
+              aria-expanded={editingDate}
             >
+              <Calendar size={12} strokeWidth={2} />
               {project.date ? fmt(project.date) : 'Add a date'}
             </button>
-          )}
+            {editingDate && (
+              <DatePicker
+                value={project.date || ''}
+                onChange={date => onUpdateProject({ ...project, date })}
+                onClose={() => setEditingDate(false)}
+              />
+            )}
           </div>
 
           <span className="pb-meta-sep" aria-hidden="true" />
@@ -910,7 +1016,7 @@ export default function ProjectDetail({ project, projects = [], team = [], onSav
 
         {countWarning && (
           <div style={{ fontSize: 11, fontFamily: 'var(--font-body)', color: 'var(--blue)', letterSpacing: '0.03em', marginTop: 10 }}>
-            Remove assigned members first before reducing the count.
+            Every box has someone in it. Take a person off the board before making the team smaller.
           </div>
         )}
       </div>
@@ -991,6 +1097,7 @@ export default function ProjectDetail({ project, projects = [], team = [], onSav
               {row.map(cell => (
               <DotCell
                 key={cell.key}
+                index={cell.index}
                 dot={project.dots[cell.index] || { member: '', responsibilities: [] }}
                 onEdit={() => setEditingDotIndex(cell.index)}
                 onToggleDone={taskIdx => handleToggleDone(cell.index, taskIdx)}
@@ -1000,6 +1107,11 @@ export default function ProjectDetail({ project, projects = [], team = [], onSav
                 animClass={isConnecting ? 'ctd-dot-animate' : ''}
                 animDelay={isConnecting ? `${150 + Math.floor(cell.index / 4) * 150}ms` : '0ms'}
                 accentColor={accentColor}
+                onDropDot={handleDotDrop}
+                draggingIndex={draggingIndex}
+                setDraggingIndex={setDraggingIndex}
+                dragOverIndex={dragOverIndex}
+                setDragOverIndex={setDragOverIndex}
               />
               ))}
             </div>
@@ -1009,7 +1121,7 @@ export default function ProjectDetail({ project, projects = [], team = [], onSav
       </div>
 
       <p style={{ textAlign: 'center', fontSize: 11, color: 'var(--muted)', marginTop: 14, fontFamily: 'Montserrat, sans-serif', letterSpacing: '0.06em', textTransform: 'uppercase' }}>
-        Click any box to assign a team member
+        Click any box to assign a team member · drag a box to move it
       </p>
 
       {editingDotIndex !== null && (
@@ -1085,10 +1197,15 @@ export default function ProjectDetail({ project, projects = [], team = [], onSav
                     >
                       <CheckCircle2 size={11} />
                     </button>
-                    <div style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.6, paddingRight: 26, whiteSpace: 'pre-wrap' }}>{note.text}</div>
-                    {note.createdAt && (
-                      <div style={{ fontSize: 10, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', letterSpacing: '0.04em', marginTop: 8 }}>
-                        {new Date(note.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                    <div style={{ fontSize: 14, color: 'var(--text)', lineHeight: 1.6, paddingRight: 26, whiteSpace: 'pre-wrap' }}>{note.text}</div>
+                    {/* Who wrote it, then when. A note on a shared board is
+                        half a message: without a name the next person has to
+                        guess who to go and ask about it. */}
+                    {(note.by || note.createdAt) && (
+                      <div style={{ fontSize: 11, color: 'var(--muted)', fontFamily: 'Montserrat, sans-serif', letterSpacing: '0.03em', marginTop: 8 }}>
+                        {note.by && <strong style={{ color: 'var(--green)', fontWeight: 700 }}>{note.by}</strong>}
+                        {note.by && note.createdAt && ' · '}
+                        {note.createdAt && new Date(note.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                       </div>
                     )}
                   </div>
